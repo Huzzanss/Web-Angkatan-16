@@ -28,17 +28,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Opsional: Toggle navbar untuk mobile (jika ingin menu hamburger, tambahkan button di HTML)
-const navRight = document.querySelector('.nav-right');
-const toggleBtn = document.createElement('button'); // Contoh button toggle
-toggleBtn.textContent = '☰'; // Icon hamburger
-toggleBtn.style.background = 'none';
-toggleBtn.style.border = 'none';
-toggleBtn.style.color = 'white';
-toggleBtn.style.fontSize = '1.5rem';
-toggleBtn.style.cursor = 'pointer';
-document.querySelector('.nav-left').appendChild(toggleBtn);
+// Toggle navbar untuk mobile saja (layar <=768px)
+if (window.innerWidth <= 768) {
+    const navRight = document.querySelector('.nav-right');
+    const toggleBtn = document.createElement('button'); // Button hamburger
+    toggleBtn.textContent = '☰';
+    toggleBtn.style.background = 'none';
+    toggleBtn.style.border = 'none';
+    toggleBtn.style.color = 'white';
+    toggleBtn.style.fontSize = '1.5rem';
+    toggleBtn.style.cursor = 'pointer';
+    document.querySelector('.nav-left').appendChild(toggleBtn);
 
-toggleBtn.addEventListener('click', () => {
-    navRight.classList.toggle('show');
-});
+    toggleBtn.addEventListener('click', () => {
+        navRight.classList.toggle('show');
+    });
+}
