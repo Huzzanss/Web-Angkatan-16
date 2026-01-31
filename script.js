@@ -10,14 +10,18 @@ document.querySelectorAll('#navbar a').forEach(anchor => {
     });
 });
 
-// Opsional: Simpan status absen di localStorage (untuk demo)
-document.querySelectorAll('.absen-checkbox').forEach(checkbox => {
-    const id = checkbox.id;
-    const saved = localStorage.getItem(id);
-    if (saved === 'true') {
-        checkbox.checked = true;
-    }
-    checkbox.addEventListener('change', () => {
-        localStorage.setItem(id, checkbox.checked);
+// Opsional: Preview foto saat upload (untuk siswa atau wali)
+document.querySelectorAll('.photo-upload').forEach(input => {
+    input.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Cari img terdekat di card yang sama
+                const img = input.previousElementSibling.querySelector('img');
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
     });
 });
