@@ -28,5 +28,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Opsional: Jika nama siswa diubah secara dinamis (misal via input), update inisial otomatis
-// Contoh: Jika ada input untuk edit nama, panggil generateInitial lagi
+// Opsional: Toggle navbar untuk mobile (jika ingin menu hamburger, tambahkan button di HTML)
+const navRight = document.querySelector('.nav-right');
+const toggleBtn = document.createElement('button'); // Contoh button toggle
+toggleBtn.textContent = '☰'; // Icon hamburger
+toggleBtn.style.background = 'none';
+toggleBtn.style.border = 'none';
+toggleBtn.style.color = 'white';
+toggleBtn.style.fontSize = '1.5rem';
+toggleBtn.style.cursor = 'pointer';
+document.querySelector('.nav-left').appendChild(toggleBtn);
+
+toggleBtn.addEventListener('click', () => {
+    navRight.classList.toggle('show');
+});
