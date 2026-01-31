@@ -5,16 +5,16 @@
     box-sizing: border-box;
 }
 
-/* Body dan font modern - ukuran font disesuaikan untuk mobile */
+/* Body dan font modern */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f4f4f4;
-    font-size: 16px; /* Base font size untuk readability di mobile */
+    font-size: 16px;
 }
 
-/* Navbar tetap di atas - lebih touch-friendly di mobile */
+/* Navbar tetap di atas */
 #navbar {
     position: fixed;
     top: 0;
@@ -24,23 +24,22 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1rem; /* Kurangi padding di mobile */
+    padding: 1rem 2rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 }
 
 .nav-left h1 {
-    font-size: 1.2rem; /* Lebih kecil di mobile */
+    font-size: 1.5rem;
 }
 
 .nav-right a {
     color: white;
     text-decoration: none;
-    margin-left: 0.5rem;
-    padding: 0.5rem 0.8rem; /* Lebih besar untuk sentuhan */
+    margin-left: 1rem;
+    padding: 0.5rem 1rem;
     border-radius: 5px;
     transition: background-color 0.3s;
-    font-size: 0.9rem; /* Sesuaikan ukuran font */
 }
 
 .nav-right a:hover {
@@ -49,25 +48,24 @@ body {
 
 /* Main content dengan padding atas untuk navbar */
 main {
-    padding-top: 70px; /* Kurangi padding atas di mobile untuk lebih banyak ruang */
+    padding-top: 80px;
 }
 
-/* Section kelas - padding lebih kecil di mobile */
+/* Section kelas */
 .kelas-section {
-    padding: 1rem; /* Kurangi padding */
-    margin-bottom: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin: 1rem auto; /* Kurangi margin */
-    max-width: 100%; /* Full width di mobile */
+    margin: 2rem auto;
+    max-width: 1200px;
 }
 
 .kelas-section h2 {
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     color: #007bff;
-    font-size: 1.2rem; /* Lebih kecil */
 }
 
 /* Konten kelas: flex untuk layout */
@@ -80,15 +78,15 @@ main {
 .wali-kelas {
     width: 100%;
     text-align: center;
-    margin-bottom: 1rem;
-    padding: 0.5rem; /* Kurangi padding */
+    margin-bottom: 2rem;
+    padding: 1rem;
     background-color: #e9ecef;
     border-radius: 5px;
 }
 
 .wali-photo img {
-    width: 80px; /* Lebih kecil di mobile */
-    height: 80px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 0.5rem;
@@ -99,30 +97,27 @@ main {
     text-align: center;
 }
 
-.daftar-siswa h3 {
-    font-size: 1rem; /* Sesuaikan ukuran */
-}
-
-/* Grid untuk student cards - responsive untuk mobile */
+/* Grid untuk student cards - selalu 2 kolom di semua device untuk kanan-kiri */
 .student-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Lebih kecil di mobile */
-    gap: 0.5rem; /* Kurangi gap */
+    grid-template-columns: repeat(2, 1fr); /* Selalu 2 kolom: kanan dan kiri */
+    gap: 1rem;
     justify-items: center;
 }
 
-/* Student card modern - ukuran disesuaikan untuk mobile */
+/* Student card modern - ukuran proporsional di desktop */
 .student-card {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
-    padding: 0.5rem; /* Kurangi padding */
+    padding: 1rem;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
-    /* Ukuran seragam tapi lebih kecil di mobile */
-    width: 150px; /* Lebih kecil dari 200px */
-    height: 120px; /* Lebih kecil dari 150px */
+    /* Ukuran di desktop: lebar max 250px, tinggi 200px agar tidak gepeng */
+    max-width: 250px;
+    width: 100%;
+    height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -134,24 +129,24 @@ main {
 }
 
 .initial {
-    width: 50px; /* Lebih kecil */
-    height: 50px;
+    width: 60px;
+    height: 60px;
     background-color: #007bff;
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem; /* Sesuaikan */
+    font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 0.5rem;
 }
 
-/* Responsive breakpoints */
+/* Responsive untuk mobile - tetap 2 kolom tapi ukuran lebih kecil */
 @media (max-width: 768px) {
     .nav-right {
         display: flex;
-        flex-direction: column; /* Link kelas vertikal di mobile */
+        flex-direction: column;
         align-items: center;
         position: absolute;
         top: 100%;
@@ -160,31 +155,29 @@ main {
         background-color: #007bff;
         padding: 0.5rem 0;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        display: none; /* Sembunyikan default, tampilkan via JS jika perlu */
+        display: none;
     }
     .nav-right.show {
-        display: flex; /* Untuk toggle menu jika ditambah JS nanti */
-    }
-    .student-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 kolom di tablet/mobile */
+        display: flex;
     }
     .student-card {
-        width: 100%;
-        max-width: 150px;
-        height: 120px;
+        height: 150px; /* Tinggi lebih kecil di tablet/HP */
+        max-width: 200px;
+    }
+    .initial {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
     }
 }
 
 @media (max-width: 480px) {
     body {
-        font-size: 14px; /* Lebih kecil untuk HP kecil */
-    }
-    .student-grid {
-        grid-template-columns: 1fr; /* 1 kolom di HP kecil */
+        font-size: 14px;
     }
     .student-card {
-        width: 100%;
-        height: 120px;
+        height: 150px; /* Tetap tinggi di HP kecil, tapi grid tetap 2 kolom */
+        max-width: 180px;
     }
     .initial {
         width: 40px;
