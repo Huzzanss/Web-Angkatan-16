@@ -3,81 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Angkatan 16</title>
+    <title>Angkatan XVI</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-left">
-            <span class="angkatan-title">Angkatan XVI</span>
+    <!-- Navbar tetap di atas -->
+    <nav id="navbar">
+        <div class="nav-left">
+            <h1>Angkatan XVI</h1>
         </div>
-        <div class="navbar-right">
+        <div class="nav-right">
             <a href="#kahayan">VI Kahayan</a>
             <a href="#kapuas">VI Kapuas</a>
             <a href="#mahakam">VI Mahakam</a>
         </div>
     </nav>
 
-    <!-- Kelas VI Kahayan -->
-    <section id="kahayan" class="kelas">
-    <h2>VI Kahayan</h2>
-    <div class="students-container">
-        <div class="student-card-wrapper">
-            <div class="student-card">A</div>
-            <div class="student-name">Adelia Felicia</div>
-        </div>
-        <div class="student-card-wrapper">
-            <div class="student-card">O</div>
-            <div class="student-name">OP</div>
-        </div>
-        <div class="student-card-wrapper">
-            <div class="student-card">Q</div>
-            <div class="student-name">QR</div>
-        </div>
-    </div>
-    </section>
+    <!-- Konten utama -->
+    <main>
+        <!-- Section untuk VI Kahayan -->
+        <section id="kahayan" class="kelas-section">
+            <h2>VI Kahayan</h2>
+            <div class="kelas-content">
+                <div class="wali-kelas">
+                    <h3>Wali Kelas</h3>
+                    <p>Nama Wali: [Nama Wali Kelas]</p>
+                    <p>Kontak: [Email atau No. HP]</p>
+                </div>
+                <div class="absen-siswa">
+                    <h3>Absen Siswa-Siswi</h3>
+                    <div class="student-grid">
+                        <!-- Contoh student card, ganti dengan data siswa asli -->
+                        <div class="student-card">
+                            <div class="initial">A</div>
+                            <p>Nama Siswa 1</p>
+                            <input type="checkbox" id="absen1" class="absen-checkbox">
+                            <label for="absen1">Hadir</label>
+                        </div>
+                        <div class="student-card">
+                            <div class="initial">B</div>
+                            <p>Nama Siswa 2</p>
+                            <input type="checkbox" id="absen2" class="absen-checkbox">
+                            <label for="absen2">Hadir</label>
+                        </div>
+                        <!-- Tambahkan lebih banyak sesuai jumlah siswa -->
+                    </div>
+                </div>
+            </div>
+        </section>
 
+        <!-- Section untuk VI Kapuas -->
+        <section id="kapuas" class="kelas-section">
+            <h2>VI Kapuas</h2>
+            <div class="kelas-content">
+                <div class="wali-kelas">
+                    <h3>Wali Kelas</h3>
+                    <p>Nama Wali: [Nama Wali Kelas]</p>
+                    <p>Kontak: [Email atau No. HP]</p>
+                </div>
+                <div class="absen-siswa">
+                    <h3>Absen Siswa-Siswi</h3>
+                    <div class="student-grid">
+                        <!-- Contoh student card -->
+                        <div class="student-card">
+                            <div class="initial">C</div>
+                            <p>Nama Siswa 3</p>
+                            <input type="checkbox" id="absen3" class="absen-checkbox">
+                            <label for="absen3">Hadir</label>
+                        </div>
+                        <!-- Tambahkan lebih banyak -->
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <!-- Kelas VI Kapuas -->
-    <section id="kapuas" class="kelas">
-    <h2>VI Kapuas</h2>
-    <div class="students-container">
-        <div class="student-card-wrapper">
-            <div class="student-card">A</div>
-            <div class="student-name">Adelia Felicia</div>
-        </div>
-        <div class="student-card-wrapper">
-            <div class="student-card">O</div>
-            <div class="student-name">OP</div>
-        </div>
-        <div class="student-card-wrapper">
-            <div class="student-card">Q</div>
-            <div class="student-name">QR</div>
-        </div>
-    </div>
-    </section>
-
-
-    <!-- Kelas VI Mahakam -->
-    <section id="mahakam" class="kelas">
-    <h2>VI Mahakam</h2>
-    <div class="students-container">
-        <div class="student-card-wrapper">
-            <div class="student-card">A</div>
-            <div class="student-name">Adelia Felicia</div>
-        </div>
-        <div class="student-card-wrapper">
-            <div class="student-card">O</div>
-            <div class="student-name">OP</div>
-        </div>
-        <div class="student-card-wrapper">
-            <div class="student-card">Q</div>
-            <div class="student-name">QR</div>
-        </div>
-    </div>
-    </section>
-
+        <!-- Section untuk VI Mahakam -->
+        <section id="mahakam" class="kelas-section">
+            <h2>VI Mahakam</h2>
+            <div class="kelas-content">
+                <div class="wali-kelas">
+                    <h3>Wali Kelas</h3>
+                    <p>Nama Wali: [Nama Wali Kelas]</p>
+                    <p>Kontak: [Email atau No. HP]</p>
+                </div>
+                <div class="absen-siswa">
+                    <h3>Absen Siswa-Siswi</h3>
+                    <div class="student-grid">
+                        <!-- Contoh student card -->
+                        <div class="student-card">
+                            <div class="initial">D</div>
+                            <p>Nama Siswa 4</p>
+                            <input type="checkbox" id="absen4" class="absen-checkbox">
+                            <label for="absen4">Hadir</label>
+                        </div>
+                        <!-- Tambahkan lebih banyak -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <script src="script.js"></script>
 </body>
