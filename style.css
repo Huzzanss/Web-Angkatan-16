@@ -83,7 +83,15 @@ main {
     border-radius: 5px;
 }
 
-.absen-siswa {
+.wali-photo img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+}
+
+.daftar-siswa {
     width: 100%;
     text-align: center;
 }
@@ -111,22 +119,17 @@ main {
     transform: translateY(-5px);
 }
 
-.initial {
-    width: 60px;
-    height: 60px;
-    background-color: #007bff;
-    color: white;
+.student-photo img {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0 auto 0.5rem;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
 }
 
-.absen-checkbox {
+.photo-upload {
     margin-top: 0.5rem;
+    font-size: 0.8rem;
 }
 
 /* Responsive */
