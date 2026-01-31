@@ -10,18 +10,14 @@ document.querySelectorAll('#navbar a').forEach(anchor => {
     });
 });
 
-// Opsional: Preview foto saat upload (untuk siswa atau wali)
-document.querySelectorAll('.photo-upload').forEach(input => {
-    input.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // Cari img terdekat di card yang sama
-                const img = input.previousElementSibling.querySelector('img');
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+// Opsional: Jika ingin auto-generate inisial dari nama siswa (jika nama diubah secara dinamis)
+function generateInitial(name) {
+    return name.charAt(0).toUpperCase();
+}
+
+// Contoh: Jika nama siswa diubah, update inisial (opsional, hapus jika tidak perlu)
+document.querySelectorAll('.student-card p').forEach(p => {
+    const name = p.textContent;
+    const initialDiv = p.previousElementSibling;
+    initialDiv.textContent = generateInitial(name);
 });
