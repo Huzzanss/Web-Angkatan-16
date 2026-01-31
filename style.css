@@ -119,17 +119,18 @@ main {
     transform: translateY(-5px);
 }
 
-.student-photo img {
-    width: 80px;
-    height: 80px;
+.initial {
+    width: 60px;
+    height: 60px;
+    background-color: #007bff;
+    color: white;
     border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 0.5rem;
-}
-
-.photo-upload {
-    margin-top: 0.5rem;
-    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 0.5rem;
 }
 
 /* Responsive */
