@@ -242,3 +242,23 @@ main {
     border-radius: 4px;
     cursor: pointer;
 }
+
+#name-input {
+    margin-bottom: 20px;
+}
+
+#name-input input {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#name-input button {
+    padding: 8px 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
