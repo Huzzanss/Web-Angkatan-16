@@ -74,8 +74,11 @@ const changeNameBtn = document.getElementById('changeNameBtn');
 
 let userName = localStorage.getItem('chatUserName') || '';
 
+console.log('Script loaded. userName from localStorage:', userName); // Debug
+
 // Cek jika nama sudah ada di localStorage, langsung masuk chat
 if (userName) {
+  console.log('Nama ada di localStorage, masuk chat langsung.'); // Debug
   nameInputDiv.style.display = 'none';
   chatRoom.style.display = 'block';
   loadMessages();
@@ -83,11 +86,14 @@ if (userName) {
 
 // Enter Chat
 enterChatBtn.addEventListener('click', () => {
+  console.log('Enter Chat button clicked.'); // Debug
   userName = userNameInput.value.trim();
+  console.log('userName input:', userName); // Debug
   if (userName) {
     localStorage.setItem('chatUserName', userName);
     nameInputDiv.style.display = 'none';
     chatRoom.style.display = 'block';
+    console.log('Chat room displayed. Loading messages...'); // Debug
     loadMessages();
   } else {
     alert('Masukkan nama dulu!');
@@ -106,12 +112,18 @@ changeNameBtn.addEventListener('click', () => {
 sendBtn.addEventListener('click', async () => {
   const message = messageInput.value.trim();
   if (message && userName) {
-    await addDoc(collection(db, 'messages'), {
-      text: message,
-      timestamp: new Date(),
-      user: userName
-    });
-    messageInput.value = '';
+    try {
+      await addDoc(collection(db, 'messages'), {
+        text: message,
+        timestamp: new Date(),
+        user: userName
+      });
+      messageInput.value = '';
+      console.log('Message sent:', message); // Debug
+    } catch (error) {
+      console.error('Error sending message:', error); // Debug
+      alert('Gagal kirim pesan: ' + error.message);
+    }
   } else if (!userName) {
     alert('Masukkan nama dulu!');
   }
@@ -119,8 +131,10 @@ sendBtn.addEventListener('click', async () => {
 
 // Load Messages Real-time
 function loadMessages() {
+  console.log('Loading messages...'); // Debug
   const q = query(collection(db, 'messages'), orderBy('timestamp'));
   onSnapshot(q, (snapshot) => {
+    console.log('Snapshot received, docs count:', snapshot.size); // Debug
     messagesDiv.innerHTML = '';
     snapshot.forEach((doc) => {
       const data = doc.data();
@@ -129,6 +143,9 @@ function loadMessages() {
       msgDiv.textContent = `${data.user}: ${data.text}`;
       messagesDiv.appendChild(msgDiv);
     });
+  }, (error) => {
+    console.error('Error loading messages:', error); // Debug
+    alert('Gagal load pesan: ' + error.message);
   });
 }
 
