@@ -45,7 +45,7 @@ if (window.innerWidth <= 768) {
     });
 }
 
-// Firebase Config (Ganti dengan configmu!)
+// Firebase Config (Pakai configmu)
 const firebaseConfig = {
   apiKey: "AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
   authDomain: "chat-angkatan-16.firebaseapp.com",
@@ -55,71 +55,65 @@ const firebaseConfig = {
   appId: "1:47699501502:web:0d09e69d0b3ff39a7359ef"
 };
 
-// Initialize Firebase
+// Initialize Firebase (Tanpa Auth)
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
-// DOM Elements untuk Chat
-const authChat = document.getElementById('auth-chat');
+// DOM Elements
+const nameInputDiv = document.getElementById('name-input');
 const chatRoom = document.getElementById('chat-room');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
+const userNameInput = document.getElementById('userName');
+const enterChatBtn = document.getElementById('enterChatBtn');
 const messagesDiv = document.getElementById('messages');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
-const logoutBtn = document.getElementById('logoutBtn');
+const changeNameBtn = document.getElementById('changeNameBtn');
 
-// Auth State Listener
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    authChat.style.display = 'none';
+let userName = localStorage.getItem('chatUserName') || '';
+
+// Cek jika nama sudah ada di localStorage, langsung masuk chat
+if (userName) {
+  nameInputDiv.style.display = 'none';
+  chatRoom.style.display = 'block';
+  loadMessages();
+}
+
+// Enter Chat
+enterChatBtn.addEventListener('click', () => {
+  userName = userNameInput.value.trim();
+  if (userName) {
+    localStorage.setItem('chatUserName', userName);
+    nameInputDiv.style.display = 'none';
     chatRoom.style.display = 'block';
     loadMessages();
   } else {
-    authChat.style.display = 'block';
-    chatRoom.style.display = 'none';
+    alert('Masukkan nama dulu!');
   }
 });
 
-// Login
-loginBtn.addEventListener('click', () => {
-  const email = emailInput.value;
-  const password = passwordInput.value;
-  signInWithEmailAndPassword(auth, email, password)
-    .catch((error) => alert('Error: ' + error.message));
-});
-
-// Register
-registerBtn.addEventListener('click', () => {
-  const email = emailInput.value;
-  const password = passwordInput.value;
-  createUserWithEmailAndPassword(auth, email, password)
-    .then(() => alert('Registrasi berhasil! Sekarang login.'))
-    .catch((error) => alert('Error: ' + error.message));
-});
-
-// Logout
-logoutBtn.addEventListener('click', () => {
-  signOut(auth);
+// Change Name
+changeNameBtn.addEventListener('click', () => {
+  localStorage.removeItem('chatUserName');
+  userName = '';
+  chatRoom.style.display = 'none';
+  nameInputDiv.style.display = 'block';
 });
 
 // Send Message
 sendBtn.addEventListener('click', async () => {
-  const message = messageInput.value;
-  if (message.trim()) {
+  const message = messageInput.value.trim();
+  if (message && userName) {
     await addDoc(collection(db, 'messages'), {
       text: message,
       timestamp: new Date(),
-      user: auth.currentUser.email
+      user: userName
     });
     messageInput.value = '';
+  } else if (!userName) {
+    alert('Masukkan nama dulu!');
   }
 });
 
@@ -138,7 +132,7 @@ function loadMessages() {
   });
 }
 
-// Kode tambahan untuk initial di student cards (opsional, kalau mau isi otomatis)
+// Kode tambahan untuk initial di student cards (opsional)
 document.addEventListener('DOMContentLoaded', () => {
   const studentCards = document.querySelectorAll('.student-card');
   studentCards.forEach(card => {
