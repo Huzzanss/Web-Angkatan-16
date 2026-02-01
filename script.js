@@ -44,3 +44,106 @@ if (window.innerWidth <= 768) {
         navRight.classList.toggle('show');
     });
 }
+
+// Firebase Config (Ganti dengan configmu!)
+const firebaseConfig = {
+  apiKey: "your-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "your-app-id"
+};
+
+// Initialize Firebase
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// DOM Elements untuk Chat
+const authChat = document.getElementById('auth-chat');
+const chatRoom = document.getElementById('chat-room');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const loginBtn = document.getElementById('loginBtn');
+const registerBtn = document.getElementById('registerBtn');
+const messagesDiv = document.getElementById('messages');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+
+// Auth State Listener
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    authChat.style.display = 'none';
+    chatRoom.style.display = 'block';
+    loadMessages();
+  } else {
+    authChat.style.display = 'block';
+    chatRoom.style.display = 'none';
+  }
+});
+
+// Login
+loginBtn.addEventListener('click', () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  signInWithEmailAndPassword(auth, email, password)
+    .catch((error) => alert('Error: ' + error.message));
+});
+
+// Register
+registerBtn.addEventListener('click', () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => alert('Registrasi berhasil! Sekarang login.'))
+    .catch((error) => alert('Error: ' + error.message));
+});
+
+// Logout
+logoutBtn.addEventListener('click', () => {
+  signOut(auth);
+});
+
+// Send Message
+sendBtn.addEventListener('click', async () => {
+  const message = messageInput.value;
+  if (message.trim()) {
+    await addDoc(collection(db, 'messages'), {
+      text: message,
+      timestamp: new Date(),
+      user: auth.currentUser.email
+    });
+    messageInput.value = '';
+  }
+});
+
+// Load Messages Real-time
+function loadMessages() {
+  const q = query(collection(db, 'messages'), orderBy('timestamp'));
+  onSnapshot(q, (snapshot) => {
+    messagesDiv.innerHTML = '';
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message');
+      msgDiv.textContent = `${data.user}: ${data.text}`;
+      messagesDiv.appendChild(msgDiv);
+    });
+  });
+}
+
+// Kode tambahan untuk initial di student cards (opsional, kalau mau isi otomatis)
+document.addEventListener('DOMContentLoaded', () => {
+  const studentCards = document.querySelectorAll('.student-card');
+  studentCards.forEach(card => {
+    const name = card.querySelector('p').textContent;
+    const initial = name.charAt(0).toUpperCase();
+    card.querySelector('.initial').textContent = initial;
+  });
+});
