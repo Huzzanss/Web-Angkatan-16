@@ -56,8 +56,14 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+try {
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  console.log('Firebase initialized successfully.');
+} catch (error) {
+  console.error('Firebase init error:', error);
+  alert('Firebase gak bisa load. Cek koneksi atau config.');
+}
 
 // Generate unique ID untuk user anonim (biar bisa track typing)
 let userId = localStorage.getItem('chatUserId');
@@ -65,19 +71,24 @@ if (!userId) {
   userId = Math.random().toString(36).substr(2, 9);
   localStorage.setItem('chatUserId', userId);
 }
+console.log('User ID:', userId);
 
 // DOM Elements
 const typingIndicator = document.getElementById('typing-indicator');
 const messagesDiv = document.getElementById('messages');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
+console.log('DOM elements:', { typingIndicator, messagesDiv, messageInput, sendBtn });
 
 let isTyping = false;
 let typingTimeout;
 
 // Load Messages Real-time
 function loadMessages() {
+  if (!db) return;
+  console.log('Loading messages...');
   db.collection('messages').orderBy('timestamp').onSnapshot((snapshot) => {
+    console.log('Messages loaded, count:', snapshot.size);
     messagesDiv.innerHTML = '';
     snapshot.forEach((doc) => {
       const data = doc.data();
@@ -87,13 +98,17 @@ function loadMessages() {
       msgDiv.textContent = `[${time}] ${data.text}`;
       messagesDiv.appendChild(msgDiv);
     });
-    // Scroll ke bawah otomatis
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }, (error) => {
+    console.error('Error loading messages:', error);
+    alert('Gagal load pesan: ' + error.message);
   });
 }
 
 // Load Typing Indicator
 function loadTypingIndicator() {
+  if (!db) return;
+  console.log('Loading typing indicator...');
   db.collection('typing').onSnapshot((snapshot) => {
     let someoneTyping = false;
     snapshot.forEach((doc) => {
@@ -103,47 +118,58 @@ function loadTypingIndicator() {
       }
     });
     typingIndicator.style.display = someoneTyping ? 'block' : 'none';
+  }, (error) => {
+    console.error('Error loading typing:', error);
   });
 }
 
 // Send Message
-sendBtn.addEventListener('click', async () => {
+sendBtn.addEventListener('click', async (event) => {
+  console.log('Send button clicked!');
+  event.preventDefault();
   const message = messageInput.value.trim();
-  if (message) {
+  console.log('Message:', message);
+  if (message && db) {
     try {
       await db.collection('messages').add({
         text: message,
         timestamp: firebase.firestore.Timestamp.fromDate(new Date())
       });
       messageInput.value = '';
-      stopTyping(); // Stop typing setelah kirim
+      stopTyping();
+      console.log('Message sent.');
     } catch (error) {
-      console.error('Error sending message:', error);
-      alert('Gagal kirim pesan: ' + error.message);
+      console.error('Error sending:', error);
+      alert('Gagal kirim: ' + error.message);
     }
+  } else {
+    console.log('Message empty or db not ready.');
   }
 });
 
 // Handle Typing
 messageInput.addEventListener('input', () => {
-  if (!isTyping) {
+  console.log('Typing...');
+  if (!isTyping && db) {
     startTyping();
   }
   clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(stopTyping, 2000); // Stop typing kalau gak ngetik 2 detik
+  typingTimeout = setTimeout(stopTyping, 2000);
 });
 
 function startTyping() {
+  if (!db) return;
   isTyping = true;
   db.collection('typing').doc(userId).set({ isTyping: true });
 }
 
 function stopTyping() {
+  if (!db) return;
   isTyping = false;
   db.collection('typing').doc(userId).set({ isTyping: false });
 }
 
-// Cleanup saat tutup halaman
+// Cleanup
 window.addEventListener('beforeunload', () => {
   stopTyping();
 });
