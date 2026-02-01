@@ -59,91 +59,98 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Generate unique ID untuk user anonim (biar bisa track typing)
+let userId = localStorage.getItem('chatUserId');
+if (!userId) {
+  userId = Math.random().toString(36).substr(2, 9);
+  localStorage.setItem('chatUserId', userId);
+}
+
 // DOM Elements
-const nameInputDiv = document.getElementById('name-input');
-const chatRoom = document.getElementById('chat-room');
-const userNameInput = document.getElementById('userName');
-const enterChatBtn = document.getElementById('enterChatBtn');
+const typingIndicator = document.getElementById('typing-indicator');
 const messagesDiv = document.getElementById('messages');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
-const changeNameBtn = document.getElementById('changeNameBtn');
 
-let userName = localStorage.getItem('chatUserName') || '';
-
-console.log('Script loaded. userName from localStorage:', userName); // Debug
-
-// Cek jika nama sudah ada di localStorage, langsung masuk chat
-if (userName) {
-  console.log('Nama ada di localStorage, masuk chat langsung.'); // Debug
-  nameInputDiv.style.display = 'none';
-  chatRoom.style.display = 'block';
-  loadMessages();
-}
-
-// Enter Chat
-enterChatBtn.addEventListener('click', () => {
-  console.log('Enter Chat button clicked.'); // Debug
-  userName = userNameInput.value.trim();
-  console.log('userName input:', userName); // Debug
-  if (userName) {
-    localStorage.setItem('chatUserName', userName);
-    nameInputDiv.style.display = 'none';
-    chatRoom.style.display = 'block';
-    console.log('Chat room displayed. Loading messages...'); // Debug
-    loadMessages();
-  } else {
-    alert('Masukkan nama dulu!');
-  }
-});
-
-// Change Name
-changeNameBtn.addEventListener('click', () => {
-  localStorage.removeItem('chatUserName');
-  userName = '';
-  chatRoom.style.display = 'none';
-  nameInputDiv.style.display = 'block';
-});
-
-// Send Message
-sendBtn.addEventListener('click', async () => {
-  const message = messageInput.value.trim();
-  if (message && userName) {
-    try {
-      await db.collection('messages').add({
-        text: message,
-        timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
-        user: userName
-      });
-      messageInput.value = '';
-      console.log('Message sent:', message); // Debug
-    } catch (error) {
-      console.error('Error sending message:', error); // Debug
-      alert('Gagal kirim pesan: ' + error.message);
-    }
-  } else if (!userName) {
-    alert('Masukkan nama dulu!');
-  }
-});
+let isTyping = false;
+let typingTimeout;
 
 // Load Messages Real-time
 function loadMessages() {
-  console.log('Loading messages...'); // Debug
   db.collection('messages').orderBy('timestamp').onSnapshot((snapshot) => {
-    console.log('Snapshot received, docs count:', snapshot.size); // Debug
     messagesDiv.innerHTML = '';
     snapshot.forEach((doc) => {
       const data = doc.data();
       const msgDiv = document.createElement('div');
       msgDiv.classList.add('message');
-      msgDiv.textContent = `${data.user}: ${data.text}`;
+      const time = data.timestamp.toDate().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      msgDiv.textContent = `[${time}] ${data.text}`;
       messagesDiv.appendChild(msgDiv);
     });
-  }, (error) => {
-    console.error('Error loading messages:', error); // Debug
-    alert('Gagal load pesan: ' + error.message);
+    // Scroll ke bawah otomatis
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
   });
 }
+
+// Load Typing Indicator
+function loadTypingIndicator() {
+  db.collection('typing').onSnapshot((snapshot) => {
+    let someoneTyping = false;
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.isTyping && doc.id !== userId) {
+        someoneTyping = true;
+      }
+    });
+    typingIndicator.style.display = someoneTyping ? 'block' : 'none';
+  });
+}
+
+// Send Message
+sendBtn.addEventListener('click', async () => {
+  const message = messageInput.value.trim();
+  if (message) {
+    try {
+      await db.collection('messages').add({
+        text: message,
+        timestamp: firebase.firestore.Timestamp.fromDate(new Date())
+      });
+      messageInput.value = '';
+      stopTyping(); // Stop typing setelah kirim
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Gagal kirim pesan: ' + error.message);
+    }
+  }
+});
+
+// Handle Typing
+messageInput.addEventListener('input', () => {
+  if (!isTyping) {
+    startTyping();
+  }
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(stopTyping, 2000); // Stop typing kalau gak ngetik 2 detik
+});
+
+function startTyping() {
+  isTyping = true;
+  db.collection('typing').doc(userId).set({ isTyping: true });
+}
+
+function stopTyping() {
+  isTyping = false;
+  db.collection('typing').doc(userId).set({ isTyping: false });
+}
+
+// Cleanup saat tutup halaman
+window.addEventListener('beforeunload', () => {
+  stopTyping();
+});
+
+// Init
+loadMessages();
+loadTypingIndicator();
 
 // Kode tambahan untuk initial di student cards (opsional)
 document.addEventListener('DOMContentLoaded', () => {
