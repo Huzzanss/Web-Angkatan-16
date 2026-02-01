@@ -190,6 +190,11 @@ main {
     margin-bottom: 10px;
 }
 
+#sendBtn {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
 /* Responsive untuk mobile */
 @media (max-width: 768px) {
     .nav-right {
