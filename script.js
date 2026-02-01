@@ -55,12 +55,9 @@ const firebaseConfig = {
   appId: "1:47699501502:web:0d09e69d0b3ff39a7359ef"
 };
 
-// Initialize Firebase (Tanpa Auth)
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 // DOM Elements
 const nameInputDiv = document.getElementById('name-input');
@@ -113,9 +110,9 @@ sendBtn.addEventListener('click', async () => {
   const message = messageInput.value.trim();
   if (message && userName) {
     try {
-      await addDoc(collection(db, 'messages'), {
+      await db.collection('messages').add({
         text: message,
-        timestamp: new Date(),
+        timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
         user: userName
       });
       messageInput.value = '';
@@ -132,8 +129,7 @@ sendBtn.addEventListener('click', async () => {
 // Load Messages Real-time
 function loadMessages() {
   console.log('Loading messages...'); // Debug
-  const q = query(collection(db, 'messages'), orderBy('timestamp'));
-  onSnapshot(q, (snapshot) => {
+  db.collection('messages').orderBy('timestamp').onSnapshot((snapshot) => {
     console.log('Snapshot received, docs count:', snapshot.size); // Debug
     messagesDiv.innerHTML = '';
     snapshot.forEach((doc) => {
