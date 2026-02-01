@@ -30,90 +30,71 @@ if (window.innerWidth <= 768) {
   toggleBtn.addEventListener('click', () => navRight.classList.toggle('show'));
 }
 
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
-  authDomain: "chat-angkatan-16.firebaseapp.com",
-  projectId: "chat-angkatan-16",
-  storageBucket: "chat-angkatan-16.appspot.com",
-  messagingSenderId: "47699501502",
-  appId: "1:47699501502:web:0d09e69d0b3ff39a7359ef"
+// Firebase
+const firebaseConfig={
+  apiKey:"AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
+  authDomain:"chat-angkatan-16.firebaseapp.com",
+  projectId:"chat-angkatan-16",
+  storageBucket:"chat-angkatan-16.appspot.com",
+  messagingSenderId:"47699501502",
+  appId:"1:47699501502:web:0d09e69d0b3ff39a7359ef"
 };
-
-// Init Firebase
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const db=firebase.firestore();
 
-// User ID anonim
-let userId = localStorage.getItem('chatUserId') || Math.random().toString(36).substr(2, 9);
-localStorage.setItem('chatUserId', userId);
+// User anonim
+let userId=localStorage.getItem('chatUserId')||Math.random().toString(36).substr(2,9);
+localStorage.setItem('chatUserId',userId);
 
-// DOM Elements
-const messagesDiv = document.getElementById('messages');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-const typingIndicator = document.getElementById('typing-indicator');
+// Chat DOM
+const messagesDiv=document.getElementById('messages');
+const messageInput=document.getElementById('messageInput');
+const sendBtn=document.getElementById('sendBtn');
+const typingIndicator=document.getElementById('typing-indicator');
+let isTyping=false,typingTimeout;
 
-let typingTimeout, isTyping = false;
-
-// Kirim pesan
-sendBtn.addEventListener('click', async () => {
-  const text = messageInput.value.trim();
-  if (!text) return;
-
-  try {
-    await db.collection('messages').add({
-      userId,
-      text,
-      timestamp: firebase.firestore.Timestamp.now()
-    });
-    messageInput.value = '';
-    stopTyping();
-  } catch (err) {
-    console.error('Error sending message:', err);
-  }
+// Send message
+sendBtn.addEventListener('click', async ()=>{
+  const text=messageInput.value.trim();
+  if(!text) return;
+  await db.collection('messages').add({
+    userId,text,timestamp:firebase.firestore.Timestamp.now()
+  });
+  messageInput.value='';
+  stopTyping();
 });
 
-// Typing indicator
-messageInput.addEventListener('input', () => {
-  if (!isTyping) startTyping();
+// Typing
+messageInput.addEventListener('input',()=>{
+  if(!isTyping) startTyping();
   clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(stopTyping, 2000);
+  typingTimeout=setTimeout(stopTyping,2000);
 });
 
-function startTyping() {
-  isTyping = true;
-  db.collection('typing').doc(userId).set({ isTyping: true });
-}
+function startTyping(){isTyping=true;db.collection('typing').doc(userId).set({isTyping:true});}
+function stopTyping(){isTyping=false;db.collection('typing').doc(userId).set({isTyping:false});}
 
-function stopTyping() {
-  isTyping = false;
-  db.collection('typing').doc(userId).set({ isTyping: false });
-}
-
-// Real-time update pesan
-db.collection('messages').orderBy('timestamp').onSnapshot(snapshot => {
-  messagesDiv.innerHTML = '';
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const msgDiv = document.createElement('div');
-    msgDiv.classList.add('message');
-    const time = data.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const userLabel = data.userId === userId ? 'Saya' : 'Anonim';
-    msgDiv.textContent = `[${time}] ${userLabel}: ${data.text}`;
-    messagesDiv.appendChild(msgDiv);
+// Load messages realtime
+db.collection('messages').orderBy('timestamp').onSnapshot(snapshot=>{
+  messagesDiv.innerHTML='';
+  snapshot.forEach(doc=>{
+    const d=doc.data();
+    const div=document.createElement('div');
+    div.className='message';
+    const time=d.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const userLabel=d.userId===userId?'Saya':'Anonim';
+    div.textContent=`[${time}] ${userLabel}: ${d.text}`;
+    messagesDiv.appendChild(div);
   });
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  messagesDiv.scrollTop=messagesDiv.scrollHeight;
 });
 
-// Real-time typing indicator
-db.collection('typing').onSnapshot(snapshot => {
-  let someoneTyping = false;
-  snapshot.forEach(doc => {
-    if (doc.id !== userId && doc.data().isTyping) someoneTyping = true;
-  });
-  typingIndicator.style.display = someoneTyping ? 'block' : 'none';
+// Typing indicator realtime
+db.collection('typing').onSnapshot(snapshot=>{
+  let someoneTyping=false;
+  snapshot.forEach(doc=>{if(doc.id!==userId&&doc.data().isTyping) someoneTyping=true;});
+  typingIndicator.style.display=someoneTyping?'block':'none';
 });
 
-// Hentikan typing saat keluar
+// Cleanup
 window.addEventListener('beforeunload', stopTyping);
