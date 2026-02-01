@@ -49,6 +49,7 @@ if (window.innerWidth <= 768) {
 const firebaseConfig = {
   apiKey: "AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
   authDomain: "chat-angkatan-16.firebaseapp.com",
+  databaseURL: "https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "chat-angkatan-16",
   storageBucket: "chat-angkatan-16.firebasestorage.app",
   messagingSenderId: "47699501502",
