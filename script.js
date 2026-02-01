@@ -55,10 +55,11 @@ const firebaseConfig = {
   appId: "1:47699501502:web:0d09e69d0b3ff39a7359ef"
 };
 
-// Initialize Firebase
+// Initialize Firebase dan db global
+let db = null;
 try {
   firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+  db = firebase.firestore();
   console.log('Firebase initialized successfully.');
 } catch (error) {
   console.error('Firebase init error:', error);
@@ -85,7 +86,10 @@ let typingTimeout;
 
 // Load Messages Real-time
 function loadMessages() {
-  if (!db) return;
+  if (!db) {
+    console.log('db not ready, skipping loadMessages');
+    return;
+  }
   console.log('Loading messages...');
   db.collection('messages').orderBy('timestamp').onSnapshot((snapshot) => {
     console.log('Messages loaded, count:', snapshot.size);
@@ -107,7 +111,10 @@ function loadMessages() {
 
 // Load Typing Indicator
 function loadTypingIndicator() {
-  if (!db) return;
+  if (!db) {
+    console.log('db not ready, skipping loadTypingIndicator');
+    return;
+  }
   console.log('Loading typing indicator...');
   db.collection('typing').onSnapshot((snapshot) => {
     let someoneTyping = false;
@@ -174,12 +181,12 @@ window.addEventListener('beforeunload', () => {
   stopTyping();
 });
 
-// Init
-loadMessages();
-loadTypingIndicator();
-
-// Kode tambahan untuk initial di student cards (opsional)
+// Init setelah DOM ready
 document.addEventListener('DOMContentLoaded', () => {
+  loadMessages();
+  loadTypingIndicator();
+
+  // Kode tambahan untuk initial di student cards (opsional)
   const studentCards = document.querySelectorAll('.student-card');
   studentCards.forEach(card => {
     const name = card.querySelector('p').textContent;
