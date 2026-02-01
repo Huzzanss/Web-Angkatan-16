@@ -47,12 +47,12 @@ if (window.innerWidth <= 768) {
 
 // Firebase Config (Ganti dengan configmu!)
 const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
+  apiKey: "AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
+  authDomain: "chat-angkatan-16.firebaseapp.com",
+  projectId: "chat-angkatan-16",
+  storageBucket: "chat-angkatan-16.firebasestorage.app",
+  messagingSenderId: "47699501502",
+  appId: "1:47699501502:web:0d09e69d0b3ff39a7359ef"
 };
 
 // Initialize Firebase
