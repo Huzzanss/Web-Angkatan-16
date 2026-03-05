@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 </head>
 <body>
 
@@ -19,6 +20,7 @@
       <a href="#kapuas">VI Kapuas</a>
       <a href="#mahakam">VI Mahakam</a>
       <a href="#countdown-hero">🎓 Wisuda</a>
+      <a href="#gallery-section">📸 Gallery</a>
       <a href="#chat-section">💬 Chat</a>
     </div>
   </nav>
@@ -216,6 +218,48 @@
           <input type="text" id="messageInput" placeholder="Tulis pesan kamu...">
           <button id="sendBtn">➤</button>
         </div>
+      </div>
+    </section>
+
+
+    <!-- ─── Gallery Angkatan ─── -->
+    <section id="gallery-section" class="gallery-section">
+      <div class="gallery-header-wrap">
+        <span class="gallery-eyebrow">✦ Kenangan Bersama ✦</span>
+        <h2 class="gallery-title">Gallery <span>Angkatan XVI</span></h2>
+        <p class="gallery-sub">Abadikan momen terbaik kalian di sini.</p>
+      </div>
+
+      <!-- Upload Area -->
+      <div class="upload-area" id="uploadArea">
+        <input type="file" id="photoInput" accept="image/*" multiple hidden>
+        <div class="upload-drop" id="uploadDrop">
+          <div class="upload-icon">📷</div>
+          <p class="upload-text">Klik atau drag foto ke sini</p>
+          <p class="upload-hint">JPG, PNG, WEBP · Maks 5MB per foto</p>
+          <button class="upload-btn" onclick="document.getElementById('photoInput').click()">Pilih Foto</button>
+        </div>
+        <div class="upload-progress" id="uploadProgress" style="display:none">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <p class="progress-text" id="progressText">Mengupload...</p>
+        </div>
+      </div>
+
+      <!-- Grid Gallery -->
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="gallery-empty" id="galleryEmpty">
+          <span>📭</span>
+          <p>Belum ada foto. Jadilah yang pertama upload!</p>
+        </div>
+      </div>
+
+      <!-- Lightbox -->
+      <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose">✕</button>
+        <button class="lightbox-nav prev" id="lightboxPrev">‹</button>
+        <img class="lightbox-img" id="lightboxImg" src="" alt="">
+        <button class="lightbox-nav next" id="lightboxNext">›</button>
+        <p class="lightbox-caption" id="lightboxCaption"></p>
       </div>
     </section>
 
