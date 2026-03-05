@@ -201,82 +201,104 @@ window.addEventListener('beforeunload', stopTyping);
 
 /* ══════════════════════════════════════
    GALLERY ANGKATAN XVI
-   Firebase Storage + Realtime DB
+   Simpan base64 ke Realtime DB (gratis)
+   — auto-compress sebelum simpan
 ══════════════════════════════════════ */
 (function() {
-  const storage   = firebase.storage();
   const galleryDb = db.ref('gallery');
 
-  const photoInput    = document.getElementById('photoInput');
-  const uploadDrop    = document.getElementById('uploadDrop');
-  const uploadProgress= document.getElementById('uploadProgress');
-  const progressFill  = document.getElementById('progressFill');
-  const progressText  = document.getElementById('progressText');
-  const galleryGrid   = document.getElementById('galleryGrid');
-  const galleryEmpty  = document.getElementById('galleryEmpty');
-  const lightbox      = document.getElementById('lightbox');
-  const lightboxImg   = document.getElementById('lightboxImg');
-  const lightboxClose = document.getElementById('lightboxClose');
-  const lightboxPrev  = document.getElementById('lightboxPrev');
-  const lightboxNext  = document.getElementById('lightboxNext');
-  const lightboxCap   = document.getElementById('lightboxCaption');
+  const photoInput     = document.getElementById('photoInput');
+  const uploadDrop     = document.getElementById('uploadDrop');
+  const uploadProgress = document.getElementById('uploadProgress');
+  const progressFill   = document.getElementById('progressFill');
+  const progressText   = document.getElementById('progressText');
+  const galleryGrid    = document.getElementById('galleryGrid');
+  const galleryEmpty   = document.getElementById('galleryEmpty');
+  const lightbox       = document.getElementById('lightbox');
+  const lightboxImg    = document.getElementById('lightboxImg');
+  const lightboxClose  = document.getElementById('lightboxClose');
+  const lightboxPrev   = document.getElementById('lightboxPrev');
+  const lightboxNext   = document.getElementById('lightboxNext');
+  const lightboxCap    = document.getElementById('lightboxCaption');
 
-  let allPhotos = []; // [{url, timestamp, name}]
+  let allPhotos = [];
   let currentIdx = 0;
 
   // ── Drag & Drop ──
-  uploadDrop.addEventListener('dragover', e => {
-    e.preventDefault();
-    uploadDrop.classList.add('dragover');
-  });
+  uploadDrop.addEventListener('dragover', e => { e.preventDefault(); uploadDrop.classList.add('dragover'); });
   uploadDrop.addEventListener('dragleave', () => uploadDrop.classList.remove('dragover'));
-  uploadDrop.addEventListener('drop', e => {
-    e.preventDefault();
-    uploadDrop.classList.remove('dragover');
-    handleFiles(e.dataTransfer.files);
-  });
+  uploadDrop.addEventListener('drop', e => { e.preventDefault(); uploadDrop.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
   uploadDrop.addEventListener('click', () => photoInput.click());
-
   photoInput.addEventListener('change', () => handleFiles(photoInput.files));
+
+  // ── Kompres gambar ke base64 (max 900px, 82% quality) ──
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const MAX = 900;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else       { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = reject;
+      img.src = url;
+    });
+  }
 
   // ── Upload Handler ──
   function handleFiles(files) {
     const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
     if (!arr.length) return;
-    let done = 0;
-    uploadProgress.style.display = 'block';
-    uploadDrop.style.display = 'none';
 
-    arr.forEach(file => {
-      if (file.size > 5 * 1024 * 1024) {
-        alert(file.name + ' melebihi 5MB, dilewati.');
-        done++;
-        if (done === arr.length) resetUploadUI();
+    // Cek ukuran asli (sebelum kompres) maks 15MB
+    for (const f of arr) {
+      if (f.size > 15 * 1024 * 1024) {
+        alert(f.name + ' terlalu besar (maks 15MB).');
         return;
       }
+    }
 
-      const ref = storage.ref('gallery/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_'));
-      const task = ref.put(file);
+    uploadProgress.style.display = 'block';
+    uploadDrop.style.display = 'none';
+    progressText.style.color = '';
 
-      task.on('state_changed',
-        snap => {
-          const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-          progressFill.style.width = pct + '%';
-          progressText.textContent = 'Mengupload ' + (done + 1) + '/' + arr.length + ' (' + pct + '%)';
-        },
-        err => {
-          console.error(err);
-          done++;
-          if (done === arr.length) resetUploadUI();
-        },
-        () => {
-          task.snapshot.ref.getDownloadURL().then(url => {
-            galleryDb.push({ url, name: file.name, timestamp: Date.now() });
-            done++;
-            if (done === arr.length) resetUploadUI();
+    let done = 0;
+
+    arr.forEach((file, i) => {
+      progressText.textContent = 'Mengompres foto ' + (i + 1) + '/' + arr.length + '...';
+      compressImage(file)
+        .then(base64 => {
+          progressFill.style.width = Math.round(((i + 0.5) / arr.length) * 100) + '%';
+          progressText.textContent = 'Menyimpan foto ' + (i + 1) + '/' + arr.length + '...';
+          return galleryDb.push({
+            data: base64,
+            name: file.name,
+            timestamp: Date.now()
           });
-        }
-      );
+        })
+        .then(() => {
+          done++;
+          progressFill.style.width = Math.round((done / arr.length) * 100) + '%';
+          if (done === arr.length) {
+            progressText.textContent = '✓ Foto berhasil disimpan!';
+            setTimeout(resetUploadUI, 1200);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          progressText.style.color = '#e07a5f';
+          progressText.textContent = '⛔ Gagal: ' + err.message;
+          setTimeout(resetUploadUI, 3000);
+        });
     });
   }
 
@@ -287,33 +309,26 @@ window.addEventListener('beforeunload', stopTyping);
     photoInput.value = '';
   }
 
-  // ── Load Gallery ──
+  // ── Load Gallery (realtime) ──
   galleryDb.orderByChild('timestamp').on('value', snap => {
     allPhotos = [];
     const data = snap.val() || {};
     Object.values(data)
       .sort((a, b) => b.timestamp - a.timestamp)
       .forEach(p => allPhotos.push(p));
-
     renderGallery();
   });
 
   function renderGallery() {
-    // Remove existing items (keep empty placeholder)
     Array.from(galleryGrid.querySelectorAll('.gallery-item')).forEach(el => el.remove());
-
-    if (allPhotos.length === 0) {
-      galleryEmpty.style.display = 'block';
-      return;
-    }
+    if (allPhotos.length === 0) { galleryEmpty.style.display = 'block'; return; }
     galleryEmpty.style.display = 'none';
-
     allPhotos.forEach((photo, idx) => {
       const item = document.createElement('div');
       item.className = 'gallery-item';
       const date = new Date(photo.timestamp).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
       item.innerHTML = `
-        <img src="${photo.url}" alt="${photo.name || 'Foto'}" loading="lazy">
+        <img src="${photo.data}" alt="${photo.name || 'Foto'}" loading="lazy">
         <div class="gallery-item-overlay">
           <span class="gallery-item-time">${date}</span>
         </div>
@@ -333,7 +348,7 @@ window.addEventListener('beforeunload', stopTyping);
 
   function showPhoto(idx) {
     const p = allPhotos[idx];
-    lightboxImg.src = p.url;
+    lightboxImg.src = p.data;
     const date = new Date(p.timestamp).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
     lightboxCap.textContent = date + (allPhotos.length > 1 ? '  ·  ' + (idx+1) + ' / ' + allPhotos.length : '');
     lightboxPrev.style.display = idx > 0 ? 'flex' : 'none';
@@ -350,11 +365,10 @@ window.addEventListener('beforeunload', stopTyping);
   lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
   lightboxPrev.addEventListener('click', e => { e.stopPropagation(); showPhoto(--currentIdx); });
   lightboxNext.addEventListener('click', e => { e.stopPropagation(); showPhoto(++currentIdx); });
-
   document.addEventListener('keydown', e => {
     if (!lightbox.classList.contains('open')) return;
     if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft' && currentIdx > 0) showPhoto(--currentIdx);
+    if (e.key === 'ArrowLeft'  && currentIdx > 0)                    showPhoto(--currentIdx);
     if (e.key === 'ArrowRight' && currentIdx < allPhotos.length - 1) showPhoto(++currentIdx);
   });
 })();
