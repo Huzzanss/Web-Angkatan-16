@@ -372,3 +372,114 @@ window.addEventListener('beforeunload', stopTyping);
     if (e.key === 'ArrowRight' && currentIdx < allPhotos.length - 1) showPhoto(++currentIdx);
   });
 })();
+
+/* ══════════════════════════════════════
+   BACKSOUND PLAYER
+   Ganti nama file di array PLAYLIST
+   sesuai file di folder ./music/ di GitHub
+══════════════════════════════════════ */
+(function() {
+  // ─── PLAYLIST — ganti sesuai nama file di ./music/ ───
+  const PLAYLIST = [
+    { file: 'lagu1.mp3',  title: 'Lagu 1' },
+    { file: 'lagu2.mp3',  title: 'Lagu 2' },
+    { file: 'lagu3.mp3',  title: 'Lagu 3' },
+  ];
+
+  const BASE_PATH = './music/'; // folder musik di repo
+
+  const audio    = document.getElementById('bgAudio');
+  const player   = document.getElementById('musicPlayer');
+  const btnPlay  = document.getElementById('mpPlay');
+  const btnPrev  = document.getElementById('mpPrev');
+  const btnNext  = document.getElementById('mpNext');
+  const mpTitle  = document.getElementById('mpTitle');
+  const mpFill   = document.getElementById('mpFill');
+  const mpIcon   = document.querySelector('.mp-icon');
+
+  let currentIdx = 0;
+  let isPlaying  = false;
+  let userInteracted = false;
+
+  function loadTrack(idx) {
+    currentIdx = ((idx % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
+    const track = PLAYLIST[currentIdx];
+    audio.src = BASE_PATH + track.file;
+    mpTitle.textContent = track.title;
+    mpFill.style.width = '0%';
+    if (isPlaying) audio.play().catch(() => {});
+  }
+
+  function play() {
+    audio.play().then(() => {
+      isPlaying = true;
+      btnPlay.innerHTML = '&#9646;&#9646;'; // pause icon
+      mpIcon.classList.add('spinning');
+      player.classList.add('active');
+    }).catch(err => {
+      console.warn('Autoplay blocked:', err);
+    });
+  }
+
+  function pause() {
+    audio.pause();
+    isPlaying = false;
+    btnPlay.innerHTML = '&#9654;'; // play icon
+    mpIcon.classList.remove('spinning');
+  }
+
+  // Play/Pause toggle
+  btnPlay.addEventListener('click', () => {
+    userInteracted = true;
+    isPlaying ? pause() : play();
+  });
+
+  // Next
+  btnNext.addEventListener('click', () => {
+    loadTrack(currentIdx + 1);
+    if (isPlaying) play();
+  });
+
+  // Prev
+  btnPrev.addEventListener('click', () => {
+    // Kalau sudah > 3 detik, restart lagu; kalau tidak, prev
+    if (audio.currentTime > 3) {
+      audio.currentTime = 0;
+    } else {
+      loadTrack(currentIdx - 1);
+      if (isPlaying) play();
+    }
+  });
+
+  // Auto next saat lagu habis
+  audio.addEventListener('ended', () => {
+    loadTrack(currentIdx + 1);
+    play(); // auto play lagu berikutnya
+  });
+
+  // Update progress bar
+  audio.addEventListener('timeupdate', () => {
+    if (audio.duration) {
+      mpFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+    }
+  });
+
+  // Error handling (file tidak ketemu)
+  audio.addEventListener('error', () => {
+    console.warn('File tidak ditemukan:', PLAYLIST[currentIdx].file);
+    mpTitle.textContent = '⚠ File tidak ditemukan: ' + PLAYLIST[currentIdx].file;
+    // Coba lagu berikutnya setelah 2 detik
+    setTimeout(() => loadTrack(currentIdx + 1), 2000);
+  });
+
+  // Muat lagu pertama
+  loadTrack(0);
+
+  // Autoplay setelah interaksi pertama di halaman
+  document.addEventListener('click', () => {
+    if (!userInteracted) {
+      userInteracted = true;
+      play();
+    }
+  }, { once: true });
+})();
