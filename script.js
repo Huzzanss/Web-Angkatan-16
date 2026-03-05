@@ -1,6 +1,6 @@
 // ─── Countdown Wisuda 13 Mei 2026 ───
 (function() {
-  const target = new Date('2026-05-13T08:00:00+08:00').getTime();
+  const target = new Date('2026-05-13T00:00:00+08:00').getTime();
 
   const elDays = document.getElementById('cd-days');
   const elHours = document.getElementById('cd-hours');
