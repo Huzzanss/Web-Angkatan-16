@@ -285,20 +285,7 @@ main {
   box-shadow: 0 4px 12px rgba(10,22,40,0.15);
 }
 
-/* Warna berbeda per huruf awal */
-.initial[data-letter="A"], .initial[data-letter="B"] { background: linear-gradient(135deg, #1a73e8, #4195f5); }
-.initial[data-letter="C"], .initial[data-letter="D"] { background: linear-gradient(135deg, #0f9d58, #34c177); }
-.initial[data-letter="E"], .initial[data-letter="F"] { background: linear-gradient(135deg, #e53935, #f06060); }
-.initial[data-letter="G"], .initial[data-letter="H"] { background: linear-gradient(135deg, #7c4dff, #aa80ff); }
-.initial[data-letter="I"], .initial[data-letter="J"] { background: linear-gradient(135deg, #f4511e, #f7895e); }
-.initial[data-letter="K"], .initial[data-letter="L"] { background: linear-gradient(135deg, #00897b, #4db6ac); }
-.initial[data-letter="M"], .initial[data-letter="N"] { background: linear-gradient(135deg, var(--navy), var(--navy3)); }
-.initial[data-letter="O"], .initial[data-letter="P"] { background: linear-gradient(135deg, #c49a00, var(--gold2)); }
-.initial[data-letter="Q"], .initial[data-letter="R"] { background: linear-gradient(135deg, #ad1457, #e91e8c); }
-.initial[data-letter="S"], .initial[data-letter="T"] { background: linear-gradient(135deg, #0097a7, #00bcd4); }
-.initial[data-letter="U"], .initial[data-letter="V"] { background: linear-gradient(135deg, #558b2f, #8bc34a); }
-.initial[data-letter="W"], .initial[data-letter="X"] { background: linear-gradient(135deg, #4527a0, #7c5abf); }
-.initial[data-letter="Y"], .initial[data-letter="Z"] { background: linear-gradient(135deg, #bf360c, #e64a19); }
+/* Warna inisial di-set dinamis via JS (spektrum A→Z) */
 
 .student-card p {
   font-size: 0.8rem;
