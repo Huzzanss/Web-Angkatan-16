@@ -1,348 +1,197 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Angkatan XVI</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angkatan XVI</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <!-- Navbar tetap di atas -->
-    <nav id="navbar">
-        <div class="nav-left">
-            <h1>Angkatan XVI</h1>
+
+  <nav id="navbar">
+    <div class="nav-left">
+      <h1>Angkatan <span>XVI</span></h1>
+    </div>
+    <div class="nav-right">
+      <a href="#kahayan">VI Kahayan</a>
+      <a href="#kapuas">VI Kapuas</a>
+      <a href="#mahakam">VI Mahakam</a>
+      <a href="#chat-section">💬 Chat</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- VI Kahayan -->
+    <section id="kahayan" class="kelas-section">
+      <div class="section-header">
+        <div>
+          <span class="section-badge">Kelas</span>
+          <h2>VI Kahayan</h2>
         </div>
-        <div class="nav-right">
-            <a href="#kahayan">VI Kahayan</a>
-            <a href="#kapuas">VI Kapuas</a>
-            <a href="#mahakam">VI Mahakam</a>
+      </div>
+      <div class="section-body">
+        <div class="wali-kelas">
+          <div class="wali-photo">
+            <img src="https://via.placeholder.com/100x100?text=Wali" alt="Foto Wali Kelas">
+          </div>
+          <div class="wali-info">
+            <h3>Wali Kelas</h3>
+            <p>Miss Sri</p>
+          </div>
         </div>
-    </nav>
+        <div class="daftar-siswa">
+          <h3>Daftar Siswa-Siswi</h3>
+          <div class="student-grid">
+            <div class="student-card"><div class="initial"></div><p>Abdullah Raziq Hanan</p></div>
+            <div class="student-card"><div class="initial"></div><p>Aditya Narendra Pambudi</p></div>
+            <div class="student-card"><div class="initial"></div><p>Ahmad Abdullah Hafi Munaji</p></div>
+            <div class="student-card"><div class="initial"></div><p>Alesha Zevanna Annayla Alfian</p></div>
+            <div class="student-card"><div class="initial"></div><p>Alisha Nur Afiyah</p></div>
+            <div class="student-card"><div class="initial"></div><p>Azim Evano Rahman</p></div>
+            <div class="student-card"><div class="initial"></div><p>Deeandra Mikhailla Hariyadi</p></div>
+            <div class="student-card"><div class="initial"></div><p>Faqih Hamizan Rahman</p></div>
+            <div class="student-card"><div class="initial"></div><p>Gavin Ahmad Farisakha Sahilin</p></div>
+            <div class="student-card"><div class="initial"></div><p>Hana Aish Sumayyah</p></div>
+            <div class="student-card"><div class="initial"></div><p>Javier Al Majid</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Alfindra Auvar Rahardja</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Asyraf Al Farisi</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Hafiz Faad Abqory</p></div>
+            <div class="student-card"><div class="initial"></div><p>Nuhammad Rezky Tri Ramadhan</p></div>
+            <div class="student-card"><div class="initial"></div><p>Nayhan Abqari</p></div>
+            <div class="student-card"><div class="initial"></div><p>Samytha Larisa Azzalea</p></div>
+            <div class="student-card"><div class="initial"></div><p>Zahratu Syifa</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <!-- Konten utama -->
-    <main>
-        <!-- Section untuk VI Kahayan -->
-        <section id="kahayan" class="kelas-section">
-            <h2>VI Kahayan</h2>
-            <div class="kelas-content">
-                <div class="wali-kelas">
-                    <h3>Wali Kelas</h3>
-                    <div class="wali-photo">
-                        <img src="https://via.placeholder.com/100x100?text=Foto+Wali" alt="Foto Wali Kelas">
-                    </div>
-                    <p>Miss Sri</p>
-                </div>
-                <div class="daftar-siswa">
-                    <h3>Daftar Siswa-Siswi</h3>
-                    <div class="student-grid">
-                        <!-- Contoh student card, ganti nama siswa sesuai data asli -->
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Abdullah Raziq Hanan</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Aditya Narendra Pambudi</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Ahmad Abdullah Hafi Munaji</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Alesha Zevanna Annayla Alfian</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Alisha Nur Afiyah</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Azim Evano Rahman</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Deeandra Mikhailla Hariyadi</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Faqih Hamizan Rahman</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Gavin Ahmad Farisakha Sahilin</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Hana Aish Sumayyah</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Javier Al Majid</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Alfindra Auvar Rahardja</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Asyraf Al Farisi</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Hafiz Faad Abqory</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Nuhammad Rezky Tri Ramadhan</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Nayhan Abqari</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Samytha Larisa Azzalea</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Zahratu Syifa</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <!-- VI Kapuas -->
+    <section id="kapuas" class="kelas-section">
+      <div class="section-header">
+        <div>
+          <span class="section-badge">Kelas</span>
+          <h2>VI Kapuas</h2>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="wali-kelas">
+          <div class="wali-photo">
+            <img src="https://via.placeholder.com/100x100?text=Wali" alt="Foto Wali Kelas">
+          </div>
+          <div class="wali-info">
+            <h3>Wali Kelas</h3>
+            <p>Miss Novita</p>
+          </div>
+        </div>
+        <div class="daftar-siswa">
+          <h3>Daftar Siswa-Siswi</h3>
+          <div class="student-grid">
+            <div class="student-card"><div class="initial"></div><p>Ahmad Faezya Rafa</p></div>
+            <div class="student-card"><div class="initial"></div><p>Ahmad Hamdan Nurzati</p></div>
+            <div class="student-card"><div class="initial"></div><p>Alkhalifi Hasyimi</p></div>
+            <div class="student-card"><div class="initial"></div><p>Andra Alghifari</p></div>
+            <div class="student-card"><div class="initial"></div><p>Angelina Natalia Tennes</p></div>
+            <div class="student-card"><div class="initial"></div><p>Arsenio Al Fattan Wibowo</p></div>
+            <div class="student-card"><div class="initial"></div><p>Chaerul Risyad Ferdansyah</p></div>
+            <div class="student-card"><div class="initial"></div><p>Devan Rafandra Pratama</p></div>
+            <div class="student-card"><div class="initial"></div><p>Ghaisan Adib Mubasyir</p></div>
+            <div class="student-card"><div class="initial"></div><p>Kanaya Lubna Janitra Hafizah</p></div>
+            <div class="student-card"><div class="initial"></div><p>Keisha Pratiwi Syahrizal</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Ahza Farezell</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Zaki Raditya</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Zamzam Zidna Fahn</p></div>
+            <div class="student-card"><div class="initial"></div><p>Nada Fajriah Salsabilla</p></div>
+            <div class="student-card"><div class="initial"></div><p>Nur Aisyah</p></div>
+            <div class="student-card"><div class="initial"></div><p>Nurul Farhana Aqilah Chandra</p></div>
+            <div class="student-card"><div class="initial"></div><p>Shazia Amira Zhafirah</p></div>
+            <div class="student-card"><div class="initial"></div><p>Super Novel Hardian</p></div>
+            <div class="student-card"><div class="initial"></div><p>Syaqila Marwa Putri Deandra</p></div>
+            <div class="student-card"><div class="initial"></div><p>Syrenia Carrisa Althafunnisa</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Mezameru Arsyada</p></div>
+            <div class="student-card"><div class="initial"></div><p>Shidqia Nabila Azzahra</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <!-- Section untuk VI Kapuas -->
-        <section id="kapuas" class="kelas-section">
-            <h2>VI Kapuas</h2>
-            <div class="kelas-content">
-                <div class="wali-kelas">
-                    <h3>Wali Kelas</h3>
-                    <div class="wali-photo">
-                        <img src="https://via.placeholder.com/100x100?text=Foto+Wali" alt="Foto Wali Kelas">
-                    </div>
-                    <p>Miss Novita</p>
-                </div>
-                <div class="daftar-siswa">
-                    <h3>Daftar Siswa-Siswi</h3>
-                    <div class="student-grid">
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Ahmad Faezya Rafa</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Ahmad Hamdan Nurzati</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Alkhalifi Hasyimi</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Andra Alghifari</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Angelina Natalia Tennes</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Arsenio Al Fattan Wibowo</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Chaerul Risyad Ferdansyah</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Devan Rafandra Pratama</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Ghaisan Adib Mubasyir</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Kanaya Lubna Janitra Hafizah</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Keisha Pratiwi Syahrizal</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Ahza Farezell</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Zaki Raditya</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Zamzam Zidna Fahn</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Nada Fajriah Salsabilla</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Nur Aisyah</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Nurul Farhana Aqilah Chandra</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Shazia Amira Zhafirah</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Super Novel Hardian</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Syaqila Marwa Putri Deandra</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Syrenia Carrisa Althafunnisa</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Mezameru Arsyada</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Shidqia Nabila Azzahra</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <!-- VI Mahakam -->
+    <section id="mahakam" class="kelas-section">
+      <div class="section-header">
+        <div>
+          <span class="section-badge">Kelas</span>
+          <h2>VI Mahakam</h2>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="wali-kelas">
+          <div class="wali-photo">
+            <img src="https://via.placeholder.com/100x100?text=Wali" alt="Foto Wali Kelas">
+          </div>
+          <div class="wali-info">
+            <h3>Wali Kelas</h3>
+            <p>Miss Yeny</p>
+          </div>
+        </div>
+        <div class="daftar-siswa">
+          <h3>Daftar Siswa-Siswi</h3>
+          <div class="student-grid">
+            <div class="student-card"><div class="initial"></div><p>Adelia Felicia</p></div>
+            <div class="student-card"><div class="initial"></div><p>Afiqah Humayra Arresky</p></div>
+            <div class="student-card"><div class="initial"></div><p>Alexandra Shavira Kaysa</p></div>
+            <div class="student-card"><div class="initial"></div><p>Alisya Zella Naura Saputro</p></div>
+            <div class="student-card"><div class="initial"></div><p>Alita Admiral</p></div>
+            <div class="student-card"><div class="initial"></div><p>Aqillah Khayyirah</p></div>
+            <div class="student-card"><div class="initial"></div><p>Azima Zafeera Khairiya</p></div>
+            <div class="student-card"><div class="initial"></div><p>Azka Aisy Muhammad Firdaus</p></div>
+            <div class="student-card"><div class="initial"></div><p>Farrel Azka Firlana</p></div>
+            <div class="student-card"><div class="initial"></div><p>Fattah Altaf Qusyairi</p></div>
+            <div class="student-card"><div class="initial"></div><p>Giovanny Syahputra</p></div>
+            <div class="student-card"><div class="initial"></div><p>Gusti Muhammad An-Nafis</p></div>
+            <div class="student-card"><div class="initial"></div><p>Hilmi Muhammad Nidho Mudhin</p></div>
+            <div class="student-card"><div class="initial"></div><p>Khalika Ismatullah Assahla</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Abdurrahman Dzaki</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad El Junot Razqal</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Fahri Ardani</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Hafidz Setiadi</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Juna Defa Alfarizie</p></div>
+            <div class="student-card"><div class="initial"></div><p>Muhammad Zharif Syatir</p></div>
+            <div class="student-card"><div class="initial"></div><p>Syifa Fathiyah Zahra</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <!-- Section untuk VI Mahakam -->
-        <section id="mahakam" class="kelas-section">
-            <h2>VI Mahakam</h2>
-            <div class="kelas-content">
-                <div class="wali-kelas">
-                    <h3>Wali Kelas</h3>
-                    <div class="wali-photo">
-                        <img src="https://via.placeholder.com/100x100?text=Foto+Wali" alt="Foto Wali Kelas">
-                    </div>
-                    <p>Miss Yeny</p>
-                </div>
-                <div class="daftar-siswa">
-                    <h3>Daftar Siswa-Siswi</h3>
-                    <div class="student-grid">
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Adelia Felicia</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Afiqah Humayra Arresky</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Alexandra Shavira Kaysa</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Alisya Zella Naura Saputro</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Alita Admiral</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Aqillah Khayyirah</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Azima Zafeera Khairiya</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Azka Aisy Muhammad Firdaus</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Farrel Azka Firlana</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Fattah Altaf Qusyairi</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Giovanny Syahputra</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Gusti Muhammad An-Nafis</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Hilmi Muhammad Nidho Mudhin</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Khalika Ismatullah Assahla</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Abdurrahman Dzaki</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad El Junot Razqal</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Fahri Ardani</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Hafidz Setiadi</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Juna Defa Alfarizie</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Muhammad Zharif Syatir</p>
-                        </div>
-                        <div class="student-card">
-                            <div class="initial"></div>
-                            <p>Syifa Fathiyah Zahra</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-  <!-- Chat Modern -->
-        <section id="chat-section">
-            <h2>Chat Angkatan XVI</h2>
-            <div id="chat-room">
-              <div id="messages" class="chat-messages"></div>
-              <div id="typing-indicator">Seseorang sedang mengetik...</div>
-              <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Ketik pesan...">
-                <button id="sendBtn">Kirim</button>
-              </div>
-            </div>
-        </section>
-</main>
+    <!-- Chat Section -->
+    <section id="chat-section">
+      <div class="chat-header">
+        <div class="chat-header-icon">💬</div>
+        <div class="chat-header-info">
+          <h2>Chat Angkatan XVI</h2>
+          <p><span class="chat-online-dot"></span>Semua angkatan terhubung</p>
+        </div>
+      </div>
+      <div id="chat-room">
+        <div id="messages" class="chat-messages"></div>
+        <div id="typing-indicator">
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+          Seseorang sedang mengetik...
+        </div>
+        <div class="chat-input-area">
+          <input type="text" id="messageInput" placeholder="Tulis pesan kamu...">
+          <button id="sendBtn">➤</button>
+        </div>
+      </div>
+    </section>
 
-    <script src="script.js"></script>
+  </main>
+
+  <footer>
+    <p>Dibuat dengan ❤️ oleh <span>Angkatan XVI</span></p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
