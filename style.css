@@ -1064,3 +1064,126 @@ footer span { color: var(--gold); font-weight: 600; }
   .gallery-grid { grid-template-columns: repeat(2, 1fr); }
   .lightbox-nav { display: none; }
 }
+
+/* ══════════════════════════════════════
+   MUSIC PLAYER FLOATING
+══════════════════════════════════════ */
+.music-player {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  animation: mpSlideUp 0.5s 1s ease both;
+}
+
+@keyframes mpSlideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(30px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.music-player-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(10, 22, 40, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: 50px;
+  padding: 0.55rem 1.2rem 0.55rem 0.8rem;
+  box-shadow: 0 8px 32px rgba(10, 22, 40, 0.35);
+  min-width: 280px;
+}
+
+.mp-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.3rem 0.4rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.mp-btn:hover { color: var(--gold2); }
+
+.mp-play {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2)) !important;
+  color: var(--navy) !important;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(201,168,76,0.35);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.mp-play:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(201,168,76,0.5);
+}
+
+.mp-play.playing::before { content: ''; }
+
+.mp-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.mp-icon {
+  color: var(--gold);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  animation: mpSpin 3s linear infinite paused;
+}
+
+.mp-icon.spinning { animation-play-state: running; }
+
+@keyframes mpSpin {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.mp-title {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.mp-progress-wrap {
+  display: none; /* visible only when playing */
+}
+
+.mp-progress-bar {
+  width: 50px; height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mp-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  border-radius: 10px;
+  transition: width 0.5s linear;
+}
+
+.music-player.active .mp-progress-wrap { display: flex; align-items: center; }
+
+@media (max-width: 480px) {
+  .music-player-inner { min-width: 240px; padding: 0.5rem 0.9rem 0.5rem 0.7rem; }
+  .mp-title { font-size: 0.72rem; }
+}
