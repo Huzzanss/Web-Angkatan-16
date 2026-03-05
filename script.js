@@ -1,136 +1,535 @@
-// Smooth scroll navbar
-document.querySelectorAll('#navbar a').forEach(anchor => {
-  anchor.addEventListener('click', e => {
-    e.preventDefault();
-    document.querySelector(anchor.getAttribute('href')).scrollIntoView({
-      behavior: 'smooth', block: 'start'
-    });
-  });
-});
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-// Generate initial dari nama siswa + warna per huruf
-function generateInitial(name) {
-  return name ? name.charAt(0).toUpperCase() : '';
+/* ─── Reset & Base ─── */
+*, *::before, *::after {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.student-card').forEach(card => {
-    const name = card.querySelector('p').textContent.trim();
-    const letter = generateInitial(name);
-    const el = card.querySelector('.initial');
-    el.textContent = letter;
-    el.setAttribute('data-letter', letter);
-  });
-});
-
-// Toggle navbar mobile
-if (window.innerWidth <= 768) {
-  const navRight = document.querySelector('.nav-right');
-  const toggleBtn = document.createElement('button');
-  toggleBtn.innerHTML = '&#9776;';
-  toggleBtn.style.cssText = 'background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;line-height:1;';
-  document.querySelector('.nav-left').appendChild(toggleBtn);
-  toggleBtn.addEventListener('click', () => navRight.classList.toggle('show'));
+:root {
+  --navy:    #0a1628;
+  --navy2:   #112240;
+  --navy3:   #1d3461;
+  --gold:    #c9a84c;
+  --gold2:   #e8c97a;
+  --cream:   #f8f4ed;
+  --text:    #2d2d2d;
+  --muted:   #7a7a8a;
+  --white:   #ffffff;
+  --radius:  14px;
+  --shadow:  0 8px 32px rgba(10,22,40,0.10);
+  --shadow2: 0 2px 8px rgba(10,22,40,0.07);
 }
 
-// ─── Firebase Config ───
-const firebaseConfig = {
-  apiKey: "AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
-  authDomain: "chat-angkatan-16.firebaseapp.com",
-  databaseURL: "https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "chat-angkatan-16",
-  storageBucket: "chat-angkatan-16.appspot.com",
-  messagingSenderId: "47699501502",
-  appId: "1:47699501502:web:0d09e69d0b3ff39a7359ef"
-};
+html { scroll-behavior: smooth; }
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 15px;
+  overflow-x: hidden;
+}
 
-// User anonim
-let userId = localStorage.getItem('chatUserId') || Math.random().toString(36).substr(2, 9);
-localStorage.setItem('chatUserId', userId);
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
-// DOM
-const messagesDiv = document.getElementById('messages');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-const typingIndicator = document.getElementById('typing-indicator');
-let isTyping = false, typingTimeout;
+/* ─── Navbar ─── */
+#navbar {
+  position: fixed;
+  top: 0; width: 100%;
+  background: rgba(10, 22, 40, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 3rem;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(201,168,76,0.18);
+  transition: all 0.3s;
+}
 
-// Send message (click)
-sendBtn.addEventListener('click', sendMessage);
+.nav-left h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.5px;
+}
 
-// Send message (Enter key)
-messageInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
+.nav-left h1 span {
+  color: var(--gold);
+}
+
+.nav-right {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.nav-right a {
+  color: rgba(255,255,255,0.78);
+  text-decoration: none;
+  padding: 0.45rem 1.1rem;
+  border-radius: 50px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.25s;
+  border: 1px solid transparent;
+}
+
+.nav-right a:hover {
+  color: var(--gold2);
+  border-color: rgba(201,168,76,0.4);
+  background: rgba(201,168,76,0.08);
+}
+
+/* ─── Main ─── */
+main {
+  padding-top: 78px;
+}
+
+/* ─── Hero Banner per section ─── */
+.kelas-section {
+  max-width: 1100px;
+  margin: 2.5rem auto;
+  background: var(--white);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1px solid rgba(201,168,76,0.12);
+}
+
+.section-header {
+  background: linear-gradient(120deg, var(--navy) 0%, var(--navy3) 100%);
+  padding: 2.2rem 3rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.section-header::before {
+  content: '';
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.07);
+  pointer-events: none;
+}
+
+.section-header::after {
+  content: '';
+  position: absolute;
+  right: 40px; bottom: -60px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.05);
+  pointer-events: none;
+}
+
+.section-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.5px;
+}
+
+.section-badge {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.3rem 0.9rem;
+  border-radius: 50px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.section-body {
+  padding: 2.5rem 3rem;
+}
+
+/* ─── Wali Kelas ─── */
+.wali-kelas {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: linear-gradient(135deg, #f8f4ed 0%, #fff8ee 100%);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: var(--radius);
+  padding: 1.4rem 2rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.wali-kelas::before {
+  content: 'Wali Kelas';
+  position: absolute;
+  top: -10px; left: 20px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 0.2rem 0.8rem;
+  border-radius: 50px;
+}
+
+.wali-photo img {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--gold);
+  box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+}
+
+.wali-kelas .wali-info h3 {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.wali-kelas .wali-info p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* ─── Student Grid ─── */
+.daftar-siswa > h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: var(--navy);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 2px solid rgba(201,168,76,0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.daftar-siswa > h3::before {
+  content: '';
+  display: inline-block;
+  width: 4px; height: 18px;
+  background: linear-gradient(to bottom, var(--gold), var(--gold2));
+  border-radius: 2px;
+}
+
+.student-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 1.1rem;
+}
+
+.student-card {
+  background: var(--white);
+  border: 1px solid #ebebf0;
+  border-radius: var(--radius);
+  padding: 1.4rem 1rem 1.2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  cursor: default;
+  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+  position: relative;
+  overflow: hidden;
+}
+
+.student-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  opacity: 0;
+  transition: opacity 0.22s;
+}
+
+.student-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(10,22,40,0.12);
+  border-color: rgba(201,168,76,0.35);
+}
+
+.student-card:hover::before {
+  opacity: 1;
+}
+
+.initial {
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--white);
+  flex-shrink: 0;
+  font-family: 'Cormorant Garamond', serif;
+  box-shadow: 0 4px 12px rgba(10,22,40,0.15);
+}
+
+/* Warna inisial di-set dinamis via JS (spektrum A→Z) */
+
+.student-card p {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+/* ─── Chat Section ─── */
+#chat-section {
+  max-width: 780px;
+  margin: 2.5rem auto 3rem;
+  background: var(--white);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1px solid rgba(201,168,76,0.12);
+}
+
+.chat-header {
+  background: linear-gradient(120deg, var(--navy) 0%, var(--navy3) 100%);
+  padding: 1.4rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chat-header-icon {
+  width: 42px; height: 42px;
+  background: rgba(201,168,76,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.chat-header-info h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.chat-header-info p {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.55);
+  font-weight: 400;
+}
+
+.chat-online-dot {
+  width: 8px; height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  box-shadow: 0 0 6px #4ade80;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+#chat-room {
+  display: flex;
+  flex-direction: column;
+  height: 420px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 1.5rem 0.5rem;
+  background: #f7f8fc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.message {
+  max-width: 72%;
+  padding: 0.65rem 1rem;
+  border-radius: 16px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  position: relative;
+  animation: msgIn 0.2s ease;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.message.sent {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--navy), var(--navy3));
+  color: var(--white);
+  border-bottom-right-radius: 5px;
+}
+
+.message.received {
+  align-self: flex-start;
+  background: var(--white);
+  color: var(--text);
+  border-bottom-left-radius: 5px;
+  box-shadow: var(--shadow2);
+}
+
+.msg-sender {
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  opacity: 0.65;
+}
+
+.msg-text {
+  word-break: break-word;
+}
+
+.msg-time {
+  font-size: 0.65rem;
+  opacity: 0.5;
+  margin-top: 0.2rem;
+  text-align: right;
+}
+
+.message.sent .msg-sender { display: none; }
+
+#typing-indicator {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.8rem;
+  padding: 0.4rem 1.5rem;
+  background: #f7f8fc;
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.typing-dots {
+  display: flex; gap: 3px;
+}
+
+.typing-dots span {
+  width: 5px; height: 5px;
+  background: var(--muted);
+  border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-5px); }
+}
+
+.chat-input-area {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 1.2rem;
+  background: var(--white);
+  border-top: 1px solid #eef0f5;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 0.75rem 1.2rem;
+  border-radius: 50px;
+  border: 1.5px solid #e0e3ee;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  background: #f7f8fc;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.chat-input-area input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+  background: var(--white);
+}
+
+.chat-input-area input::placeholder { color: #b0b3c1; }
+
+#sendBtn {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--navy), var(--navy3));
+  color: var(--white);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+  box-shadow: 0 4px 14px rgba(10,22,40,0.18);
+}
+
+#sendBtn:hover {
+  transform: scale(1.07);
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy);
+  box-shadow: 0 6px 18px rgba(201,168,76,0.35);
+}
+
+#sendBtn:active { transform: scale(0.95); }
+
+/* ─── Footer ─── */
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  border-top: 1px solid rgba(201,168,76,0.15);
+}
+
+footer span { color: var(--gold); font-weight: 600; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  #navbar { padding: 0.9rem 1.5rem; }
+  .nav-right { display: none; }
+  .nav-right.show {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%; left: 0; width: 100%;
+    background: rgba(10,22,40,0.97);
+    padding: 1rem;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
   }
-});
-
-function sendMessage() {
-  const text = messageInput.value.trim();
-  if (!text) return;
-  db.ref('messages').push({ userId, text, timestamp: Date.now() });
-  messageInput.value = '';
-  stopTyping();
+  .section-header { padding: 1.5rem 1.5rem; }
+  .section-body { padding: 1.5rem; }
+  .wali-kelas { flex-direction: column; text-align: center; }
+  .kelas-section, #chat-section { margin: 1.5rem 1rem; }
 }
 
-// Typing indicator
-messageInput.addEventListener('input', () => {
-  if (!isTyping) startTyping();
-  clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(stopTyping, 2000);
-});
-
-function startTyping() {
-  isTyping = true;
-  db.ref('typing/' + userId).set(true);
+@media (max-width: 480px) {
+  .student-grid { grid-template-columns: repeat(2, 1fr); }
+  .chat-messages { padding: 1rem; }
 }
-
-function stopTyping() {
-  isTyping = false;
-  db.ref('typing/' + userId).set(false);
-}
-
-// Render messages realtime
-db.ref('messages').on('value', snapshot => {
-  messagesDiv.innerHTML = '';
-  const data = snapshot.val() || {};
-  Object.values(data)
-    .sort((a, b) => a.timestamp - b.timestamp)
-    .forEach(msg => {
-      const isMine = msg.userId === userId;
-      const time = new Date(msg.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-      const div = document.createElement('div');
-      div.className = `message ${isMine ? 'sent' : 'received'}`;
-      div.innerHTML = `
-        <div class="msg-sender">${isMine ? 'Saya' : 'Anonim'}</div>
-        <div class="msg-text">${escapeHtml(msg.text)}</div>
-        <div class="msg-time">${time}</div>
-      `;
-      messagesDiv.appendChild(div);
-    });
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-});
-
-// Typing indicator realtime
-db.ref('typing').on('value', snapshot => {
-  const data = snapshot.val() || {};
-  const someoneTyping = Object.keys(data).some(k => k !== userId && data[k]);
-  typingIndicator.style.display = someoneTyping ? 'flex' : 'none';
-});
-
-// Escape HTML to prevent XSS
-function escapeHtml(text) {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-// Cleanup on unload
-window.addEventListener('beforeunload', stopTyping);
