@@ -1,3 +1,52 @@
+// ─── Countdown Wisuda 13 Mei 2026 ───
+(function() {
+  const target = new Date('2026-05-13T08:00:00+08:00').getTime();
+
+  const elDays = document.getElementById('cd-days');
+  const elHours = document.getElementById('cd-hours');
+  const elMins = document.getElementById('cd-minutes');
+  const elSecs = document.getElementById('cd-seconds');
+  const elMsg = document.getElementById('countdown-msg');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function tick(el, val) {
+    const formatted = pad(val);
+    if (el.textContent !== formatted) {
+      el.textContent = formatted;
+      el.classList.remove('tick');
+      void el.offsetWidth; // reflow
+      el.classList.add('tick');
+      setTimeout(() => el.classList.remove('tick'), 150);
+    }
+  }
+
+  function update() {
+    const now = Date.now();
+    const diff = target - now;
+
+    if (diff <= 0) {
+      [elDays, elHours, elMins, elSecs].forEach(el => el.textContent = '00');
+      elMsg.textContent = '🎓 Selamat! Hari Wisuda telah tiba!';
+      elMsg.classList.add('done');
+      return;
+    }
+
+    const days  = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins  = Math.floor((diff % 3600000)  / 60000);
+    const secs  = Math.floor((diff % 60000)    / 1000);
+
+    tick(elDays,  days);
+    tick(elHours, hours);
+    tick(elMins,  mins);
+    tick(elSecs,  secs);
+  }
+
+  update();
+  setInterval(update, 1000);
+})();
+
 // Smooth scroll navbar
 document.querySelectorAll('#navbar a').forEach(anchor => {
   anchor.addEventListener('click', e => {
