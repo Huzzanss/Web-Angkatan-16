@@ -268,6 +268,25 @@
     <p>Dibuat dengan ❤️ oleh <span>Angkatan XVI</span></p>
   </footer>
 
+
+  <!-- ─── Music Player Floating ─── -->
+  <div class="music-player" id="musicPlayer">
+    <div class="music-player-inner">
+      <button class="mp-btn" id="mpPrev" title="Sebelumnya">&#9664;&#9664;</button>
+      <button class="mp-btn mp-play" id="mpPlay" title="Play/Pause">&#9654;</button>
+      <button class="mp-btn" id="mpNext" title="Selanjutnya">&#9654;&#9654;</button>
+      <div class="mp-info">
+        <span class="mp-icon">♪</span>
+        <span class="mp-title" id="mpTitle">Memuat musik...</span>
+      </div>
+      <div class="mp-progress-wrap">
+        <div class="mp-progress-bar"><div class="mp-progress-fill" id="mpFill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="bgAudio" preload="auto"></audio>
+
   <script src="script.js"></script>
 </body>
 </html>
