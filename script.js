@@ -198,3 +198,163 @@ function escapeHtml(text) {
 
 // Cleanup on unload
 window.addEventListener('beforeunload', stopTyping);
+
+/* ══════════════════════════════════════
+   GALLERY ANGKATAN XVI
+   Firebase Storage + Realtime DB
+══════════════════════════════════════ */
+(function() {
+  const storage   = firebase.storage();
+  const galleryDb = db.ref('gallery');
+
+  const photoInput    = document.getElementById('photoInput');
+  const uploadDrop    = document.getElementById('uploadDrop');
+  const uploadProgress= document.getElementById('uploadProgress');
+  const progressFill  = document.getElementById('progressFill');
+  const progressText  = document.getElementById('progressText');
+  const galleryGrid   = document.getElementById('galleryGrid');
+  const galleryEmpty  = document.getElementById('galleryEmpty');
+  const lightbox      = document.getElementById('lightbox');
+  const lightboxImg   = document.getElementById('lightboxImg');
+  const lightboxClose = document.getElementById('lightboxClose');
+  const lightboxPrev  = document.getElementById('lightboxPrev');
+  const lightboxNext  = document.getElementById('lightboxNext');
+  const lightboxCap   = document.getElementById('lightboxCaption');
+
+  let allPhotos = []; // [{url, timestamp, name}]
+  let currentIdx = 0;
+
+  // ── Drag & Drop ──
+  uploadDrop.addEventListener('dragover', e => {
+    e.preventDefault();
+    uploadDrop.classList.add('dragover');
+  });
+  uploadDrop.addEventListener('dragleave', () => uploadDrop.classList.remove('dragover'));
+  uploadDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadDrop.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+  uploadDrop.addEventListener('click', () => photoInput.click());
+
+  photoInput.addEventListener('change', () => handleFiles(photoInput.files));
+
+  // ── Upload Handler ──
+  function handleFiles(files) {
+    const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (!arr.length) return;
+    let done = 0;
+    uploadProgress.style.display = 'block';
+    uploadDrop.style.display = 'none';
+
+    arr.forEach(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        alert(file.name + ' melebihi 5MB, dilewati.');
+        done++;
+        if (done === arr.length) resetUploadUI();
+        return;
+      }
+
+      const ref = storage.ref('gallery/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_'));
+      const task = ref.put(file);
+
+      task.on('state_changed',
+        snap => {
+          const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+          progressFill.style.width = pct + '%';
+          progressText.textContent = 'Mengupload ' + (done + 1) + '/' + arr.length + ' (' + pct + '%)';
+        },
+        err => {
+          console.error(err);
+          done++;
+          if (done === arr.length) resetUploadUI();
+        },
+        () => {
+          task.snapshot.ref.getDownloadURL().then(url => {
+            galleryDb.push({ url, name: file.name, timestamp: Date.now() });
+            done++;
+            if (done === arr.length) resetUploadUI();
+          });
+        }
+      );
+    });
+  }
+
+  function resetUploadUI() {
+    uploadProgress.style.display = 'none';
+    uploadDrop.style.display = 'block';
+    progressFill.style.width = '0%';
+    photoInput.value = '';
+  }
+
+  // ── Load Gallery ──
+  galleryDb.orderByChild('timestamp').on('value', snap => {
+    allPhotos = [];
+    const data = snap.val() || {};
+    Object.values(data)
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .forEach(p => allPhotos.push(p));
+
+    renderGallery();
+  });
+
+  function renderGallery() {
+    // Remove existing items (keep empty placeholder)
+    Array.from(galleryGrid.querySelectorAll('.gallery-item')).forEach(el => el.remove());
+
+    if (allPhotos.length === 0) {
+      galleryEmpty.style.display = 'block';
+      return;
+    }
+    galleryEmpty.style.display = 'none';
+
+    allPhotos.forEach((photo, idx) => {
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      const date = new Date(photo.timestamp).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
+      item.innerHTML = `
+        <img src="${photo.url}" alt="${photo.name || 'Foto'}" loading="lazy">
+        <div class="gallery-item-overlay">
+          <span class="gallery-item-time">${date}</span>
+        </div>
+      `;
+      item.addEventListener('click', () => openLightbox(idx));
+      galleryGrid.appendChild(item);
+    });
+  }
+
+  // ── Lightbox ──
+  function openLightbox(idx) {
+    currentIdx = idx;
+    showPhoto(currentIdx);
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function showPhoto(idx) {
+    const p = allPhotos[idx];
+    lightboxImg.src = p.url;
+    const date = new Date(p.timestamp).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
+    lightboxCap.textContent = date + (allPhotos.length > 1 ? '  ·  ' + (idx+1) + ' / ' + allPhotos.length : '');
+    lightboxPrev.style.display = idx > 0 ? 'flex' : 'none';
+    lightboxNext.style.display = idx < allPhotos.length - 1 ? 'flex' : 'none';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    lightboxImg.src = '';
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+  lightboxPrev.addEventListener('click', e => { e.stopPropagation(); showPhoto(--currentIdx); });
+  lightboxNext.addEventListener('click', e => { e.stopPropagation(); showPhoto(++currentIdx); });
+
+  document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft' && currentIdx > 0) showPhoto(--currentIdx);
+    if (e.key === 'ArrowRight' && currentIdx < allPhotos.length - 1) showPhoto(++currentIdx);
+  });
+})();
