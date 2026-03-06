@@ -146,6 +146,35 @@
       line-height: 1;
     }
 
+    .next-options {
+      display: flex; align-items: center; gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .next-pill {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--navy), var(--navy3));
+      padding: 0.15rem 0.7rem;
+      border-radius: 8px;
+      border: 1px solid rgba(201,168,76,0.3);
+      line-height: 1.3;
+    }
+
+    .next-pill:first-child {
+      font-size: 2rem;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: var(--navy);
+    }
+
+    .next-or {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
     .status-sep { width: 1px; height: 40px; background: rgba(10,22,40,0.08); }
 
     .online-count {
@@ -783,8 +812,8 @@
         </div>
         <div class="status-sep"></div>
         <div class="status-item">
-          <span class="status-label">Huruf Berikutnya</span>
-          <span class="status-value next-letter" id="nextLetter">?</span>
+          <span class="status-label">Awalan Berikutnya</span>
+          <div class="next-options" id="nextOptions"><span class="status-value next-letter">?</span></div>
         </div>
         <div class="status-sep"></div>
         <div class="status-item">
@@ -898,7 +927,8 @@
   let allWords       = [];
   let wordSet        = new Set();
   let lastWord       = '';
-  let nextLetter     = '';
+  let nextLetter = '';
+  let nextOptions = []; // array of valid prefixes (1,2,3 huruf)
   localStorage.setItem('skUserId', myId);
 
   const playerNameInput = document.getElementById('playerName');
@@ -1155,17 +1185,32 @@
   }
 
   function updateStatus() {
+    const optEl = document.getElementById('nextOptions');
     if (allWords.length === 0) {
       document.getElementById('lastWord').textContent = '—';
-      document.getElementById('nextLetter').textContent = '?';
-      lastWord = ''; nextLetter = '';
+      optEl.innerHTML = '<span class="status-value next-letter">?</span>';
+      lastWord = ''; nextLetter = ''; nextOptions = [];
       return;
     }
     const lw = allWords[allWords.length - 1].word;
-    lastWord   = lw;
-    nextLetter = lw.charAt(lw.length - 1).toUpperCase();
-    document.getElementById('lastWord').textContent   = lw;
-    document.getElementById('nextLetter').textContent = nextLetter;
+    lastWord = lw;
+
+    // Kata panjang (≥5 huruf): boleh pakai 1, 2, atau 3 huruf terakhir
+    // Kata pendek (<5 huruf): hanya 1 huruf terakhir
+    nextOptions = [];
+    const maxSuffix = lw.length >= 5 ? 3 : 1;
+    for (let i = 1; i <= maxSuffix; i++) {
+      nextOptions.push(lw.slice(-i).toUpperCase());
+    }
+    nextLetter = nextOptions[0]; // fallback 1 huruf
+
+    document.getElementById('lastWord').textContent = lw;
+
+    // Render option pills
+    optEl.innerHTML = nextOptions.map((opt, i) => {
+      const labels = ['1 huruf', '2 huruf', '3 huruf'];
+      return `<span class="next-pill" title="${labels[i]}">${opt}</span>`;
+    }).join('<span class="next-or">atau</span>');
   }
 
   /* ══════════════════════
@@ -1192,8 +1237,14 @@
       return showFeedback('fail', '⚠ Hanya huruf yang dibolehkan!', input);
     if (wordSet.has(raw))
       return showFeedback('fail', '❌ Kata "' + raw + '" sudah pernah dipakai!', input);
-    if (nextLetter && raw.charAt(0).toUpperCase() !== nextLetter)
-      return showFeedback('fail', '❌ Kata harus dimulai huruf ' + nextLetter + '!', input);
+    if (nextOptions.length > 0) {
+      const rawUp = raw.toUpperCase();
+      const valid = nextOptions.some(opt => rawUp.startsWith(opt));
+      if (!valid) {
+        const opts = nextOptions.join(' / ');
+        return showFeedback('fail', '❌ Kata harus dimulai dengan: ' + opts, input);
+      }
+    }
 
     clearTurnTimer();
     gameRef.push({ word: raw, player: myName||'Anonim', userId: myId, timestamp: Date.now() });
