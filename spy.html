@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Who Is The Spy — Angkatan XVI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0a1628;--navy3:#1d3461;
+  --gold:#c9a84c;--gold2:#e8c97a;
+  --spy:#7c2d12;--spy2:#b45309;
+  --night:#0f172a;
+  --green:#22c55e;--red:#ef4444;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;background:var(--night);overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--gold2);border-radius:10px;}
+
+/* Navbar */
+.navbar{position:fixed;top:0;width:100%;background:rgba(10,22,40,.95);backdrop-filter:blur(18px);border-bottom:1px solid rgba(201,168,76,.2);padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;z-index:200;}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:#fff;text-decoration:none;}
+.nav-logo span{color:var(--gold);}
+.nav-back{color:rgba(255,255,255,.55);text-decoration:none;font-size:.78rem;padding:.3rem .75rem;border-radius:50px;border:1px solid rgba(255,255,255,.15);}
+
+/* Screens */
+.screen{display:none;min-height:100vh;}
+#sJoin.show{display:flex;align-items:center;justify-content:center;padding:80px 1rem 2rem;background:radial-gradient(ellipse at top,#1a0a2e 0%,var(--night) 70%);}
+#sLobby.show,#sGame.show,#sEnd.show{display:block;}
+
+/* JOIN */
+.join-card{background:rgba(255,255,255,.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:28px;padding:2.5rem 2rem;max-width:420px;width:100%;text-align:center;}
+.j-icon{font-size:4rem;margin-bottom:.8rem;filter:drop-shadow(0 0 24px rgba(124,45,18,.7));}
+.j-title{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;margin-bottom:.3rem;}
+.j-title em{color:var(--gold2);font-style:italic;}
+.j-sub{font-size:.82rem;color:rgba(255,255,255,.4);margin-bottom:1.8rem;line-height:1.6;}
+.j-inp{width:100%;padding:.85rem 1.2rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:50px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;text-align:center;margin-bottom:.9rem;transition:border-color .2s;}
+.j-inp::placeholder{color:rgba(255,255,255,.3);}
+.j-inp:focus{border-color:var(--gold);}
+.j-btn{width:100%;padding:.9rem;background:linear-gradient(135deg,var(--spy),var(--spy2));color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.j-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,45,18,.5);}
+
+/* LOBBY */
+#sLobby{background:radial-gradient(ellipse at top,#1a0a2e 0%,var(--night) 70%);}
+.wrap{max-width:680px;margin:0 auto;padding:74px 1rem 3rem;}
+.lcard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:1.3rem;margin-bottom:1rem;}
+.lcard-t{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;font-weight:600;}
+.plyr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.6rem;}
+.plyr-chip{display:flex;align-items:center;gap:.5rem;padding:.55rem .75rem;background:rgba(255,255,255,.06);border-radius:10px;border:1px solid rgba(255,255,255,.07);}
+.plyr-chip.host{border-color:rgba(201,168,76,.4);}
+.chip-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0;}
+.chip-name{font-size:.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.chip-host{font-size:.58rem;color:var(--gold);font-weight:700;}
+.start-btn{width:100%;padding:.9rem;background:linear-gradient(135deg,var(--spy),var(--spy2));color:#fff;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:.8rem;}
+.start-btn:disabled{opacity:.35;cursor:not-allowed;}
+.start-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,45,18,.5);}
+.start-hint{font-size:.72rem;color:rgba(255,255,255,.28);text-align:center;margin-top:.5rem;}
+/* Word pairs config */
+.word-pair-row{display:flex;gap:.6rem;margin-bottom:.6rem;}
+.word-inp{flex:1;padding:.55rem .85rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.84rem;outline:none;transition:border-color .2s;}
+.word-inp:focus{border-color:var(--gold);}
+.word-inp::placeholder{color:rgba(255,255,255,.25);}
+.add-pair-btn{padding:.55rem .9rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-size:.82rem;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+.add-pair-btn:hover{border-color:var(--gold);}
+.del-pair-btn{padding:.55rem .65rem;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:#fca5a5;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.spy-count-row{display:flex;align-items:center;gap:.8rem;margin-top:.8rem;}
+.spy-count-lbl{font-size:.8rem;color:rgba(255,255,255,.55);}
+.cnt-btn{width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.cnt-btn:hover{border-color:var(--gold);}
+.cnt-val{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:var(--gold2);min-width:1.3rem;text-align:center;}
+
+/* GAME */
+.game-wrap{max-width:900px;margin:0 auto;padding:66px 1rem 3rem;display:grid;grid-template-columns:1fr 280px;gap:1rem;}
+.left-col{display:flex;flex-direction:column;gap:1rem;}
+.right-col{display:flex;flex-direction:column;gap:1rem;}
+.panel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.1rem;}
+.panel-t{font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:.9rem;font-weight:600;}
+
+/* Phase banner */
+.ph-banner{border-radius:16px;padding:1.2rem 1.5rem;margin-bottom:1rem;position:relative;overflow:hidden;grid-column:1/-1;}
+.ph-banner::after{content:'';position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.04);}
+.ph-clue{background:linear-gradient(120deg,#1e3a5f,#1d3461);border:1px solid rgba(201,168,76,.2);}
+.ph-vote{background:linear-gradient(120deg,var(--spy),#9a3412);border:1px solid rgba(249,115,22,.25);}
+.ph-end{background:linear-gradient(120deg,#14532d,#166534);border:1px solid rgba(34,197,94,.25);}
+.pb-label{font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.25rem;}
+.pb-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;margin-bottom:.2rem;}
+.pb-sub{font-size:.79rem;color:rgba(255,255,255,.5);line-height:1.4;}
+.pb-timer{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:rgba(255,255,255,.75);position:absolute;right:1.4rem;top:50%;transform:translateY(-50%);}
+.pb-timer.urg{color:var(--red);animation:urg .5s ease infinite;}
+@keyframes urg{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* My word card */
+.word-reveal{background:linear-gradient(120deg,var(--spy),#9a3412);border:1px solid rgba(249,115,22,.3);border-radius:16px;padding:1.5rem;text-align:center;grid-column:1/-1;}
+.wr-label{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.5rem;}
+.wr-word{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5);}
+.wr-hint{font-size:.78rem;color:rgba(255,255,255,.4);margin-top:.5rem;}
+.wr-spy{color:var(--gold2);font-weight:700;font-size:.85rem;margin-top:.3rem;}
+
+/* Player list */
+.plyr-list{display:flex;flex-direction:column;gap:.4rem;}
+.pc{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:10px;border:1.5px solid transparent;background:rgba(255,255,255,.04);transition:all .2s;}
+.pc.active-turn{border-color:rgba(46,204,113,.5);background:rgba(46,204,113,.07);}
+.pc.eliminated{opacity:.35;background:rgba(0,0,0,.2);}
+.pc.clickable{cursor:pointer;}
+.pc.clickable:hover{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.07);}
+.pc.voted-sel{border-color:var(--gold);background:rgba(201,168,76,.1);}
+.pc-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff;flex-shrink:0;}
+.pc-name{font-size:.85rem;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pc-tag{font-size:.62rem;padding:.1rem .4rem;border-radius:50px;font-weight:700;flex-shrink:0;}
+.pt-spy{background:rgba(124,45,18,.5);color:#fca5a5;border:1px solid rgba(239,68,68,.3);}
+.pt-civ{background:rgba(30,58,95,.5);color:#93c5fd;border:1px solid rgba(99,102,241,.3);}
+.pc-vcount{font-size:.72rem;color:var(--gold);font-weight:700;margin-left:auto;}
+.pc-dead{font-size:.8rem;margin-left:auto;}
+
+/* Clue display */
+.clue-list{display:flex;flex-direction:column;gap:.5rem;}
+.clue-item{padding:.6rem .9rem;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);}
+.clue-name{font-size:.65rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:.2rem;}
+.clue-text{font-size:.92rem;font-weight:600;line-height:1.4;}
+.clue-item.active{background:linear-gradient(120deg,rgba(201,168,76,.12),transparent);border-color:rgba(201,168,76,.25);}
+.clue-item.pending{border-style:dashed;border-color:rgba(255,255,255,.2);opacity:.5;}
+
+/* Clue input */
+.clue-input-wrap{display:flex;flex-direction:column;gap:.6rem;padding:1rem;background:linear-gradient(120deg,rgba(46,204,113,.1),transparent);border:1px solid rgba(46,204,113,.25);border-radius:12px;}
+.clue-input-lbl{font-size:.7rem;font-weight:700;color:rgba(46,204,113,.8);text-transform:uppercase;letter-spacing:2px;}
+.clue-inp{padding:.7rem 1rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:50px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;}
+.clue-inp:focus{border-color:var(--green);}
+.clue-inp::placeholder{color:rgba(255,255,255,.25);}
+.clue-submit{padding:.7rem;background:linear-gradient(135deg,var(--green),#16a34a);color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.clue-submit:hover{transform:translateY(-2px);}
+.clue-submit:disabled{opacity:.35;cursor:not-allowed;transform:none!important;}
+
+/* Vote */
+.vote-done{text-align:center;padding:.7rem;font-size:.8rem;color:rgba(255,255,255,.35);font-style:italic;}
+.vote-btns{display:flex;flex-direction:column;gap:.4rem;margin-top:.5rem;}
+.vote-btn{padding:.7rem;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--spy),var(--spy2));color:#fff;transition:all .18s;}
+.vote-btn:hover{transform:translateY(-2px);}
+.skip-vote-btn{background:rgba(255,255,255,.07);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.1);}
+.skip-vote-btn:hover{background:rgba(255,255,255,.12);}
+
+/* Chat */
+.chat-box{display:flex;flex-direction:column;height:360px;}
+.chat-head{padding:.8rem;border-bottom:1px solid rgba(255,255,255,.07);font-size:.82rem;font-weight:700;}
+.chat-msgs{flex:1;overflow-y:auto;padding:.7rem;display:flex;flex-direction:column;gap:.28rem;}
+.cm{font-size:.78rem;padding:.4rem .65rem;border-radius:9px;line-height:1.4;animation:fi .2s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(4px);}to{opacity:1;}}
+.cm.mine{background:rgba(201,168,76,.18);align-self:flex-end;max-width:90%;}
+.cm.theirs{background:rgba(255,255,255,.06);max-width:90%;}
+.cm.sys{background:rgba(255,255,255,.04);text-align:center;font-size:.7rem;color:rgba(255,255,255,.3);font-style:italic;border-radius:50px;}
+.cm.ann{background:linear-gradient(120deg,rgba(201,168,76,.12),transparent);border:1px solid rgba(201,168,76,.2);text-align:center;font-weight:600;color:var(--gold2);border-radius:12px;padding:.55rem;}
+.cm-n{font-size:.62rem;color:rgba(255,255,255,.4);font-weight:700;margin-bottom:.06rem;}
+.chat-row{display:flex;gap:.4rem;padding:.6rem .7rem;border-top:1px solid rgba(255,255,255,.07);}
+.chat-inp{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:.48rem .85rem;color:#fff;font-family:'DM Sans',sans-serif;font-size:.8rem;outline:none;}
+.chat-inp::placeholder{color:rgba(255,255,255,.23);}
+.chat-inp:focus{border-color:var(--gold);}
+.chat-send{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.chat-send:hover{background:var(--gold);color:var(--navy);}
+
+/* Spy guess modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:400;display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-bg.show{display:flex;}
+.modal-card{background:#111827;border-radius:20px;padding:2rem;max-width:360px;width:100%;text-align:center;border:1px solid rgba(255,255,255,.1);}
+.modal-icon{font-size:3rem;margin-bottom:.7rem;}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;margin-bottom:.4rem;}
+.modal-sub{font-size:.83rem;color:rgba(255,255,255,.5);margin-bottom:1.2rem;line-height:1.5;}
+.modal-inp{width:100%;padding:.7rem 1rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:50px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;text-align:center;margin-bottom:.8rem;}
+.modal-inp:focus{border-color:var(--gold);}
+.modal-btn{padding:.65rem 1.8rem;border-radius:50px;background:var(--gold);color:var(--navy);border:none;font-family:'DM Sans',sans-serif;font-weight:700;cursor:pointer;font-size:.9rem;margin:.2rem;}
+.modal-btn.sec{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);}
+
+/* END */
+#sEnd{background:var(--night);}
+.end-wrap{max-width:600px;margin:0 auto;padding:80px 1rem 3rem;text-align:center;}
+.end-big{font-size:5rem;margin-bottom:1rem;}
+.end-title{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;margin-bottom:.4rem;}
+.end-sub{font-size:.88rem;color:rgba(255,255,255,.5);margin-bottom:1.5rem;line-height:1.6;}
+.end-reveal{background:rgba(255,255,255,.05);border-radius:14px;padding:1.2rem;margin-bottom:1.5rem;text-align:left;}
+.er-label{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;font-weight:600;}
+.er-word-pair{display:flex;gap:1rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap;}
+.er-word{padding:.5rem 1.2rem;border-radius:10px;font-size:1.2rem;font-weight:700;}
+.er-word.civ{background:rgba(30,58,95,.5);color:#93c5fd;}
+.er-word.spy{background:rgba(124,45,18,.5);color:#fca5a5;}
+.er-players{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;}
+.er-chip{padding:.32rem .8rem;border-radius:50px;font-size:.78rem;font-weight:600;}
+.er-chip.spy-c{background:rgba(124,45,18,.4);color:#fca5a5;border:1px solid rgba(239,68,68,.3);}
+.er-chip.civ-c{background:rgba(30,58,95,.5);color:#93c5fd;border:1px solid rgba(99,102,241,.3);}
+.restart-btn{padding:.85rem 2.5rem;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.restart-btn:hover{transform:translateY(-2px);}
+
+/* Toast */
+.toast{position:fixed;top:66px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.96);backdrop-filter:blur(10px);color:#fff;padding:.62rem 1.4rem;border-radius:50px;font-size:.82rem;font-weight:500;z-index:500;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(201,168,76,.22);max-width:90vw;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* Mobile */
+@media(max-width:700px){
+  .game-wrap{grid-template-columns:1fr;padding-top:62px;}
+  .ph-banner{grid-column:1;}
+  .word-reveal{grid-column:1;}
+  .pb-timer{position:static;transform:none;font-size:1.7rem;display:inline-block;margin-top:.3rem;}
+  .chat-box{height:260px;}
+  .wr-word{font-size:2.2rem;}
+}
+@media(max-width:480px){
+  .wrap{padding-left:.75rem;padding-right:.75rem;}
+  .end-wrap{padding-left:.75rem;padding-right:.75rem;}
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">Angkatan <span>XVI</span></a>
+  <a href="index.html" class="nav-back">← Kembali</a>
+</nav>
+
+<!-- JOIN -->
+<div id="sJoin" class="screen">
+  <div class="join-card">
+    <div class="j-icon">🕵️</div>
+    <h1 class="j-title">Who Is <em>The Spy?</em></h1>
+    <p class="j-sub">Semua pemain dapat kata yang mirip, kecuali mata-mata yang dapat kata berbeda. Berikan petunjuk satu kalimat, lalu temukan mata-matanya! 3–12 pemain.</p>
+    <input class="j-inp" id="jName" placeholder="Nama kamu..." maxlength="20" autocomplete="off">
+    <button class="j-btn" onclick="joinGame()">Masuk ke Ruangan →</button>
+  </div>
+</div>
+
+<!-- LOBBY -->
+<div id="sLobby" class="screen">
+  <div class="wrap">
+    <div style="text-align:center;padding:1.5rem 0 .5rem">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;margin-bottom:.2rem">Ruang <em style="color:var(--gold2)">Tunggu</em></h2>
+      <p style="font-size:.82rem;color:rgba(255,255,255,.4)">Tunggu semua bergabung, lalu host atur kata dan mulai.</p>
+    </div>
+    <div class="lcard">
+      <div class="lcard-t">🧑‍🤝‍🧑 Pemain (<span id="lobCount">0</span>)</div>
+      <div class="plyr-grid" id="lobPlayers"></div>
+    </div>
+    <div class="lcard" id="hostPanel" style="display:none">
+      <div class="lcard-t">📝 Pasangan Kata</div>
+      <div id="wordPairs"></div>
+      <button class="add-pair-btn" onclick="addPair()" style="margin-top:.3rem">+ Tambah Pasangan</button>
+      <div class="spy-count-row">
+        <span class="spy-count-lbl">Jumlah Mata-mata:</span>
+        <button class="cnt-btn" onclick="changeSpyCount(-1)">−</button>
+        <span class="cnt-val" id="spyCount">1</span>
+        <button class="cnt-btn" onclick="changeSpyCount(1)">+</button>
+        <span style="font-size:.72rem;color:rgba(255,255,255,.35)">(dari <span id="totalPlayers2">0</span> pemain)</span>
+      </div>
+      <button class="start-btn" id="startBtn" onclick="startGame()" disabled>🕵️ Mulai Game</button>
+      <p class="start-hint" id="startHint">Butuh minimal 3 pemain</p>
+    </div>
+    <div class="lcard" id="guestPanel" style="display:none">
+      <div style="text-align:center;padding:1.5rem;color:rgba(255,255,255,.5)">⏳ Menunggu host memulai...</div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="sGame" class="screen">
+  <div class="game-wrap">
+    <!-- Phase Banner (spans full width) -->
+    <div class="ph-banner ph-clue" id="phBanner">
+      <div class="pb-label" id="pbLabel">FASE PETUNJUK</div>
+      <div class="pb-title" id="pbTitle">💬 Berikan Petunjuk</div>
+      <div class="pb-sub"  id="pbSub">Giliran memberikan petunjuk satu kalimat...</div>
+      <div class="pb-timer" id="pbTimer"></div>
+    </div>
+
+    <!-- Word Reveal -->
+    <div class="word-reveal" id="wordReveal" style="display:none">
+      <div class="wr-label">KATA RAHASIAMU</div>
+      <div class="wr-word" id="wrWord">—</div>
+      <div class="wr-hint" id="wrHint"></div>
+    </div>
+
+    <!-- Left Col -->
+    <div class="left-col">
+      <!-- Players + clue input -->
+      <div class="panel">
+        <div class="panel-t">Pemain</div>
+        <div class="plyr-list" id="gamePlayers"></div>
+        <div id="actionArea" style="margin-top:.8rem"></div>
+      </div>
+      <!-- Clue Board -->
+      <div class="panel">
+        <div class="panel-t">💬 Petunjuk Terkumpul</div>
+        <div class="clue-list" id="clueList"></div>
+      </div>
+    </div>
+
+    <!-- Right Col: Chat -->
+    <div class="right-col">
+      <div class="panel chat-box">
+        <div class="chat-head">💬 Diskusi</div>
+        <div class="chat-msgs" id="chatMsgs"></div>
+        <div class="chat-row">
+          <input class="chat-inp" id="chatInp" placeholder="Tulis..." maxlength="200" autocomplete="off">
+          <button class="chat-send" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- END -->
+<div id="sEnd" class="screen">
+  <div class="end-wrap">
+    <div class="end-big" id="endBig">🕵️</div>
+    <div class="end-title" id="endTitle">Game Selesai</div>
+    <div class="end-sub"  id="endSub"></div>
+    <div class="end-reveal">
+      <div class="er-label">Pasangan Kata</div>
+      <div class="er-word-pair">
+        <div class="er-word civ">Warga: <strong id="erCivWord">—</strong></div>
+        <div class="er-word spy">Mata-mata: <strong id="erSpyWord">—</strong></div>
+      </div>
+      <div class="er-label" style="margin-top:.8rem">Peran Pemain</div>
+      <div class="er-players" id="erPlayers"></div>
+    </div>
+    <button class="restart-btn" onclick="backToLobby()">🔄 Main Lagi</button>
+  </div>
+</div>
+
+<!-- Spy Guess Modal -->
+<div class="modal-bg" id="spyModal">
+  <div class="modal-card">
+    <div class="modal-icon">🕵️</div>
+    <div class="modal-title">Kamu Ketahuan!</div>
+    <div class="modal-sub">Kamu adalah mata-mata! Tebak kata yang dipegang warga untuk menang. Kamu punya 1 kesempatan.</div>
+    <input class="modal-inp" id="spyGuessInp" placeholder="Tebak kata warga..." maxlength="40">
+    <br>
+    <button class="modal-btn" onclick="submitSpyGuess()">Tebak!</button>
+    <button class="modal-btn sec" onclick="closeModal()">Tidak Menebak</button>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
+  authDomain:"chat-angkatan-16.firebaseapp.com",
+  databaseURL:"https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"chat-angkatan-16",storageBucket:"chat-angkatan-16.appspot.com",
+  messagingSenderId:"47699501502",appId:"1:47699501502:web:0d09e69d0b3ff39a7359ef"
+});
+const db=firebase.database();
+const pRef=db.ref('spy/players');
+const gRef=db.ref('spy/game');
+const cRef=db.ref('spy/chat');
+const clueRef=db.ref('spy/clues');
+const voteRef=db.ref('spy/votes');
+
+/* Word Pairs Bank */
+const DEFAULT_PAIRS=[
+  {civ:'Apel',spy:'Mangga'},{civ:'Dokter',spy:'Perawat'},{civ:'Pantai',spy:'Kolam Renang'},
+  {civ:'Kucing',spy:'Harimau'},{civ:'Motor',spy:'Sepeda'},{civ:'Kopi',spy:'Teh'},
+  {civ:'Sepak Bola',spy:'Futsal'},{civ:'Tidur',spy:'Istirahat'},{civ:'Buku',spy:'Majalah'},
+  {civ:'Pizza',spy:'Roti Bakar'},{civ:'Bioskop',spy:'Teater'},{civ:'Gunung',spy:'Bukit'},
+  {civ:'Gitar',spy:'Ukulele'},{civ:'Sungai',spy:'Danau'},{civ:'Sekolah',spy:'Kampus'},
+  {civ:'Awan',spy:'Kabut'},{civ:'Nasi Goreng',spy:'Mie Goreng'},{civ:'Tikus',spy:'Hamster'},
+];
+
+/* ── State ── */
+let myId=localStorage.getItem('spyUid')||Math.random().toString(36).substr(2,9);
+let myName=localStorage.getItem('spyName')||'';
+let isHost=false;
+let playersData={};
+let gameData={};
+let myRole=''; // 'spy' or 'civilian'
+let myWord='';
+let hasGivenClue=false;
+let hasVoted=false;
+let phaseTimer=null;
+let gameListeners=false;
+let spyCount=1;
+let wordPairs=[...DEFAULT_PAIRS.slice(0,5)];
+localStorage.setItem('spyUid',myId);
+
+/* ── Screens ── */
+function showScreen(id){
+  ['sJoin','sLobby','sGame','sEnd'].forEach(s=>{
+    const el=document.getElementById(s);
+    el.style.display='none';el.classList.remove('show');
+  });
+  const el=document.getElementById(id);
+  el.style.display=id==='sJoin'?'flex':'block';
+  el.classList.add('show');
+}
+
+/* ── Join ── */
+document.getElementById('jName').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame();});
+function joinGame(){
+  const n=document.getElementById('jName').value.trim();
+  if(!n){document.getElementById('jName').focus();return;}
+  myName=n;localStorage.setItem('spyName',n);
+  pRef.child(myId).set({name:n,alive:true,joinedAt:Date.now()});
+  pRef.child(myId).onDisconnect().remove();
+  showScreen('sLobby');
+  startLobbyListeners();
+}
+
+/* ── Lobby ── */
+function startLobbyListeners(){
+  buildWordPairsUI();
+  pRef.orderByChild('joinedAt').on('value',snap=>{
+    playersData={};
+    snap.forEach(s=>{playersData[s.key]=s.val();});
+    const ids=Object.keys(playersData);
+    isHost=ids.length>0&&ids[0]===myId;
+    document.getElementById('lobCount').textContent=ids.length;
+    document.getElementById('totalPlayers2').textContent=ids.length;
+    document.getElementById('lobPlayers').innerHTML=ids.map((id,i)=>{
+      const p=playersData[id];
+      const hue=Math.round(i/ids.length*300);
+      return `<div class="plyr-chip${i===0?' host':''}">
+        <div class="chip-av" style="background:hsl(${hue},55%,42%)">${p.name.charAt(0).toUpperCase()}</div>
+        <span class="chip-name">${esc(p.name)}${id===myId?' (kamu)':''}</span>
+        ${i===0?'<span class="chip-host">HOST</span>':''}
+      </div>`;
+    }).join('');
+    document.getElementById('hostPanel').style.display=isHost?'block':'none';
+    document.getElementById('guestPanel').style.display=isHost?'none':'block';
+    document.getElementById('startBtn').disabled=ids.length<3;
+    document.getElementById('startHint').textContent=ids.length>=3?`${ids.length} pemain siap!`:`Butuh min 3 pemain (${ids.length} sekarang)`;
+    if(playersData[myId]?.role) enterGame();
+  });
+  gRef.on('value',snap=>{
+    gameData=snap.val()||{};
+    if(gameData.phase) enterGame();
+  });
+}
+
+/* ── Word Pairs UI ── */
+function buildWordPairsUI(){
+  const cont=document.getElementById('wordPairs');
+  cont.innerHTML=wordPairs.map((p,i)=>`
+    <div class="word-pair-row" id="pair${i}">
+      <input class="word-inp" placeholder="Kata Warga" value="${esc(p.civ)}" oninput="updatePair(${i},'civ',this.value)">
+      <input class="word-inp" placeholder="Kata Spy" value="${esc(p.spy)}" oninput="updatePair(${i},'spy',this.value)">
+      <button class="del-pair-btn" onclick="removePair(${i})">✕</button>
+    </div>`).join('');
+}
+function updatePair(i,k,v){wordPairs[i][k]=v;}
+function addPair(){wordPairs.push({civ:'',spy:''});buildWordPairsUI();}
+function removePair(i){if(wordPairs.length>1){wordPairs.splice(i,1);buildWordPairsUI();}}
+function changeSpyCount(d){
+  spyCount=Math.max(1,spyCount+d);
+  document.getElementById('spyCount').textContent=spyCount;
+}
+
+/* ── Start Game ── */
+function startGame(){
+  const ids=Object.keys(playersData);
+  if(ids.length<3){toast('Butuh minimal 3 pemain!');return;}
+  const validPairs=wordPairs.filter(p=>p.civ.trim()&&p.spy.trim());
+  if(validPairs.length===0){toast('Masukkan minimal 1 pasangan kata!');return;}
+  // Pick random pair
+  const pair=validPairs[Math.floor(Math.random()*validPairs.length)];
+  // Assign roles
+  const shuffled=[...ids].sort(()=>Math.random()-.5);
+  const spies=shuffled.slice(0,Math.min(spyCount,ids.length-2));
+  const up={};
+  ids.forEach(id=>{
+    const isSpy=spies.includes(id);
+    up[`${id}/role`]=isSpy?'spy':'civilian';
+    up[`${id}/word`]=isSpy?pair.spy:pair.civ;
+    up[`${id}/alive`]=true;
+  });
+  pRef.update(up);
+  cRef.remove(); clueRef.remove(); voteRef.remove();
+  gRef.set({
+    phase:'clue',
+    round:1,
+    turnOrder:ids,
+    turnIdx:0,
+    civWord:pair.civ,
+    spyWord:pair.spy,
+    hostId:myId,
+    startedAt:Date.now()
+  });
+  cRef.push({text:`🕵️ Game dimulai! ${ids.length} pemain, ${spies.length} mata-mata.`,uid:'sys',ts:Date.now()});
+}
+
+/* ── Enter Game ── */
+function enterGame(){
+  myRole=playersData[myId]?.role||'';
+  myWord=playersData[myId]?.word||'';
+  if(!myRole) return;
+  showScreen('sGame');
+  // Show word
+  const wr=document.getElementById('wordReveal');
+  wr.style.display='block';
+  document.getElementById('wrWord').textContent=myWord;
+  document.getElementById('wrHint').textContent=myRole==='spy'
+    ?'Kamu adalah MATA-MATA! Cari tahu kata warga tanpa ketahuan.'
+    :'Kamu adalah WARGA. Berikan petunjuk yang jelas tapi tidak terlalu jelas!';
+  if(myRole==='spy'){
+    document.getElementById('wrWord').style.color='#fca5a5';
+    const sp=document.createElement('div');
+    sp.className='wr-spy'; sp.textContent='🕵️ Kamu adalah MATA-MATA!';
+    wr.appendChild(sp);
+  }
+  if(!gameListeners){
+    gameListeners=true;
+    pRef.on('value',snap=>{
+      playersData={};
+      snap.forEach(s=>{playersData[s.key]=s.val();});
+      myRole=playersData[myId]?.role||myRole;
+      myWord=playersData[myId]?.word||myWord;
+      renderGame();
+    });
+    gRef.on('value',snap=>{
+      gameData=snap.val()||{};
+      if(gameData.phase) handlePhase();
+    });
+    cRef.limitToLast(80).on('child_added',snap=>appendChat(snap.val()));
+    clueRef.on('value',snap=>renderClues(snap.val()||{}));
+    voteRef.on('value',snap=>renderVoteProgress(snap.val()||{}));
+  }
+}
+
+/* ── Phase Handler ── */
+function handlePhase(){
+  clearTimer();
+  hasGivenClue=false; hasVoted=false;
+  const {phase,round,turnIdx,turnOrder}=gameData;
+  const banner=document.getElementById('phBanner');
+
+  if(phase==='clue'){
+    banner.className='ph-banner ph-clue';
+    const turnId=turnOrder?.[turnIdx%turnOrder.length]||'';
+    const turnName=playersData[turnId]?.name||'?';
+    const isMyTurn=turnId===myId;
+    document.getElementById('pbLabel').textContent=`RONDE ${round} — PETUNJUK`;
+    document.getElementById('pbTitle').textContent='💬 Giliran Memberikan Petunjuk';
+    document.getElementById('pbSub').textContent=isMyTurn?`🎯 Giliran KAMU memberikan petunjuk!`:`Menunggu ${turnName} memberikan petunjuk...`;
+    renderGame();
+    startTimer(30,()=>{
+      if(isMyTurn&&isHost) autoSkipClue();
+      else if(isHost) advanceClue();
+    });
+  }
+  else if(phase==='vote'){
+    banner.className='ph-banner ph-vote';
+    document.getElementById('pbLabel').textContent=`RONDE ${round} — VOTING`;
+    document.getElementById('pbTitle').textContent='🗳️ Siapa Mata-matanya?';
+    document.getElementById('pbSub').textContent='Diskusikan dan vote siapa yang kamu curigai sebagai mata-mata!';
+    renderGame();
+    startTimer(50,()=>{if(isHost) resolveVoting();});
+  }
+  else if(phase==='end'){
+    clearTimer();
+    renderEndScreen();
+  }
+}
+
+/* ── Render Game ── */
+function renderGame(){
+  const {phase,turnOrder,turnIdx}=gameData;
+  const curTurnId=turnOrder?.[turnIdx%turnOrder.length]||'';
+  const isMyTurn=curTurnId===myId;
+  const isVoting=phase==='vote';
+
+  // Players list
+  const plist=document.getElementById('gamePlayers');
+  const votes={};
+  voteRef.once('value',snap=>{
+    Object.values(snap.val()||{}).forEach(v=>{votes[v]=(votes[v]||0)+1;});
+  });
+  plist.innerHTML=Object.entries(playersData).sort((a,b)=>a[1].joinedAt-b[1].joinedAt).map(([id,p])=>{
+    const alive=p.alive!==false;
+    const showRole=!alive||phase==='end';
+    const isActive=(phase==='clue')&&id===curTurnId;
+    return `<div class="pc ${alive?'':'eliminated'} ${isActive?'active-turn':''}">
+      <div class="pc-av" style="background:${avBg(id)}">${p.name.charAt(0).toUpperCase()}</div>
+      <span class="pc-name">${esc(p.name)}${id===myId?' (kamu)':''}</span>
+      ${showRole&&p.role?`<span class="pc-tag ${p.role==='spy'?'pt-spy':'pt-civ'}">${p.role==='spy'?'🕵️ Spy':'👤 Warga'}</span>`:''}
+      ${!alive?'<span class="pc-dead">💀</span>':''}
+    </div>`;
+  }).join('');
+
+  // Action area
+  const area=document.getElementById('actionArea');
+  if(phase==='clue'&&isMyTurn&&!hasGivenClue&&playersData[myId]?.alive!==false){
+    area.innerHTML=`<div class="clue-input-wrap">
+      <div class="clue-input-lbl">🎯 Giliran kamu! Berikan petunjuk 1 kalimat:</div>
+      <input class="clue-inp" id="clueInp" placeholder="Petunjukmu tentang kata '${esc(myWord)}'..." maxlength="80" autocomplete="off">
+      <button class="clue-submit" id="clueSubmit" onclick="submitClue()">Kirim Petunjuk ✦</button>
+    </div>`;
+    document.getElementById('clueInp').addEventListener('keydown',e=>{if(e.key==='Enter')submitClue();});
+  } else if(phase==='vote'&&!hasVoted&&playersData[myId]?.alive!==false){
+    const targets=Object.entries(playersData).filter(([id,p])=>id!==myId&&p.alive!==false);
+    area.innerHTML=`<div style="font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.5rem">🗳️ Vote siapa yang paling mencurigakan:</div>`+
+      `<div class="vote-btns">`+
+      targets.map(([id,p])=>`
+        <button class="vote-btn" onclick="castVote('${id}')">
+          Vote ${esc(p.name)}
+        </button>`).join('')+
+      `<button class="vote-btn skip-vote-btn" onclick="skipVote()">Lewati Vote</button>`+
+      `</div>`;
+  } else if(phase==='clue'&&!isMyTurn){
+    area.innerHTML='';
+  } else if(hasGivenClue){
+    area.innerHTML='<div class="vote-done">✓ Petunjuk sudah dikirim!</div>';
+  } else if(hasVoted){
+    area.innerHTML='<div class="vote-done">✓ Vote sudah terkirim!</div>';
+  }
+}
+
+/* ── Clue ── */
+function submitClue(){
+  const inp=document.getElementById('clueInp');
+  const text=inp?.value.trim();
+  if(!text) return;
+  hasGivenClue=true;
+  const {turnOrder,turnIdx,round}=gameData;
+  const turnId=turnOrder?.[turnIdx%turnOrder.length]||'';
+  clueRef.push({uid:myId,name:myName,text,turnIdx,round,ts:Date.now()});
+  cRef.push({uid:myId,name:myName,text:`💬 ${myName}: "${text}"`,ts:Date.now()});
+  document.getElementById('actionArea').innerHTML='<div class="vote-done">✓ Petunjuk terkirim!</div>';
+  if(isHost) advanceClue();
+}
+
+function autoSkipClue(){
+  clueRef.push({uid:myId,name:myName,text:'(melewati)',turnIdx:gameData.turnIdx,round:gameData.round,ts:Date.now()});
+  advanceClue();
+}
+
+function advanceClue(){
+  const {turnOrder,turnIdx,round}=gameData;
+  const alive=Object.entries(playersData).filter(([,p])=>p.alive!==false);
+  const nextIdx=(turnIdx||0)+1;
+  // If all alive players have given clue this round, move to vote
+  if(nextIdx>=alive.length){
+    gRef.update({phase:'vote'});
+  } else {
+    gRef.update({turnIdx:nextIdx});
+  }
+}
+
+/* ── Clue Render ── */
+function renderClues(clues){
+  const list=document.getElementById('clueList');
+  const arr=Object.values(clues).sort((a,b)=>a.ts-b.ts);
+  const {turnOrder,turnIdx}=gameData;
+  const curTurnId=turnOrder?.[turnIdx%(turnOrder.length||1)]||'';
+  list.innerHTML=arr.length?arr.map(c=>`
+    <div class="clue-item${c.uid===curTurnId?' active':''}">
+      <div class="clue-name">${esc(c.name)}</div>
+      <div class="clue-text">${esc(c.text)}</div>
+    </div>`).join(''):'<div style="font-size:.78rem;color:rgba(255,255,255,.25);text-align:center;padding:.5rem">Belum ada petunjuk</div>';
+}
+
+/* ── Vote ── */
+function castVote(targetId){
+  hasVoted=true;
+  voteRef.child(myId).set(targetId);
+  toast('🗳️ Vote terkirim!');
+  document.getElementById('actionArea').innerHTML='<div class="vote-done">✓ Vote terkirim!</div>';
+  voteRef.once('value',snap=>{
+    const alive=Object.entries(playersData).filter(([,p])=>p.alive!==false).length;
+    if(Object.keys(snap.val()||{}).length>=alive&&isHost) resolveVoting();
+  });
+}
+
+function skipVote(){
+  hasVoted=true;
+  document.getElementById('actionArea').innerHTML='<div class="vote-done">⏩ Kamu tidak vote.</div>';
+}
+
+function renderVoteProgress(votes){
+  // Show vote counts on player cards
+  const counts={};
+  Object.values(votes).forEach(id=>{counts[id]=(counts[id]||0)+1;});
+  if(gameData.phase!=='vote') return;
+  const plist=document.getElementById('gamePlayers');
+  if(!plist) return;
+  // Append vote counts
+  Object.entries(counts).forEach(([id,n])=>{
+    const el=plist.querySelector(`[data-plid="${id}"]`);
+    if(el){const vc=el.querySelector('.pc-vcount');if(vc)vc.textContent=`🗳 ${n}`;}
+  });
+}
+
+function resolveVoting(){
+  voteRef.once('value',snap=>{
+    const votes=snap.val()||{};
+    const counts={};
+    Object.values(votes).forEach(id=>{counts[id]=(counts[id]||0)+1;});
+    const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    let eliminated=null;
+    if(sorted.length>0&&(sorted.length===1||sorted[0][1]>sorted[1][1])){
+      eliminated=sorted[0][0];
+    }
+
+    if(eliminated){
+      const p=playersData[eliminated];
+      const isSpy=p?.role==='spy';
+      announceChat(`⚖️ ${p?.name||'?'} dieliminasi! Perannya: ${isSpy?'🕵️ MATA-MATA!':'👤 Warga biasa...'}`);
+      pRef.child(eliminated).update({alive:false});
+
+      if(isSpy){
+        // Spy was caught — show spy guess modal to spy if myId
+        const spies=Object.entries(playersData).filter(([,p])=>p.role==='spy'&&p.alive!==false&&p.key!==eliminated);
+        const remainingSpies=Object.entries(playersData).filter(([id,p])=>p.role==='spy'&&p.alive!==false&&id!==eliminated);
+        if(remainingSpies.length===0){
+          // All spies caught — villagers might win, but check
+          setTimeout(checkWin,500);
+        } else {
+          setTimeout(checkWin,500);
+        }
+        // Show guess modal to eliminated spy
+        if(eliminated===myId){
+          document.getElementById('spyModal').classList.add('show');
+        }
+      } else {
+        setTimeout(checkWin,500);
+      }
+    } else {
+      announceChat('⚖️ Vote seri! Tidak ada yang dieliminasi.');
+    }
+
+    voteRef.remove();
+    clueRef.remove();
+    const nextRound=(gameData.round||1)+1;
+    gRef.update({phase:'clue',round:nextRound,turnIdx:0});
+    setTimeout(checkWin,600);
+  });
+}
+
+/* ── Win Check ── */
+function checkWin(){
+  const alive=Object.entries(playersData).filter(([,p])=>p.alive!==false);
+  const spies=alive.filter(([,p])=>p.role==='spy');
+  const civs=alive.filter(([,p])=>p.role==='civilian');
+
+  if(spies.length===0){
+    // Villagers win
+    gRef.update({phase:'end',winner:'civilian'});
+  } else if(spies.length>=civs.length){
+    // Spies win
+    gRef.update({phase:'end',winner:'spy'});
+  }
+}
+
+/* ── Spy Guess ── */
+function submitSpyGuess(){
+  const guess=document.getElementById('spyGuessInp').value.trim();
+  document.getElementById('spyModal').classList.remove('show');
+  if(!guess) return;
+  const civWord=gameData.civWord||'';
+  const correct=guess.toLowerCase().trim()===civWord.toLowerCase().trim();
+  if(correct){
+    announceChat(`🕵️ Mata-mata menebak dengan benar! Kata warga adalah "${civWord}". Mata-mata MENANG!`);
+    gRef.update({phase:'end',winner:'spy_guess'});
+  } else {
+    announceChat(`🕵️ Mata-mata salah menebak ("${guess}"). Kata warga sebenarnya: "${civWord}". Warga MENANG!`);
+    gRef.update({phase:'end',winner:'civilian'});
+  }
+}
+
+function closeModal(){
+  document.getElementById('spyModal').classList.remove('show');
+}
+
+/* ── End Screen ── */
+function renderEndScreen(){
+  clearTimer();
+  showScreen('sEnd');
+  const w=gameData.winner;
+  const spyWin=w==='spy'||w==='spy_guess';
+  document.getElementById('endBig').textContent=spyWin?'🕵️':'🏘️';
+  document.getElementById('endTitle').textContent=spyWin?'Mata-mata Menang!':'Warga Menang!';
+  document.getElementById('endSub').textContent=spyWin
+    ?(w==='spy_guess'?'Mata-mata berhasil menebak kata warga! Brilian!':'Mata-mata berhasil bertahan dan menguasai desa!')
+    :'Semua mata-mata berhasil ditemukan! Desa aman!';
+  document.getElementById('erCivWord').textContent=gameData.civWord||'?';
+  document.getElementById('erSpyWord').textContent=gameData.spyWord||'?';
+  document.getElementById('erPlayers').innerHTML=Object.entries(playersData).map(([,p])=>{
+    const isSpy=p.role==='spy';
+    return `<div class="er-chip ${isSpy?'spy-c':'civ-c'}">${isSpy?'🕵️':'👤'} ${esc(p.name)}${p.alive===false?' 💀':''}</div>`;
+  }).join('');
+}
+
+function backToLobby(){
+  clearTimer();
+  gameListeners=false;
+  db.ref('spy').remove();
+  pRef.child(myId).set({name:myName,alive:true,joinedAt:Date.now()});
+  pRef.child(myId).onDisconnect().remove();
+  const wr=document.getElementById('wordReveal');
+  wr.style.display='none';
+  wr.innerHTML='<div class="wr-label">KATA RAHASIAMU</div><div class="wr-word" id="wrWord">—</div><div class="wr-hint" id="wrHint"></div>';
+  showScreen('sLobby');
+  startLobbyListeners();
+}
+
+/* ── Chat ── */
+function sendChat(){
+  const inp=document.getElementById('chatInp');
+  const t=inp.value.trim(); if(!t) return; inp.value='';
+  cRef.push({uid:myId,name:myName,text:t,ts:Date.now()});
+}
+document.getElementById('chatInp').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
+function announceChat(text){cRef.push({uid:'ann',text,ts:Date.now()});}
+function appendChat(d){
+  if(!d) return;
+  const box=document.getElementById('chatMsgs');
+  const div=document.createElement('div');
+  const isMine=d.uid===myId,isAnn=d.uid==='ann',isSys=d.uid==='sys';
+  div.className=`cm ${isAnn?'ann':isSys?'sys':isMine?'mine':'theirs'}`;
+  if(!isMine&&!isAnn&&!isSys) div.innerHTML=`<div class="cm-n">${esc(d.name)}</div>${esc(d.text)}`;
+  else div.textContent=d.text;
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+}
+
+/* ── Timer ── */
+function startTimer(secs,onEnd){
+  clearTimer();
+  let left=secs;
+  const el=document.getElementById('pbTimer');
+  const tick=()=>{
+    if(!el) return;
+    el.textContent=left+'s';
+    el.className='pb-timer'+(left<=8?' urg':'');
+    if(left<=0){clearTimer();onEnd&&onEnd();}
+    left--;
+  };
+  tick();
+  phaseTimer=setInterval(tick,1000);
+}
+function clearTimer(){
+  if(phaseTimer){clearInterval(phaseTimer);phaseTimer=null;}
+  const el=document.getElementById('pbTimer');
+  if(el){el.textContent='';el.className='pb-timer';}
+}
+
+/* ── Utils ── */
+function avBg(id){
+  const ids=Object.keys(playersData).sort();
+  const i=ids.indexOf(id);
+  const hue=Math.round(i/Math.max(ids.length,1)*300);
+  return `linear-gradient(135deg,hsl(${hue},55%,38%),hsl(${hue+20},45%,52%))`;
+}
+function toast(msg){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),2500);
+}
+function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+window.addEventListener('beforeunload',()=>pRef.child(myId).remove());
+showScreen('sJoin');
+if(myName) document.getElementById('jName').value=myName;
+</script>
+</body>
+</html>
