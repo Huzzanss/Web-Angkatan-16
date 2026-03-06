@@ -536,6 +536,24 @@
       background: rgba(10,22,40,0.07); color: var(--muted);
     }
 
+    .turn-timer {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--green); min-width: 2.5rem;
+      text-align: right; line-height: 1;
+      transition: color 0.3s;
+    }
+
+    .turn-timer.urgent {
+      color: var(--red);
+      animation: timerPulse 0.5s ease-in-out infinite;
+    }
+
+    @keyframes timerPulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
     @keyframes badgePulse {
       0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.4); }
       50% { box-shadow: 0 0 0 6px rgba(201,168,76,0); }
@@ -671,6 +689,7 @@
           <span class="turn-label">Giliran</span>
           <span class="turn-name" id="turnName">Menunggu pemain...</span>
           <span class="turn-badge" id="turnBadge"></span>
+          <span class="turn-timer" id="turnTimer"></span>
         </div>
         <div class="turn-queue" id="turnQueue"></div>
       </div>
@@ -820,20 +839,23 @@
     document.getElementById('joinSection').style.display = 'none';
     document.getElementById('wordSection').style.display = 'block';
     document.getElementById('playerJoinedLabel').innerHTML = '✓ Bergabung sebagai <strong>' + esc(name) + '</strong>';
+    // Force update input state setelah join (untuk kasus rejoin)
+    setTimeout(updateInputState, 300);
   }
 
   /* ── Leave Game ── */
   document.getElementById('leaveBtn').addEventListener('click', leaveGame);
 
   function leaveGame() {
+    clearTurnTimer(); // stop timer
     playersRef.child(myId).remove();
     hasJoined = false;
-    document.getElementById('joinSection').style.display = 'block';
-    document.getElementById('wordSection').style.display = 'none';
-    // Kalau ini giliran kita saat keluar, pindah ke berikutnya
+    // Kalau giliran kita, pindah dulu sebelum remove
     turnRef.once('value', snap => {
       if (snap.val() === myId) advanceTurn();
     });
+    document.getElementById('joinSection').style.display = 'block';
+    document.getElementById('wordSection').style.display = 'none';
   }
 
   /* ── Online Presence ── */
@@ -863,6 +885,8 @@
     currentTurnId = snap.val();
     renderTurnQueue();
     updateInputState();
+    if (hasJoined && currentTurnId === myId) startTurnTimer();
+    else clearTurnTimer();
   });
 
   function advanceTurn() {
@@ -920,9 +944,46 @@
     });
   }
 
-  function updateInputState() {
+  /* ── Turn Timer (13 detik) ── */
+  const TURN_SECONDS = 13;
+  let _timerInterval = null;
+  let _timerLeft = TURN_SECONDS;
+
+  function clearTurnTimer() {
+    clearInterval(_timerInterval);
+    _timerInterval = null;
+    const el = document.getElementById('turnTimer');
+    if (el) { el.textContent = ''; el.className = 'turn-timer'; }
+  }
+
+  function startTurnTimer() {
+    clearTurnTimer();
+    if (currentTurnId !== myId) return; // hanya jalankan di giliran kita
+    _timerLeft = TURN_SECONDS;
+    _updateTimerDisplay();
+    _timerInterval = setInterval(() => {
+      _timerLeft--;
+      _updateTimerDisplay();
+      if (_timerLeft <= 0) {
+        clearTurnTimer();
+        // Waktu habis — skip giliran, kirim notif chat
+        const skipName = myName || 'Anonim';
+        chatRef.push({ text: '⏱ ' + skipName + ' kehabisan waktu! Giliran dilewati.', name: 'Sistem', userId: 'system', timestamp: Date.now() });
+        advanceTurn();
+      }
+    }, 1000);
+  }
+
+  function _updateTimerDisplay() {
+    const el = document.getElementById('turnTimer');
+    if (!el) return;
+    el.textContent = _timerLeft + 's';
+    el.className = 'turn-timer' + (_timerLeft <= 5 ? ' urgent' : '');
+  }
+
+    function updateInputState() {
     if (!hasJoined) return;
-    const isMyTurn = currentTurnId === myId;
+    const isMyTurn = (currentTurnId === myId);
     const wordInput = document.getElementById('wordInput');
     const sendBtn   = document.getElementById('sendWordBtn');
     const fb        = document.getElementById('feedbackMsg');
@@ -1030,6 +1091,7 @@
     document.getElementById('wordInput').value = '';
     showFeedback('ok', '✓ Kata "' + raw + '" diterima! Giliran berpindah...', input, true);
 
+    clearTurnTimer();
     // Pindah giliran ke pemain berikutnya
     setTimeout(advanceTurn, 400);
   }
