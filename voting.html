@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voting & Ranking — Angkatan XVI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:#0a1628;--navy2:#112240;--navy3:#1d3461;
+      --gold:#c9a84c;--gold2:#e8c97a;
+      --cream:#f8f4ed;--white:#fff;--text:#2d2d2d;--muted:#7a7a8a;
+      --green:#22c55e;--red:#ef4444;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+    ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--gold);border-radius:10px;}
+
+    .navbar{position:fixed;top:0;width:100%;background:rgba(10,22,40,0.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(201,168,76,0.18);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;z-index:100;}
+    .navbar-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:#fff;text-decoration:none;}
+    .navbar-logo span{color:var(--gold);}
+    .navbar-back{color:rgba(255,255,255,.6);text-decoration:none;font-size:.85rem;font-weight:500;padding:.4rem 1rem;border-radius:50px;border:1px solid rgba(255,255,255,.15);transition:all .2s;}
+    .navbar-back:hover{color:var(--gold2);border-color:rgba(201,168,76,.4);}
+
+    .page{max-width:860px;margin:0 auto;padding:82px 1.5rem 3rem;}
+
+    .hero{background:linear-gradient(120deg,var(--navy) 0%,var(--navy3) 100%);border-radius:20px;padding:2rem 2.5rem;color:#fff;margin-bottom:1.5rem;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:rgba(201,168,76,.07);}
+    .hero-eyebrow{font-size:.68rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;}
+    .hero-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;margin-bottom:.3rem;}
+    .hero-title span{color:var(--gold2);font-style:italic;}
+    .hero-desc{font-size:.85rem;color:rgba(255,255,255,.5);max-width:480px;}
+
+    .card{background:#fff;border-radius:18px;box-shadow:0 4px 20px rgba(10,22,40,.08);border:1px solid rgba(201,168,76,.1);padding:1.8rem;margin-bottom:1.2rem;}
+    .card-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:var(--navy);margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem;}
+    .card-title::before{content:'';display:inline-block;width:4px;height:18px;background:linear-gradient(to bottom,var(--gold),var(--gold2));border-radius:2px;}
+
+    /* Name input */
+    .name-row{display:flex;gap:.7rem;align-items:center;margin-bottom:1rem;}
+    .name-lbl{font-size:.75rem;color:var(--muted);font-weight:600;white-space:nowrap;}
+    .input{flex:1;padding:.6rem 1rem;border:1.5px solid rgba(10,22,40,.1);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;color:var(--text);transition:border-color .2s;}
+    .input:focus{border-color:var(--gold);}
+
+    /* Admin: create session */
+    .create-row{display:flex;gap:.7rem;flex-wrap:wrap;}
+    .textarea{width:100%;padding:.8rem 1rem;border:1.5px solid rgba(10,22,40,.1);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;color:var(--text);transition:border-color .2s;resize:vertical;min-height:80px;}
+    .textarea:focus{border-color:var(--gold);}
+    .btn{padding:.65rem 1.5rem;background:linear-gradient(135deg,var(--navy),var(--navy3));color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+    .btn:hover{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);}
+    .btn.danger{background:linear-gradient(135deg,#991b1b,#dc2626);color:#fff;}
+    .btn.danger:hover{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;}
+    .btn.small{padding:.45rem 1rem;font-size:.8rem;}
+    .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
+
+    .hint{font-size:.76rem;color:var(--muted);margin-top:.5rem;font-style:italic;}
+
+    /* Session Status */
+    .session-status{display:flex;align-items:center;gap:.8rem;padding:1rem 1.2rem;border-radius:12px;margin-bottom:1.2rem;font-weight:600;font-size:.88rem;}
+    .session-status.open{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#15803d;}
+    .session-status.closed{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#b91c1c;}
+    .session-status.waiting{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:#92600a;}
+    .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .session-status.open .status-dot{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
+    .session-status.closed .status-dot{background:var(--red);}
+    .session-status.waiting .status-dot{background:var(--gold);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+    /* Question */
+    .question-box{background:linear-gradient(135deg,var(--navy),var(--navy3));border-radius:14px;padding:1.5rem;margin-bottom:1.2rem;text-align:center;}
+    .question-text{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:#fff;line-height:1.3;}
+    .question-hint{font-size:.78rem;color:rgba(255,255,255,.45);margin-top:.4rem;}
+
+    /* Candidates */
+    .candidates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.8rem;margin-bottom:1rem;}
+    .candidate-btn{background:#fff;border:2px solid rgba(10,22,40,.1);border-radius:14px;padding:1rem;text-align:center;cursor:pointer;transition:all .22s;font-family:'DM Sans',sans-serif;position:relative;overflow:hidden;}
+    .candidate-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.06),transparent);opacity:0;transition:opacity .2s;}
+    .candidate-btn:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 24px rgba(10,22,40,.1);}
+    .candidate-btn:hover::before{opacity:1;}
+    .candidate-btn.selected{border-color:var(--gold);background:linear-gradient(135deg,var(--navy),var(--navy3));color:#fff;}
+    .candidate-btn.selected .cand-name{color:#fff;}
+    .candidate-btn:disabled{cursor:default;transform:none!important;}
+    .cand-avatar{width:52px;height:52px;border-radius:50%;margin:0 auto .6rem;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:#fff;box-shadow:0 4px 12px rgba(10,22,40,.15);}
+    .cand-name{font-weight:600;font-size:.88rem;color:var(--text);}
+
+    /* Results */
+    .results-list{display:flex;flex-direction:column;gap:.7rem;}
+    .result-item{display:flex;align-items:center;gap:.9rem;padding:.8rem 1rem;border-radius:12px;background:var(--cream);transition:all .3s;animation:resultIn .4s ease both;}
+    @keyframes resultIn{from{opacity:0;transform:translateX(-12px);}to{opacity:1;transform:translateX(0);}}
+    .result-rank{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;}
+    .result-rank.r1{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);}
+    .result-rank.r2{background:linear-gradient(135deg,#9ca3af,#d1d5db);color:var(--navy);}
+    .result-rank.r3{background:linear-gradient(135deg,#b45309,#d97706);color:#fff;}
+    .result-rank.rn{background:rgba(10,22,40,.08);color:var(--muted);}
+    .result-name{font-weight:600;font-size:.9rem;flex:1;}
+    .result-bar-wrap{flex:1;height:8px;background:rgba(10,22,40,.07);border-radius:10px;overflow:hidden;}
+    .result-bar{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .6s ease;}
+    .result-count{font-size:.8rem;color:var(--muted);font-weight:600;min-width:3rem;text-align:right;}
+    .result-item.winner{background:linear-gradient(120deg,rgba(201,168,76,.12),rgba(232,201,122,.06));}
+
+    /* Voters list */
+    .voters-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem;}
+    .voter-chip{font-size:.7rem;padding:.2rem .6rem;border-radius:50px;background:rgba(10,22,40,.06);color:var(--muted);}
+
+    /* Online */
+    .online-bar{display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:var(--muted);margin-bottom:.8rem;}
+    .online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
+
+    /* Toast */
+    .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:.75rem 1.5rem;border-radius:50px;font-size:.85rem;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+    .toast.show{opacity:1;}
+
+    /* Tabs */
+    .tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;}
+    .tab-btn{padding:.5rem 1.2rem;border-radius:50px;border:1.5px solid rgba(10,22,40,.1);background:#fff;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted);}
+    .tab-btn.active{background:linear-gradient(135deg,var(--navy),var(--navy3));color:#fff;border-color:transparent;}
+
+    @media(max-width:600px){
+      .page{padding:76px 1rem 2rem;}
+      .hero{padding:1.2rem 1.2rem;}
+      .hero-title{font-size:1.5rem;}
+      .candidates-grid{grid-template-columns:repeat(2,1fr);}
+      .create-row{flex-direction:column;}
+      .name-row{flex-wrap:wrap;}
+      .name-lbl{width:100%;}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="navbar-logo">Angkatan <span>XVI</span></a>
+  <a href="index.html" class="navbar-back">← Kembali</a>
+</nav>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <p class="hero-eyebrow">🗳️ Mini Game</p>
+    <h1 class="hero-title">Voting & <span>Ranking</span></h1>
+    <p class="hero-desc">Buat pertanyaan "Siapa yang paling...", semua vote secara rahasia, hasilnya muncul serentak saat voting ditutup!</p>
+  </div>
+
+  <!-- Name -->
+  <div class="card">
+    <div class="card-title">Nama Kamu</div>
+    <div class="name-row">
+      <span class="name-lbl">Nama:</span>
+      <input class="input" id="myName" placeholder="Tulis nama kamu..." maxlength="24">
+    </div>
+    <p class="hint">Nama dipakai supaya admin bisa lihat siapa yang sudah vote.</p>
+  </div>
+
+  <!-- Tabs: Admin / Vote -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tabAdmin" onclick="switchTab('admin')">⚙️ Admin / Buat Sesi</button>
+    <button class="tab-btn" id="tabVote" onclick="switchTab('vote')">🗳️ Voting</button>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="panelAdmin">
+    <div class="card">
+      <div class="card-title">Buat Sesi Voting Baru</div>
+      <div style="margin-bottom:.8rem">
+        <label style="font-size:.78rem;color:var(--muted);font-weight:600;display:block;margin-bottom:.4rem">Pertanyaan:</label>
+        <input class="input" id="adminQuestion" placeholder="Siapa yang paling sering terlambat?" maxlength="120" style="width:100%;border-radius:10px;">
+      </div>
+      <div style="margin-bottom:.8rem">
+        <label style="font-size:.78rem;color:var(--muted);font-weight:600;display:block;margin-bottom:.4rem">Pilihan kandidat (satu per baris):</label>
+        <textarea class="textarea" id="adminCandidates" placeholder="Ahmad&#10;Budi&#10;Citra&#10;Dani"></textarea>
+      </div>
+      <div class="create-row">
+        <button class="btn" onclick="createSession()">✦ Buat Sesi</button>
+        <button class="btn danger small" onclick="deleteSession()">🗑 Hapus Sesi</button>
+      </div>
+      <p class="hint">Setelah sesi dibuat, klik "Tutup Voting" untuk tampilkan hasil ke semua orang.</p>
+    </div>
+
+    <!-- Current Session Control -->
+    <div class="card" id="adminControl" style="display:none">
+      <div class="card-title">Kontrol Sesi</div>
+      <div id="adminStatus"></div>
+      <div style="display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem">
+        <button class="btn" id="btnToggle" onclick="toggleVoting()">Tutup Voting</button>
+        <button class="btn small" onclick="resetVotes()">🔄 Reset Votes</button>
+      </div>
+      <div style="margin-top:1rem">
+        <div class="card-title" style="margin-bottom:.8rem">Siapa Sudah Vote:</div>
+        <div class="voters-row" id="votersList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOTE PANEL -->
+  <div id="panelVote" style="display:none">
+    <div id="noSession" class="card" style="text-align:center;padding:2.5rem">
+      <div style="font-size:2rem;margin-bottom:.8rem">🗳️</div>
+      <div style="font-weight:600;color:var(--muted)">Belum ada sesi voting aktif.<br>Tunggu admin membuat sesi.</div>
+    </div>
+
+    <div id="voteSection" style="display:none">
+      <div id="sessionStatus" class="session-status waiting">
+        <span class="status-dot"></span>
+        <span id="statusText">Menunggu...</span>
+      </div>
+
+      <div class="question-box" id="questionBox" style="display:none">
+        <div class="question-text" id="questionText"></div>
+        <div class="question-hint">Pilih satu kandidat di bawah</div>
+      </div>
+
+      <div class="online-bar">
+        <span class="online-dot"></span>
+        <span id="onlineInfo">0 pemain</span>
+      </div>
+
+      <!-- Voting UI -->
+      <div class="card" id="voteCard" style="display:none">
+        <div class="card-title">Pilihanmu</div>
+        <div class="candidates-grid" id="candidatesGrid"></div>
+        <button class="btn" id="submitVoteBtn" onclick="submitVote()" disabled>Kirim Vote →</button>
+        <p class="hint" id="voteHint">Pilih satu kandidat lalu klik Kirim Vote.</p>
+      </div>
+
+      <!-- Results -->
+      <div class="card" id="resultsCard" style="display:none">
+        <div class="card-title">🏆 Hasil Voting</div>
+        <div class="results-list" id="resultsList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey:"AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
+  authDomain:"chat-angkatan-16.firebaseapp.com",
+  databaseURL:"https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"chat-angkatan-16",
+  storageBucket:"chat-angkatan-16.appspot.com",
+  messagingSenderId:"47699501502",
+  appId:"1:47699501502:web:0d09e69d0b3ff39a7359ef"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const sessionRef = db.ref('voting/session');
+const votesRef   = db.ref('voting/votes');
+const onlineRef  = db.ref('voting/online');
+
+let myId   = localStorage.getItem('voteUserId') || Math.random().toString(36).substr(2,9);
+localStorage.setItem('voteUserId', myId);
+
+let myVote       = null;
+let sessionData  = null;
+let currentTab   = 'admin';
+
+/* ── Online presence ── */
+onlineRef.child(myId).set(true);
+onlineRef.child(myId).onDisconnect().remove();
+onlineRef.on('value', snap => {
+  document.getElementById('onlineInfo').textContent = snap.numChildren() + ' pemain online';
+});
+
+/* ── Tab switch ── */
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('panelAdmin').style.display = tab === 'admin' ? 'block' : 'none';
+  document.getElementById('panelVote').style.display  = tab === 'vote'  ? 'block' : 'none';
+  document.getElementById('tabAdmin').className = 'tab-btn' + (tab==='admin'?' active':'');
+  document.getElementById('tabVote').className  = 'tab-btn' + (tab==='vote' ?' active':'');
+}
+
+/* ── Session listener ── */
+sessionRef.on('value', snap => {
+  sessionData = snap.val();
+  renderVotePanel();
+  renderAdminControl();
+});
+
+votesRef.on('value', snap => {
+  const votes = snap.val() || {};
+  renderResults(votes);
+  renderVotersList(votes);
+});
+
+/* ── Admin: Create ── */
+function createSession() {
+  const name = document.getElementById('myName').value.trim() || 'Admin';
+  const question = document.getElementById('adminQuestion').value.trim();
+  const rawCands = document.getElementById('adminCandidates').value.trim();
+  if (!question) return showToast('⚠ Isi pertanyaan dulu!');
+  if (!rawCands)  return showToast('⚠ Isi kandidat dulu!');
+  const candidates = rawCands.split('\n').map(s=>s.trim()).filter(Boolean);
+  if (candidates.length < 2) return showToast('⚠ Minimal 2 kandidat!');
+
+  sessionRef.set({ question, candidates, open: true, createdBy: name, createdAt: Date.now() });
+  votesRef.remove();
+  showToast('✓ Sesi voting dibuat!');
+}
+
+/* ── Admin: Toggle open/close ── */
+function toggleVoting() {
+  if (!sessionData) return;
+  sessionRef.update({ open: !sessionData.open });
+}
+
+/* ── Admin: Reset votes ── */
+function resetVotes() {
+  if (!confirm('Reset semua vote?')) return;
+  votesRef.remove();
+  myVote = null;
+  showToast('✓ Votes direset');
+}
+
+/* ── Admin: Delete session ── */
+function deleteSession() {
+  if (!confirm('Hapus sesi dan semua vote?')) return;
+  db.ref('voting').remove();
+  showToast('✓ Sesi dihapus');
+}
+
+/* ── Admin Control Panel ── */
+function renderAdminControl() {
+  const panel = document.getElementById('adminControl');
+  if (!sessionData) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  const statusEl = document.getElementById('adminStatus');
+  const btnToggle = document.getElementById('btnToggle');
+
+  if (sessionData.open) {
+    statusEl.innerHTML = '<div class="session-status open"><span class="status-dot"></span>Voting TERBUKA — pemain bisa vote sekarang</div>';
+    btnToggle.textContent = '🔒 Tutup Voting & Tampilkan Hasil';
+    btnToggle.className = 'btn danger';
+  } else {
+    statusEl.innerHTML = '<div class="session-status closed"><span class="status-dot"></span>Voting DITUTUP — hasil sudah ditampilkan</div>';
+    btnToggle.textContent = '🔓 Buka Voting Lagi';
+    btnToggle.className = 'btn';
+  }
+}
+
+function renderVotersList(votes) {
+  const el = document.getElementById('votersList');
+  const entries = Object.values(votes);
+  if (!entries.length) { el.innerHTML = '<span style="font-size:.8rem;color:var(--muted)">Belum ada yang vote</span>'; return; }
+  el.innerHTML = entries.map(v =>
+    `<span class="voter-chip">✓ ${esc(v.name)}</span>`
+  ).join('');
+}
+
+/* ── Vote Panel ── */
+function renderVotePanel() {
+  const noSess  = document.getElementById('noSession');
+  const voteSec = document.getElementById('voteSection');
+  const statusEl = document.getElementById('sessionStatus');
+  const statusTxt = document.getElementById('statusText');
+  const qBox    = document.getElementById('questionBox');
+  const qTxt    = document.getElementById('questionText');
+  const vCard   = document.getElementById('voteCard');
+  const rCard   = document.getElementById('resultsCard');
+
+  if (!sessionData) {
+    noSess.style.display  = 'block';
+    voteSec.style.display = 'none';
+    return;
+  }
+
+  noSess.style.display  = 'none';
+  voteSec.style.display = 'block';
+  qBox.style.display    = 'block';
+  qTxt.textContent      = sessionData.question;
+
+  if (sessionData.open) {
+    statusEl.className = 'session-status open';
+    statusTxt.textContent = '✓ Voting terbuka — pilih kandidatmu!';
+    vCard.style.display = 'block';
+    rCard.style.display = 'none';
+    renderCandidates();
+  } else {
+    statusEl.className = 'session-status closed';
+    statusTxt.textContent = '🔒 Voting ditutup — lihat hasil di bawah';
+    vCard.style.display = 'none';
+    rCard.style.display = 'block';
+  }
+}
+
+let selectedCandidate = null;
+function renderCandidates() {
+  const grid = document.getElementById('candidatesGrid');
+  if (!sessionData?.candidates) return;
+  grid.innerHTML = sessionData.candidates.map((c, i) => {
+    const hue = Math.round((i / sessionData.candidates.length) * 300);
+    const isSelected = c === selectedCandidate;
+    return `<button class="candidate-btn${isSelected?' selected':''}"
+      onclick="selectCandidate('${esc(c)}')" ${myVote?'disabled':''}>
+      <div class="cand-avatar" style="background:linear-gradient(135deg,hsl(${hue},65%,38%),hsl(${hue+20},55%,52%))">${c.charAt(0).toUpperCase()}</div>
+      <div class="cand-name">${esc(c)}</div>
+    </button>`;
+  }).join('');
+}
+
+function selectCandidate(name) {
+  if (myVote) return;
+  selectedCandidate = name;
+  document.getElementById('submitVoteBtn').disabled = false;
+  document.getElementById('voteHint').textContent = 'Kamu memilih: ' + name + ' — klik Kirim Vote untuk konfirmasi.';
+  renderCandidates();
+}
+
+function submitVote() {
+  const name = document.getElementById('myName').value.trim() || 'Anonim';
+  if (!selectedCandidate) return showToast('⚠ Pilih kandidat dulu!');
+  if (!sessionData?.open)  return showToast('⚠ Voting sudah ditutup!');
+
+  votesRef.child(myId).set({ candidate: selectedCandidate, name, timestamp: Date.now() });
+  myVote = selectedCandidate;
+  document.getElementById('submitVoteBtn').disabled = true;
+  document.getElementById('voteHint').textContent = '✓ Vote kamu sudah masuk! Tunggu hasil dari admin.';
+  renderCandidates();
+  showToast('✓ Vote terkirim!');
+  switchTab('vote');
+}
+
+function renderResults(votes) {
+  const list = document.getElementById('resultsList');
+  if (!sessionData?.candidates || !list) return;
+
+  // Hitung votes per kandidat
+  const counts = {};
+  sessionData.candidates.forEach(c => { counts[c] = { count: 0, voters: [] }; });
+  Object.values(votes).forEach(v => {
+    if (counts[v.candidate]) {
+      counts[v.candidate].count++;
+      counts[v.candidate].voters.push(v.name);
+    }
+  });
+
+  const total = Object.values(counts).reduce((s,c) => s+c.count, 0);
+  const sorted = Object.entries(counts).sort((a,b) => b[1].count - a[1].count);
+  const rankCls = ['r1','r2','r3'];
+
+  list.innerHTML = sorted.map(([name, data], i) => {
+    const pct = total > 0 ? Math.round((data.count/total)*100) : 0;
+    return `<div class="result-item${i===0&&data.count>0?' winner':''}">
+      <span class="result-rank ${rankCls[i]||'rn'}">${i+1}</span>
+      <span class="result-name">${esc(name)}</span>
+      <div class="result-bar-wrap"><div class="result-bar" style="width:${pct}%"></div></div>
+      <span class="result-count">${data.count} vote${data.count!==1?'s':''}</span>
+    </div>`;
+  }).join('');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function esc(t) {
+  return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+window.addEventListener('beforeunload', () => onlineRef.child(myId).remove());
+</script>
+</body>
+</html>
