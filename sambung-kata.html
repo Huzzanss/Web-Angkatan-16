@@ -649,17 +649,98 @@
       font-style: italic; margin-top: 0.5rem;
     }
 
-    /* ── Responsive ── */
+    /* ── Responsive — Tablet & HP ── */
     @media (max-width: 900px) {
-      .page { grid-template-columns: 1fr; }
-      .chat-panel { position: static; height: auto; }
-      .chat-box { height: 380px; }
+      .page {
+        grid-template-columns: 1fr;
+        padding-top: 1rem;
+      }
+      .chat-panel {
+        position: static;
+        height: auto;
+        padding-top: 0;
+      }
+      .chat-box { height: 360px; }
+      .game-panel { padding-top: 1rem; }
     }
 
-    @media (max-width: 480px) {
-      .page { padding-left: 1rem; padding-right: 1rem; }
-      .game-hero { padding: 1.5rem; }
-      .status-bar { gap: 1rem; }
+    @media (max-width: 600px) {
+      /* Navbar */
+      .navbar { padding: 0.75rem 1rem; }
+      .navbar-logo { font-size: 1.1rem; }
+      .navbar-back { font-size: 0.78rem; padding: 0.3rem 0.7rem; }
+
+      /* Page */
+      .page { padding-left: 0.75rem; padding-right: 0.75rem; gap: 0.9rem; }
+
+      /* Hero */
+      .game-hero { padding: 1.2rem 1.2rem; border-radius: 14px; }
+      .game-hero-title { font-size: 1.5rem; }
+      .game-hero-desc { font-size: 0.8rem; }
+
+      /* Turn Banner */
+      .turn-banner { padding: 0.9rem 1rem; border-radius: 12px; }
+      .turn-banner-inner { gap: 0.5rem; flex-wrap: wrap; }
+      .turn-name { font-size: 1.1rem; }
+      .turn-timer { font-size: 1.2rem; min-width: 2rem; }
+      .turn-badge { font-size: 0.65rem; padding: 0.2rem 0.6rem; }
+      .turn-queue { gap: 0.4rem; }
+      .queue-player { font-size: 0.75rem; padding: 0.25rem 0.6rem; }
+      .queue-avatar { width: 18px; height: 18px; font-size: 0.6rem; }
+
+      /* Status Bar */
+      .status-bar {
+        padding: 0.9rem 1rem;
+        gap: 0.8rem;
+        border-radius: 12px;
+        flex-wrap: wrap;
+      }
+      .status-sep { display: none; }
+      .status-value { font-size: 0.9rem; }
+      .status-value.next-letter { font-size: 1.6rem; }
+      .online-count { margin-left: 0; width: 100%; justify-content: flex-end; }
+
+      /* Chain Box */
+      .chain-box { padding: 1rem; border-radius: 12px; }
+      .chain-word { font-size: 0.8rem; padding: 0.3rem 0.7rem; }
+      .chain-words { max-height: 120px; }
+
+      /* Input Area */
+      .input-area { padding: 1rem; border-radius: 12px; }
+      .name-input-wrap { flex-wrap: wrap; gap: 0.5rem; }
+      .name-label { width: 100%; margin-bottom: -0.3rem; }
+      .name-input { min-width: 0; }
+      .join-btn { width: 100%; justify-content: center; text-align: center; border-radius: 10px; }
+      .join-hint { font-size: 0.72rem; }
+      .word-input-row { gap: 0.5rem; }
+      .word-input { font-size: 0.88rem; padding: 0.65rem 1rem; }
+      .send-word-btn { padding: 0.65rem 1.2rem; font-size: 0.85rem; white-space: nowrap; }
+      .feedback-msg { font-size: 0.78rem; }
+      .player-joined-label { font-size: 0.78rem; }
+      .leave-btn { font-size: 0.72rem; }
+
+      /* Leaderboard */
+      .leaderboard { padding: 1rem; border-radius: 12px; }
+      .lb-title { font-size: 1rem; }
+      .lb-item { padding: 0.5rem 0.7rem; }
+      .lb-name { font-size: 0.82rem; }
+      .lb-score { font-size: 1rem; }
+
+      /* Chat */
+      .chat-box { border-radius: 16px; height: 320px; }
+      .chat-head { padding: 0.8rem 1rem; }
+      .chat-head-title { font-size: 0.92rem; }
+      .chat-messages { padding: 0.75rem; }
+      .chat-msg { font-size: 0.82rem; padding: 0.55rem 0.8rem; }
+      .chat-input-row { padding: 0.6rem 0.75rem; gap: 0.4rem; }
+      .chat-input { font-size: 0.82rem; padding: 0.55rem 0.85rem; }
+      .chat-send-btn { width: 34px; height: 34px; font-size: 0.82rem; }
+    }
+
+    @media (max-width: 380px) {
+      .count-grid { grid-template-columns: repeat(2, 1fr); }
+      .word-input-row { flex-direction: column; }
+      .send-word-btn { width: 100%; border-radius: 10px; }
     }
   </style>
 </head>
