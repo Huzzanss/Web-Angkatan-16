@@ -282,6 +282,13 @@
       transition: all 0.2s; white-space: nowrap;
     }
 
+    .send-word-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      background: linear-gradient(135deg, #4a5568, #6b7280);
+    }
+
     .send-word-btn:hover {
       background: linear-gradient(135deg, var(--gold), var(--gold2));
       color: var(--navy);
@@ -680,7 +687,8 @@
     allWords.forEach((w, i) => {
       const el = document.createElement('span');
       el.className = 'chain-word' + (i === allWords.length - 1 ? ' latest' : '');
-      el.innerHTML = `<span class="word-initial">${(w.player||'?').charAt(0).toUpperCase()}</span>${esc(w.word)}`;
+      const flag = w.lang === 'EN' ? ' 🇬🇧' : (w.lang === 'ID' ? ' 🇮🇩' : '');
+      el.innerHTML = `<span class="word-initial">${(w.player||'?').charAt(0).toUpperCase()}</span>${esc(w.word)}${flag}`;
       el.title = w.player || 'Anonim';
       container.appendChild(el);
     });
@@ -703,57 +711,156 @@
     document.getElementById('nextLetter').textContent = nextLetter;
   }
 
+  /* ══════════════════════════════════════
+     KATA KASAR — Indonesian + English
+  ══════════════════════════════════════ */
+  const BAD_WORDS = new Set([
+    // Indonesian
+    'anjing','anjir','anjrit','anying','asu','babi','bajingan','bangsat','bego',
+    'bejat','bencong','biadab','bitch','bodoh','bokep','bolot','brengsek','budek',
+    'bullshit','bunuh','coli','colmek','continental','croot','dancuk','dancok',
+    'dengki','despicable','edan','fluk','fuck','fucking','goblok','goblog','gokil',
+    'haram','hejo','idiot','jalang','jancok','jancuk','keparat','khianat','kimak',
+    'kontol','koplak','kurang ajar','laknat','lonte','mampus','memek','monyet',
+    'ngentot','ngewe','pantat','pecundang','pelacur','perek','pukimak','setan',
+    'sialan','stupid','tai','tahi','tolol','tucuk','tukang','utang','vagina',
+    'pepek','jembut','nganye','ngewe','ngocok','cibai','puki','butuh','titit',
+    // English
+    'ass','asshole','bastard','bitch','cock','crap','cum','cunt','damn','dick',
+    'dildo','dumb','fag','faggot','fool','fucker','goddamn','hell','horny','idiot',
+    'jackass','jerk','loser','moron','motherfucker','nigga','nigger','penis','piss',
+    'porn','prick','pussy','rape','retard','shit','slut','spank','stupid','twat',
+    'ugly','vagina','wank','whore',
+  ]);
+
+  /* ══════════════════════════════════════
+     DICTIONARY CHECK — EN + ID
+  ══════════════════════════════════════ */
+  const dictCache = new Map(); // cache hasil cek biar tidak double request
+
+  async function isValidWord(word) {
+    const w = word.toLowerCase();
+
+    if (dictCache.has(w)) return dictCache.get(w);
+
+    // 1. Check English via Free Dictionary API
+    try {
+      const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + w);
+      if (res.ok) {
+        dictCache.set(w, { valid: true, lang: 'EN' });
+        return { valid: true, lang: 'EN' };
+      }
+    } catch (e) { /* network error, lanjut ke cek ID */ }
+
+    // 2. Check Indonesian via KBBI unofficial API
+    try {
+      const res = await fetch('https://api.kbbi.kemdikbud.go.id/kata/' + encodeURIComponent(w), {
+        signal: AbortSignal.timeout(4000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        // API returns array of entries; valid if array has items with 'lema' field
+        if (Array.isArray(data) && data.length > 0) {
+          dictCache.set(w, { valid: true, lang: 'ID' });
+          return { valid: true, lang: 'ID' };
+        }
+      }
+    } catch(e) { /* timeout or network */ }
+
+    // 3. Fallback: try another community KBBI endpoint
+    try {
+      const res = await fetch('https://kbbi.vercel.app/api?q=' + encodeURIComponent(w), {
+        signal: AbortSignal.timeout(4000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && (data.found || (data.entries && data.entries.length > 0))) {
+          dictCache.set(w, { valid: true, lang: 'ID' });
+          return { valid: true, lang: 'ID' };
+        }
+      }
+    } catch(e) {}
+
+    dictCache.set(w, { valid: false, lang: null });
+    return { valid: false, lang: null };
+  }
+
   /* ── Send Word ── */
-  function sendWord() {
-    const name = playerNameInput.value.trim() || 'Anonim';
+  async function sendWord() {
+    const name  = playerNameInput.value.trim() || 'Anonim';
     myName = name;
     localStorage.setItem('skPlayerName', name);
 
-    const raw  = document.getElementById('wordInput').value.trim().toLowerCase();
-    const input= document.getElementById('wordInput');
-    const fb   = document.getElementById('feedbackMsg');
+    const raw   = document.getElementById('wordInput').value.trim().toLowerCase();
+    const input = document.getElementById('wordInput');
+    const btn   = document.getElementById('sendWordBtn');
 
     if (!raw) return;
 
-    // Validasi
+    // Validasi format
     if (!/^[a-zA-Z]+$/.test(raw)) {
       return showFeedback('fail', '⚠ Hanya huruf yang dibolehkan!', input);
     }
 
+    // Cek kata kasar dulu
+    if (BAD_WORDS.has(raw)) {
+      return showFeedback('fail', '🚫 Kata tidak sopan tidak boleh dipakai!', input);
+    }
+
+    // Cek sudah dipakai
     if (wordSet.has(raw)) {
       return showFeedback('fail', '❌ Kata "' + raw + '" sudah pernah dipakai!', input);
     }
 
+    // Cek huruf awal
     if (nextLetter && raw.charAt(0).toUpperCase() !== nextLetter) {
       return showFeedback('fail', '❌ Kata harus dimulai huruf ' + nextLetter + '!', input);
     }
 
-    // Kirim ke Firebase
-    gameRef.push({ word: raw, player: name, userId: myId, timestamp: Date.now() });
+    // Loading state
+    btn.disabled = true;
+    btn.textContent = '🔍 Mengecek...';
+    input.disabled = true;
+    showFeedback('warn', '🔍 Mengecek kamus...', input);
 
-    // Update skor
+    // Cek kamus
+    const result = await isValidWord(raw);
+
+    btn.disabled = false;
+    btn.textContent = 'Kirim ✦';
+    input.disabled = false;
+    input.focus();
+
+    if (!result.valid) {
+      return showFeedback('fail', '❌ Kata "' + raw + '" tidak ada di kamus Indonesia/English!', input);
+    }
+
+    // Semua valid — kirim
+    const langLabel = result.lang === 'EN' ? '🇬🇧' : '🇮🇩';
+    gameRef.push({ word: raw, player: name, userId: myId, timestamp: Date.now(), lang: result.lang });
     scoreRef.child(myId).transaction(cur => {
       if (!cur) return { name, score: 1 };
       return { name, score: (cur.score || 0) + 1 };
     });
-
     document.getElementById('wordInput').value = '';
-    showFeedback('ok', '✓ Kata "' + raw + '" diterima!', input, true);
+    showFeedback('ok', '✓ ' + langLabel + ' Kata "' + raw + '" diterima!', input, true);
   }
 
   function showFeedback(type, msg, input, isOk) {
     const fb = document.getElementById('feedbackMsg');
     fb.className = 'feedback-msg ' + type;
     fb.textContent = msg;
-    if (input) {
+    if (input && !input.disabled) {
       input.className = 'word-input ' + (isOk ? 'success' : 'error');
-      setTimeout(() => input.className = 'word-input', 800);
+      setTimeout(() => { if (!input.disabled) input.className = 'word-input'; }, 800);
     }
-    clearTimeout(window._fbTimer);
-    window._fbTimer = setTimeout(() => { fb.textContent = ''; fb.className = 'feedback-msg'; }, 3000);
+    if (type !== 'warn') {
+      clearTimeout(window._fbTimer);
+      window._fbTimer = setTimeout(() => { fb.textContent = ''; fb.className = 'feedback-msg'; }, 3500);
+    }
   }
 
-  document.getElementById('sendWordBtn').addEventListener('click', sendWord);
+  document.getElementById('sendWordBtn').addEventListener('click', () => sendWord());
   document.getElementById('wordInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); sendWord(); }
   });
