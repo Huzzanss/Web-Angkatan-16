@@ -423,9 +423,15 @@ window.addEventListener('beforeunload', stopTyping);
 (function() {
   // ─── PLAYLIST — ganti sesuai nama file di ./music/ ───
   const PLAYLIST = [
-    { file: 'lagu1.mp3',  title: 'Lagu 1' },
-    { file: 'lagu2.mp3',  title: 'Lagu 2' },
-    { file: 'lagu3.mp3',  title: 'Lagu 3' },
+    { file: 'Tujuh Belas.mp3',  title: 'Tujuh Belas' },
+    { file: 'Kenangan Manis.mp3',  title: 'Kenangan Manis' },
+    { file: 'Kita Ke Sana.mp3',  title: 'Kita Ke Sana' },
+    { file: 'Monolog.mp3',  title: 'Monolog' },
+    { file: 'Monokrom.mp3',  title: 'Monokrom' },
+    { file: 'Lantas.mp3',  title: 'Lantas' },
+    { file: 'Terbuang Dalam Waktu.mp3',  title: 'Terbuang Dalam Waktu' },
+    { file: 'Ribuan Memori.mp3',  title: 'Ribuan Memori' },
+    { file: 'Secukupnya.mp3',  title: 'Secukupnya' },
   ];
 
   const BASE_PATH = './music/'; // folder musik di repo
