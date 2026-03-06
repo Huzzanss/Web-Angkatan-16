@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gambar Bareng — Angkatan XVI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:#0a1628;--navy2:#112240;--navy3:#1d3461;
+      --gold:#c9a84c;--gold2:#e8c97a;
+      --cream:#f8f4ed;--white:#fff;--text:#2d2d2d;--muted:#7a7a8a;
+      --green:#22c55e;--red:#ef4444;--orange:#f97316;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;overflow-x:hidden;}
+    ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--gold);border-radius:10px;}
+
+    /* Navbar */
+    .navbar{position:fixed;top:0;width:100%;background:rgba(10,22,40,0.93);backdrop-filter:blur(18px);border-bottom:1px solid rgba(201,168,76,.18);padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;z-index:200;}
+    .navbar-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:#fff;text-decoration:none;}
+    .navbar-logo span{color:var(--gold);}
+    .navbar-back{color:rgba(255,255,255,.6);text-decoration:none;font-size:.8rem;font-weight:500;padding:.35rem .85rem;border-radius:50px;border:1px solid rgba(255,255,255,.15);transition:all .2s;}
+    .navbar-back:hover{color:var(--gold2);}
+
+    /* Join Screen */
+    #joinScreen{position:fixed;inset:0;background:var(--cream);z-index:150;display:flex;align-items:center;justify-content:center;padding:1rem;}
+    .join-card{background:#fff;border-radius:24px;box-shadow:0 20px 60px rgba(10,22,40,.15);padding:2.5rem;max-width:420px;width:100%;text-align:center;}
+    .join-icon{font-size:3rem;margin-bottom:1rem;}
+    .join-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--navy);margin-bottom:.4rem;}
+    .join-title span{color:var(--gold);font-style:italic;}
+    .join-desc{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.5;}
+    .join-input{width:100%;padding:.8rem 1.2rem;border:2px solid rgba(10,22,40,.1);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;text-align:center;margin-bottom:1rem;transition:border-color .2s;}
+    .join-input:focus{border-color:var(--gold);}
+    .join-btn{width:100%;padding:.85rem;background:linear-gradient(135deg,var(--navy),var(--navy3));color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
+    .join-btn:hover{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);}
+
+    /* Main Layout */
+    .game-layout{padding-top:58px;display:grid;grid-template-columns:1fr 300px;height:100vh;gap:0;}
+
+    /* Left: Canvas Area */
+    .canvas-area{display:flex;flex-direction:column;background:#fff;border-right:1px solid rgba(10,22,40,.08);}
+
+    /* Round / Word Banner */
+    .round-banner{background:linear-gradient(120deg,var(--navy),var(--navy3));padding:.7rem 1.2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+    .round-info{font-size:.75rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:2px;}
+    .word-display{flex:1;text-align:center;}
+    .word-blanks{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:#fff;letter-spacing:.4rem;}
+    .word-blanks.revealed{color:var(--gold2);}
+    .timer-badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:.3rem .9rem;border-radius:50px;font-size:.85rem;font-weight:700;min-width:60px;text-align:center;transition:background .3s;}
+    .timer-badge.urgent{background:rgba(239,68,68,.3);border-color:rgba(239,68,68,.5);animation:timerPulse .5s ease-in-out infinite;}
+    @keyframes timerPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+
+    /* Drawing Tools */
+    .toolbar{padding:.6rem 1rem;background:#f7f8fc;border-bottom:1px solid rgba(10,22,40,.07);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+    .tool-group{display:flex;align-items:center;gap:.4rem;}
+    .tool-sep{width:1px;height:28px;background:rgba(10,22,40,.1);}
+    .tool-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid transparent;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .18s;box-shadow:0 1px 4px rgba(10,22,40,.08);}
+    .tool-btn:hover{border-color:var(--gold);transform:translateY(-1px);}
+    .tool-btn.active{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(232,201,122,.1));}
+    .size-slider{width:80px;accent-color:var(--gold);}
+    .color-swatch{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .18s;flex-shrink:0;}
+    .color-swatch:hover,.color-swatch.active{border-color:var(--navy);transform:scale(1.15);}
+    .color-custom{width:34px;height:34px;border-radius:8px;border:1.5px solid rgba(10,22,40,.15);cursor:pointer;padding:2px;background:#fff;}
+    .clear-btn{margin-left:auto;padding:.35rem .9rem;border-radius:50px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--red);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;}
+    .clear-btn:hover{background:rgba(239,68,68,.2);}
+    .toolbar-locked{position:absolute;inset:0;background:rgba(247,248,252,.7);backdrop-filter:blur(2px);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;color:var(--muted);font-weight:600;}
+
+    /* Canvas */
+    .canvas-wrap{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden;}
+    #drawCanvas{display:block;background:#fff;cursor:crosshair;touch-action:none;max-width:100%;max-height:100%;}
+    .canvas-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.8rem;pointer-events:none;}
+    .overlay-msg{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:rgba(10,22,40,.25);text-align:center;padding:0 2rem;}
+    .your-turn-banner{position:absolute;top:.8rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);padding:.5rem 1.4rem;border-radius:50px;font-weight:700;font-size:.88rem;box-shadow:0 4px 16px rgba(201,168,76,.4);animation:bannerPop .4s ease;white-space:nowrap;}
+    @keyframes bannerPop{from{opacity:0;transform:translateX(-50%) translateY(-10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+
+    /* Right: Chat + Players */
+    .side-panel{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+
+    /* Players */
+    .players-section{padding:1rem;border-bottom:1px solid rgba(10,22,40,.07);}
+    .section-title{font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:.7rem;}
+    .players-list{display:flex;flex-direction:column;gap:.4rem;max-height:160px;overflow-y:auto;}
+    .player-row{display:flex;align-items:center;gap:.6rem;padding:.4rem .5rem;border-radius:8px;background:var(--cream);}
+    .player-row.drawing{background:linear-gradient(120deg,rgba(201,168,76,.15),transparent);border:1px solid rgba(201,168,76,.25);}
+    .player-row.guessed{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);}
+    .player-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0;}
+    .player-name{font-size:.82rem;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .player-score{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:var(--gold);}
+    .drawing-badge{font-size:.6rem;padding:.1rem .4rem;border-radius:50px;background:var(--gold);color:var(--navy);font-weight:700;letter-spacing:.5px;}
+    .guessed-badge{font-size:.6rem;color:var(--green);font-weight:700;}
+
+    /* Word Picker (for drawer) */
+    .word-picker{position:fixed;inset:0;background:rgba(10,22,40,.7);z-index:300;display:none;align-items:center;justify-content:center;padding:1rem;}
+    .word-picker.show{display:flex;}
+    .word-picker-card{background:#fff;border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center;}
+    .picker-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--navy);margin-bottom:.5rem;}
+    .picker-sub{font-size:.82rem;color:var(--muted);margin-bottom:1.5rem;}
+    .word-choices{display:flex;flex-direction:column;gap:.7rem;}
+    .word-choice-btn{padding:.85rem 1.5rem;border:2px solid rgba(10,22,40,.1);border-radius:12px;background:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;color:var(--navy);transition:all .2s;}
+    .word-choice-btn:hover{border-color:var(--gold);background:rgba(201,168,76,.08);transform:translateY(-2px);}
+
+    /* Chat */
+    .chat-section{flex:1;display:flex;flex-direction:column;min-height:0;}
+    .chat-head{padding:.8rem 1rem;border-bottom:1px solid rgba(10,22,40,.07);background:#f7f8fc;}
+    .chat-head-title{font-size:.88rem;font-weight:700;color:var(--navy);}
+    .chat-messages{flex:1;overflow-y:auto;padding:.8rem;display:flex;flex-direction:column;gap:.4rem;background:#fff;}
+    .chat-msg{font-size:.82rem;padding:.5rem .75rem;border-radius:10px;line-height:1.4;animation:msgIn .2s ease;}
+    @keyframes msgIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+    .chat-msg.guess{background:var(--cream);}
+    .chat-msg.correct{background:linear-gradient(120deg,rgba(34,197,94,.15),rgba(34,197,94,.05));border:1px solid rgba(34,197,94,.3);}
+    .chat-msg.close{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);}
+    .chat-msg.system{background:rgba(10,22,40,.05);text-align:center;font-style:italic;color:var(--muted);font-size:.75rem;}
+    .chat-msg-name{font-weight:700;color:var(--navy);font-size:.75rem;margin-bottom:.1rem;}
+    .chat-msg.correct .chat-msg-name{color:var(--green);}
+    .chat-input-row{display:flex;gap:.5rem;padding:.7rem;border-top:1px solid rgba(10,22,40,.07);background:#f7f8fc;}
+    .chat-input{flex:1;padding:.55rem .9rem;border:1.5px solid rgba(10,22,40,.1);border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;background:#fff;transition:border-color .2s;}
+    .chat-input:focus{border-color:var(--gold);}
+    .chat-send{width:34px;height:34px;border-radius:50%;border:none;background:var(--navy);color:#fff;font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+    .chat-send:hover{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);}
+
+    /* Toast */
+    .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:.65rem 1.4rem;border-radius:50px;font-size:.85rem;font-weight:500;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+    .toast.show{opacity:1;}
+
+    /* Mobile */
+    @media(max-width:700px){
+      .game-layout{grid-template-columns:1fr;grid-template-rows:1fr 280px;}
+      .side-panel{border-top:1px solid rgba(10,22,40,.1);}
+      .players-section{display:none;}
+      #drawCanvas{width:100%!important;height:auto!important;}
+      .toolbar{gap:.4rem;padding:.5rem .7rem;}
+      .tool-btn{width:30px;height:30px;font-size:.9rem;}
+      .color-swatch{width:24px;height:24px;}
+      .size-slider{width:60px;}
+      .word-blanks{font-size:1.4rem;letter-spacing:.3rem;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Join Screen -->
+<div id="joinScreen">
+  <div class="join-card">
+    <div class="join-icon">🎨</div>
+    <h1 class="join-title">Gambar <span>Bareng</span></h1>
+    <p class="join-desc">Satu orang dapat kata rahasia dan menggambar — yang lain menebak! Poin untuk penebak tercepat dan pemain yang gambarnya berhasil ditebak.</p>
+    <input class="join-input" id="joinName" placeholder="Nama kamu..." maxlength="20" autocomplete="off">
+    <button class="join-btn" onclick="joinGame()">Masuk ke Game ✦</button>
+  </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-logo">Angkatan <span>XVI</span></a>
+  <a href="index.html" class="navbar-back">← Kembali</a>
+</nav>
+
+<!-- Main Game -->
+<div class="game-layout" id="gameLayout" style="display:none">
+
+  <!-- Canvas Area -->
+  <div class="canvas-area">
+
+    <!-- Round Banner -->
+    <div class="round-banner">
+      <span class="round-info" id="roundInfo">Menunggu pemain...</span>
+      <div class="word-display">
+        <div class="word-blanks" id="wordBlanks">• • •</div>
+      </div>
+      <div class="timer-badge" id="timerBadge">—</div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar" id="toolbar" style="position:relative">
+      <div class="tool-group">
+        <button class="tool-btn active" id="toolPen" onclick="setTool('pen')" title="Pensil">✏️</button>
+        <button class="tool-btn" id="toolEraser" onclick="setTool('eraser')" title="Hapus">🧹</button>
+      </div>
+      <div class="tool-sep"></div>
+      <div class="tool-group">
+        <input type="range" class="size-slider" id="sizeSlider" min="2" max="40" value="6">
+      </div>
+      <div class="tool-sep"></div>
+      <div class="tool-group" id="colorPalette">
+        <!-- Swatches injected by JS -->
+      </div>
+      <input type="color" class="color-custom" id="colorPicker" title="Warna custom">
+      <button class="clear-btn" onclick="clearCanvas()">🗑 Clear</button>
+      <div class="toolbar-locked" id="toolbarLocked" style="display:none">🔒 Bukan giliranmu menggambar</div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrap">
+      <canvas id="drawCanvas" width="700" height="460"></canvas>
+      <div class="canvas-overlay" id="canvasOverlay" style="display:none">
+        <div class="overlay-msg" id="overlayMsg"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Side Panel -->
+  <div class="side-panel">
+
+    <!-- Players -->
+    <div class="players-section">
+      <div class="section-title">Pemain</div>
+      <div class="players-list" id="playersList"></div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-section">
+      <div class="chat-head">
+        <div class="chat-head-title">💬 Tebak Kata</div>
+      </div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chatInput" placeholder="Tebak kata..." autocomplete="off" maxlength="60">
+        <button class="chat-send" onclick="sendGuess()">➤</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Word Picker Modal -->
+<div class="word-picker" id="wordPicker">
+  <div class="word-picker-card">
+    <div class="picker-title">Pilih Kata</div>
+    <div class="picker-sub">Pilih kata yang akan kamu gambar. Pemain lain tidak bisa melihat ini!</div>
+    <div class="word-choices" id="wordChoices"></div>
+  </div>
+</div>
+
+<!-- Your Turn Banner (injected) -->
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+/* ── Firebase ── */
+const firebaseConfig = {
+  apiKey:"AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
+  authDomain:"chat-angkatan-16.firebaseapp.com",
+  databaseURL:"https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"chat-angkatan-16",
+  storageBucket:"chat-angkatan-16.appspot.com",
+  messagingSenderId:"47699501502",
+  appId:"1:47699501502:web:0d09e69d0b3ff39a7359ef"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const gameRef    = db.ref('gambarBareng/game');
+const playersRef = db.ref('gambarBareng/players');
+const chatRef    = db.ref('gambarBareng/chat');
+const strokesRef = db.ref('gambarBareng/strokes');
+const onlineRef  = db.ref('gambarBareng/online');
+
+/* ── Word Bank ── */
+const WORDS = [
+  // Hewan
+  'kucing','anjing','gajah','harimau','kelinci','kuda','sapi','kambing','ayam','bebek',
+  'ikan','kupu-kupu','semut','lebah','kura-kura','buaya','monyet','gorila','panda','koala',
+  // Makanan
+  'nasi goreng','mie goreng','sate','rendang','bakso','pizza','burger','roti','kue','es krim',
+  'apel','pisang','jeruk','mangga','semangka','anggur','nanas','strawberry',
+  // Benda
+  'buku','pensil','tas','sepatu','jam','kacamata','payung','kursi','meja','pintu',
+  'mobil','motor','pesawat','kapal','sepeda','kereta','helikopter',
+  // Tempat
+  'sekolah','rumah sakit','pantai','gunung','hutan','pasar','mall','stadion',
+  // Lain
+  'pelangi','matahari','bintang','bulan','awan','hujan','petir',
+  'sepak bola','basket','renang','berlari','memasak','tidur','membaca',
+];
+
+/* ── State ── */
+let myId   = localStorage.getItem('gbUserId') || Math.random().toString(36).substr(2,9);
+let myName = '';
+let hasJoined = false;
+let isDrawer  = false;
+let currentWord = '';
+let gameState   = null;
+let playersData = {};
+let guessedCorrect = false;
+let roundTimer  = null;
+localStorage.setItem('gbUserId', myId);
+
+/* ── Canvas Setup ── */
+const canvas  = document.getElementById('drawCanvas');
+const ctx     = canvas.getContext('2d');
+let drawing   = false;
+let lastX = 0, lastY = 0;
+let currentColor = '#000000';
+let currentSize  = 6;
+let currentTool  = 'pen';
+let strokeBuffer = [];
+let strokeFlushTimer = null;
+
+/* ── Color Palette ── */
+const COLORS = ['#000000','#ffffff','#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899','#6b7280','#92400e','#065f46'];
+const palette = document.getElementById('colorPalette');
+COLORS.forEach(c => {
+  const sw = document.createElement('div');
+  sw.className = 'color-swatch' + (c==='#000000'?' active':'');
+  sw.style.background = c;
+  sw.style.border = c==='#ffffff' ? '2px solid #ddd' : '2px solid transparent';
+  sw.onclick = () => { setColor(c); };
+  palette.appendChild(sw);
+});
+document.getElementById('colorPicker').addEventListener('input', e => setColor(e.target.value));
+document.getElementById('sizeSlider').addEventListener('input', e => currentSize = +e.target.value);
+
+function setColor(c) {
+  currentColor = c;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  document.getElementById('colorPicker').value = c;
+  if (currentTool === 'eraser') setTool('pen');
+}
+
+function setTool(t) {
+  currentTool = t;
+  document.getElementById('toolPen').classList.toggle('active', t==='pen');
+  document.getElementById('toolEraser').classList.toggle('active', t==='eraser');
+}
+
+/* ── Drawing Events ── */
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const src = e.touches ? e.touches[0] : e;
+  return {
+    x: (src.clientX - rect.left) * scaleX,
+    y: (src.clientY - rect.top)  * scaleY
+  };
+}
+
+canvas.addEventListener('mousedown',  startDraw);
+canvas.addEventListener('touchstart', startDraw, {passive:false});
+canvas.addEventListener('mousemove',  draw);
+canvas.addEventListener('touchmove',  draw, {passive:false});
+canvas.addEventListener('mouseup',    endDraw);
+canvas.addEventListener('touchend',   endDraw);
+canvas.addEventListener('mouseleave', endDraw);
+
+function startDraw(e) {
+  if (!isDrawer) return;
+  e.preventDefault();
+  drawing = true;
+  const pos = getPos(e);
+  lastX = pos.x; lastY = pos.y;
+  // Dot
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, (currentTool==='eraser'?currentSize*3:currentSize)/2, 0, Math.PI*2);
+  ctx.fillStyle = currentTool==='eraser' ? '#ffffff' : currentColor;
+  ctx.fill();
+  bufferStroke({type:'dot', x:lastX, y:lastY, color:currentTool==='eraser'?'#ffffff':currentColor, size:currentTool==='eraser'?currentSize*3:currentSize});
+}
+
+function draw(e) {
+  if (!drawing || !isDrawer) return;
+  e.preventDefault();
+  const pos = getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(lastX, lastY);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.strokeStyle = currentTool==='eraser' ? '#ffffff' : currentColor;
+  ctx.lineWidth   = currentTool==='eraser' ? currentSize*3 : currentSize;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+  ctx.stroke();
+  bufferStroke({type:'line', x1:lastX, y1:lastY, x2:pos.x, y2:pos.y, color:currentTool==='eraser'?'#ffffff':currentColor, size:currentTool==='eraser'?currentSize*3:currentSize});
+  lastX = pos.x; lastY = pos.y;
+}
+
+function endDraw() { drawing = false; }
+
+function bufferStroke(s) {
+  strokeBuffer.push(s);
+  clearTimeout(strokeFlushTimer);
+  strokeFlushTimer = setTimeout(flushStrokes, 80);
+}
+
+function flushStrokes() {
+  if (!strokeBuffer.length) return;
+  strokesRef.push({ strokes: JSON.stringify(strokeBuffer), ts: Date.now() });
+  strokeBuffer = [];
+}
+
+function clearCanvas() {
+  if (!isDrawer) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  strokesRef.remove();
+}
+
+/* ── Render remote strokes ── */
+strokesRef.on('child_added', snap => {
+  if (isDrawer) return; // drawer sees own strokes already
+  const data = snap.val();
+  if (!data) return;
+  const strokes = JSON.parse(data.strokes || '[]');
+  strokes.forEach(s => {
+    if (s.type === 'dot') {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size/2, 0, Math.PI*2);
+      ctx.fillStyle = s.color;
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(s.x1, s.y1);
+      ctx.lineTo(s.x2, s.y2);
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth   = s.size;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
+  });
+});
+
+strokesRef.on('value', snap => {
+  // If strokes cleared (null), clear canvas for guessers too
+  if (!snap.val() && !isDrawer) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
+});
+
+/* ─────────────────────────────
+   JOIN
+───────────────────────────── */
+document.getElementById('joinName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') joinGame();
+});
+
+function joinGame() {
+  const name = document.getElementById('joinName').value.trim();
+  if (!name) { document.getElementById('joinName').focus(); return; }
+  myName = name;
+  localStorage.setItem('gbPlayerName', name);
+
+  playersRef.child(myId).set({ name, score: 0, joinedAt: Date.now() });
+  playersRef.child(myId).onDisconnect().remove();
+  onlineRef.child(myId).set(true);
+  onlineRef.child(myId).onDisconnect().remove();
+
+  hasJoined = true;
+  document.getElementById('joinScreen').style.display = 'none';
+  document.getElementById('gameLayout').style.display = 'grid';
+
+  // If no game in progress, try to start
+  gameRef.once('value', snap => {
+    if (!snap.val() || snap.val().phase === 'waiting') {
+      checkAndStartRound();
+    }
+  });
+}
+
+/* ─────────────────────────────
+   GAME STATE LISTENER
+───────────────────────────── */
+gameRef.on('value', snap => {
+  gameState = snap.val();
+  if (!hasJoined) return;
+  handleGameState();
+});
+
+playersRef.orderByChild('joinedAt').on('value', snap => {
+  playersData = {};
+  snap.forEach(s => { playersData[s.key] = s.val(); });
+  renderPlayers();
+  if (hasJoined) checkAndStartRound();
+});
+
+function handleGameState() {
+  if (!gameState) {
+    setPhaseWaiting();
+    return;
+  }
+  const phase = gameState.phase;
+  if (phase === 'waiting')  { setPhaseWaiting(); }
+  if (phase === 'picking')  { setPhasePicking(); }
+  if (phase === 'drawing')  { setPhaseDrawing(); }
+  if (phase === 'roundEnd') { setPhaseRoundEnd(); }
+}
+
+/* ─────────────────────────────
+   PHASES
+───────────────────────────── */
+function setPhaseWaiting() {
+  isDrawer = false;
+  document.getElementById('roundInfo').textContent = 'Menunggu pemain...';
+  document.getElementById('wordBlanks').textContent = '• • •';
+  document.getElementById('wordBlanks').className = 'word-blanks';
+  document.getElementById('timerBadge').textContent = '—';
+  document.getElementById('toolbarLocked').style.display = 'flex';
+  document.getElementById('canvasOverlay').style.display = 'flex';
+  document.getElementById('overlayMsg').textContent = 'Menunggu pemain lain bergabung...';
+  clearRoundTimer();
+}
+
+function setPhasePicking() {
+  clearRoundTimer();
+  const drawerId = gameState.drawerId;
+  const drawerName = playersData[drawerId]?.name || '?';
+  isDrawer = (drawerId === myId);
+
+  document.getElementById('roundInfo').textContent = 'Ronde ' + (gameState.round||1);
+  document.getElementById('wordBlanks').textContent = isDrawer ? 'Pilih kata...' : drawerName + ' sedang memilih kata...';
+  document.getElementById('timerBadge').textContent = '—';
+  document.getElementById('toolbarLocked').style.display = isDrawer ? 'none' : 'flex';
+  document.getElementById('canvasOverlay').style.display = isDrawer ? 'none' : 'flex';
+  document.getElementById('overlayMsg').textContent = drawerName + ' sedang memilih kata...';
+
+  if (isDrawer) {
+    // Show word picker
+    const words = getRandomWords(3);
+    const choices = document.getElementById('wordChoices');
+    choices.innerHTML = words.map(w => `<button class="word-choice-btn" onclick="pickWord('${w}')">${w}</button>`).join('');
+    document.getElementById('wordPicker').classList.add('show');
+  }
+}
+
+function setPhaseDrawing() {
+  clearRoundTimer();
+  guessedCorrect = false;
+  const drawerId = gameState.drawerId;
+  const drawerName = playersData[drawerId]?.name || '?';
+  isDrawer = (drawerId === myId);
+  currentWord = isDrawer ? gameState.word : '';
+
+  document.getElementById('wordPicker').classList.remove('show');
+  document.getElementById('toolbarLocked').style.display = isDrawer ? 'none' : 'flex';
+  document.getElementById('canvasOverlay').style.display = 'none';
+  document.getElementById('roundInfo').textContent = 'Ronde ' + (gameState.round||1) + ' — ' + (isDrawer ? 'Kamu menggambar!' : drawerName + ' menggambar');
+
+  // Show word hints
+  updateWordDisplay();
+
+  if (isDrawer) {
+    showToast('🎨 Kamu yang menggambar!');
+    // Add "your turn" banner
+    let yb = document.querySelector('.your-turn-banner');
+    if (!yb) {
+      yb = document.createElement('div');
+      yb.className = 'your-turn-banner';
+      document.querySelector('.canvas-wrap').appendChild(yb);
+    }
+    yb.textContent = '🎨 Giliran kamu! Kata: ' + gameState.word;
+    setTimeout(() => { if (yb.parentNode) yb.remove(); }, 3000);
+  } else {
+    document.getElementById('chatInput').disabled = false;
+  }
+
+  // Start countdown
+  startRoundTimer(gameState.endTime);
+}
+
+function setPhaseRoundEnd() {
+  clearRoundTimer();
+  isDrawer = false;
+  const word = gameState.word || '?';
+  document.getElementById('wordBlanks').textContent = word;
+  document.getElementById('wordBlanks').className = 'word-blanks revealed';
+  document.getElementById('timerBadge').textContent = '—';
+  document.getElementById('toolbarLocked').style.display = 'flex';
+  document.getElementById('canvasOverlay').style.display = 'flex';
+  document.getElementById('overlayMsg').textContent = '🎉 Kata: ' + word + '\nRonde berikutnya sebentar lagi...';
+  addChatSystem('🔑 Jawabannya adalah: ' + word);
+
+  // Next round after 4s (only drawer or first player triggers)
+  const playerIds = Object.keys(playersData);
+  if (playerIds.length > 0 && playerIds[0] === myId) {
+    setTimeout(startNextRound, 4000);
+  }
+}
+
+/* ─────────────────────────────
+   WORD DISPLAY
+───────────────────────────── */
+function updateWordDisplay() {
+  if (!gameState || gameState.phase !== 'drawing') return;
+  const word = gameState.word;
+  if (isDrawer) {
+    document.getElementById('wordBlanks').textContent = word;
+  } else {
+    // Show underscores, reveal first/last letter as hint
+    const blanks = word.split('').map((c,i) => {
+      if (c === ' ') return ' ';
+      if (i === 0 || i === word.length-1) return c; // reveal first & last
+      return '_';
+    }).join(' ');
+    document.getElementById('wordBlanks').textContent = blanks;
+  }
+}
+
+/* ─────────────────────────────
+   TIMER
+───────────────────────────── */
+function startRoundTimer(endTime) {
+  clearRoundTimer();
+  function tick() {
+    const left = Math.max(0, Math.round((endTime - Date.now()) / 1000));
+    const badge = document.getElementById('timerBadge');
+    badge.textContent = left + 's';
+    badge.className = 'timer-badge' + (left <= 10 ? ' urgent' : '');
+    if (left <= 0) {
+      clearRoundTimer();
+      // Only the drawer ends the round
+      if (isDrawer) {
+        gameRef.update({ phase: 'roundEnd' });
+      }
+    }
+  }
+  tick();
+  roundTimer = setInterval(tick, 1000);
+}
+
+function clearRoundTimer() {
+  if (roundTimer) { clearInterval(roundTimer); roundTimer = null; }
+}
+
+/* ─────────────────────────────
+   ROUND MANAGEMENT
+───────────────────────────── */
+function checkAndStartRound() {
+  const playerList = Object.keys(playersData);
+  if (playerList.length < 2) return; // need at least 2
+  if (!gameState || gameState.phase === 'waiting') {
+    // First player starts
+    if (playerList[0] === myId) {
+      startNewRound(1, playerList[0]);
+    }
+  }
+}
+
+function startNewRound(roundNum, drawerId) {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  strokesRef.remove();
+  gameRef.set({
+    phase: 'picking',
+    round: roundNum,
+    drawerId,
+    word: '',
+    endTime: 0,
+    guessedCount: 0
+  });
+  // Reset guessed flags
+  playersRef.once('value', snap => {
+    snap.forEach(s => playersRef.child(s.key).update({ guessed: false }));
+  });
+}
+
+function startNextRound() {
+  const playerList = Object.keys(playersData);
+  if (playerList.length < 2) {
+    gameRef.update({ phase: 'waiting' });
+    return;
+  }
+  const currentDrawerIdx = playerList.indexOf(gameState?.drawerId || '');
+  const nextIdx = (currentDrawerIdx + 1) % playerList.length;
+  const nextDrawer = playerList[nextIdx];
+  const nextRound = (gameState?.round || 0) + 1;
+  startNewRound(nextRound, nextDrawer);
+}
+
+/* ─────────────────────────────
+   WORD PICKER
+───────────────────────────── */
+function getRandomWords(n) {
+  const shuffled = [...WORDS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n);
+}
+
+function pickWord(word) {
+  document.getElementById('wordPicker').classList.remove('show');
+  const endTime = Date.now() + 80000; // 80 seconds
+  gameRef.update({ phase: 'drawing', word, endTime });
+  addChatSystem('🎨 ' + myName + ' mulai menggambar!');
+}
+
+/* ─────────────────────────────
+   CHAT & GUESSING
+───────────────────────────── */
+document.getElementById('chatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendGuess();
+});
+
+function sendGuess() {
+  if (isDrawer) return;
+  const input = document.getElementById('chatInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  if (gameState?.phase !== 'drawing' || guessedCorrect) return;
+
+  const guess   = text.toLowerCase();
+  const correct = currentWord ? guess === currentWord.toLowerCase() : false;
+  const word    = gameState.word || '';
+  const isClose = !correct && word && levenshtein(guess, word.toLowerCase()) <= 2;
+
+  chatRef.push({
+    name: myName, userId: myId,
+    text, correct, close: isClose && !correct,
+    ts: Date.now()
+  });
+
+  if (correct) {
+    guessedCorrect = true;
+    const timeLeft  = Math.max(0, Math.round((gameState.endTime - Date.now()) / 1000));
+    const points    = Math.round(50 + timeLeft * 1.5);
+    playersRef.child(myId).transaction(p => {
+      if (!p) return { name: myName, score: points, joinedAt: Date.now() };
+      return { ...p, score: (p.score||0) + points, guessed: true };
+    });
+    // Drawer gets points too
+    playersRef.child(gameState.drawerId).transaction(p => {
+      if (!p) return p;
+      return { ...p, score: (p.score||0) + 20 };
+    });
+    // Count guessed
+    gameRef.transaction(g => {
+      if (!g) return g;
+      const count = (g.guessedCount||0) + 1;
+      const totalGuessers = Object.keys(playersData).length - 1;
+      // If everyone guessed, end round
+      if (count >= totalGuessers) return { ...g, guessedCount: count, phase: 'roundEnd' };
+      return { ...g, guessedCount: count };
+    });
+    document.getElementById('chatInput').disabled = true;
+    input.placeholder = '✓ Kamu sudah menebak!';
+  }
+}
+
+chatRef.limitToLast(60).on('child_added', snap => {
+  const d = snap.val();
+  if (Date.now() - d.ts > 10000 && !document.getElementById('chatMessages').children.length) return;
+  appendChatMsg(d);
+});
+
+function appendChatMsg(d) {
+  const box = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+
+  if (d.correct) {
+    div.className = 'chat-msg correct';
+    div.innerHTML = `<div class="chat-msg-name">${esc(d.name)}</div>✓ Benar! 🎉`;
+  } else if (d.close) {
+    div.className = 'chat-msg close';
+    div.innerHTML = `<div class="chat-msg-name">${esc(d.name)}</div>🔥 Hampir! "${esc(d.text)}"`;
+  } else if (d.system) {
+    div.className = 'chat-msg system';
+    div.textContent = d.text;
+  } else {
+    div.className = 'chat-msg guess';
+    div.innerHTML = `<div class="chat-msg-name">${esc(d.name)}</div>${esc(d.text)}`;
+  }
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function addChatSystem(text) {
+  chatRef.push({ text, system: true, ts: Date.now() });
+}
+
+/* ─────────────────────────────
+   PLAYERS LIST
+───────────────────────────── */
+function renderPlayers() {
+  const list = document.getElementById('playersList');
+  const sorted = Object.entries(playersData).sort((a,b) => (b[1].score||0) - (a[1].score||0));
+  list.innerHTML = sorted.map(([id, p], i) => {
+    const hue = Math.round((i/sorted.length)*300);
+    const isDrawing = id === gameState?.drawerId && gameState?.phase === 'drawing';
+    const hasGuessed = p.guessed;
+    return `<div class="player-row${isDrawing?' drawing':''}${hasGuessed?' guessed':''}">
+      <div class="player-avatar" style="background:linear-gradient(135deg,hsl(${hue},60%,40%),hsl(${hue+20},50%,55%))">${p.name.charAt(0).toUpperCase()}</div>
+      <span class="player-name">${esc(p.name)}${id===myId?' (kamu)':''}</span>
+      ${isDrawing ? '<span class="drawing-badge">✏️</span>' : ''}
+      ${hasGuessed && !isDrawing ? '<span class="guessed-badge">✓</span>' : ''}
+      <span class="player-score">${p.score||0}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ─────────────────────────────
+   UTILS
+───────────────────────────── */
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length:m+1}, (_,i) => Array.from({length:n+1}, (_,j) => i||j));
+  for (let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function esc(t) {
+  return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Init canvas background
+ctx.fillStyle = '#fff';
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+window.addEventListener('beforeunload', () => {
+  if (hasJoined) {
+    playersRef.child(myId).remove();
+    onlineRef.child(myId).remove();
+    if (isDrawer) gameRef.update({ phase: 'roundEnd' });
+  }
+});
+</script>
+</body>
+</html>
