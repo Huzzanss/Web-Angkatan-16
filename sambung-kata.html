@@ -718,44 +718,78 @@
     const w = word.toLowerCase();
     if (dictCache.has(w)) return dictCache.get(w);
 
-    // 1. English — Free Dictionary API
+    const timeout = ms => new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms));
+
+    // 1. English — Free Dictionary API (paling reliable, ada CORS)
     try {
-      const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + w);
+      const res = await Promise.race([
+        fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + w),
+        timeout(5000)
+      ]);
       if (res.ok) {
         const r = { valid: true, lang: 'EN' };
         dictCache.set(w, r); return r;
       }
-    } catch(e) {}
+      // 404 = kata tidak ada di EN, lanjut cek ID
+    } catch(e) {
+      // network error / timeout — lanjut ke cek ID
+    }
 
-    // 2. Indonesian — KBBI Kemdikbud
+    // 2. Indonesian — Coba beberapa endpoint KBBI aktif
+    // Endpoint A: kbbi.dev (community, aktif)
     try {
-      const res = await fetch('https://api.kbbi.kemdikbud.go.id/kata/' + encodeURIComponent(w), {
-        signal: AbortSignal.timeout(4000)
-      });
+      const res = await Promise.race([
+        fetch('https://kbbi.dev/api/cari?q=' + encodeURIComponent(w)),
+        timeout(5000)
+      ]);
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
+        if (data && data.hasil && data.hasil.length > 0) {
+          const r = { valid: true, lang: 'ID' };
+          dictCache.set(w, r); return r;
+        }
+        if (res.ok && res.status === 200) {
+          // Beberapa endpoint return 200 kosong untuk tidak ditemukan
+          // lanjut ke endpoint berikutnya
+        }
+      }
+    } catch(e) {}
+
+    // Endpoint B: api.kbbi.web.id
+    try {
+      const res = await Promise.race([
+        fetch('https://api.kbbi.web.id/kata/' + encodeURIComponent(w)),
+        timeout(5000)
+      ]);
+      if (res.ok) {
+        const data = await res.json();
+        // Valid jika ada data lema/arti
+        if (data && (Array.isArray(data) ? data.length > 0 : data.lema || data.arti)) {
           const r = { valid: true, lang: 'ID' };
           dictCache.set(w, r); return r;
         }
       }
     } catch(e) {}
 
-    // 3. Fallback KBBI community
+    // Endpoint C: Datamuse (EN words by pattern — fallback terakhir untuk EN)
     try {
-      const res = await fetch('https://kbbi.vercel.app/api?q=' + encodeURIComponent(w), {
-        signal: AbortSignal.timeout(4000)
-      });
+      const res = await Promise.race([
+        fetch('https://api.datamuse.com/words?sp=' + encodeURIComponent(w) + '&max=1'),
+        timeout(4000)
+      ]);
       if (res.ok) {
         const data = await res.json();
-        if (data && (data.found || (data.entries && data.entries.length > 0))) {
-          const r = { valid: true, lang: 'ID' };
+        if (Array.isArray(data) && data.length > 0 && data[0].word === w) {
+          const r = { valid: true, lang: 'EN' };
           dictCache.set(w, r); return r;
         }
       }
     } catch(e) {}
 
-    const r = { valid: false, lang: null };
+    // Semua API gagal (mati / CORS / timeout) → anggap valid
+    // supaya game tidak macet karena masalah jaringan
+    // Tandai sebagai 'unknown' bukan invalid
+    const r = { valid: false, lang: null, apiError: true };
     dictCache.set(w, r);
     return r;
   }
@@ -805,10 +839,10 @@
     input.disabled = false;
     input.focus();
 
-    if (!result.valid)
-      return showFeedback('fail', '❌ "' + raw + '" tidak ada di kamus ID/EN!', input);
+    if (!result.valid && !result.apiError)
+      return showFeedback('fail', '❌ "' + raw + '" tidak ditemukan di kamus Bahasa Indonesia / English!', input);
 
-    const flag = result.lang === 'EN' ? ' 🇬🇧' : ' 🇮🇩';
+    const flag = result.lang === 'EN' ? ' 🇬🇧' : (result.lang === 'ID' ? ' 🇮🇩' : ' ⚠️');
     gameRef.push({ word: raw, player: name, userId: myId, timestamp: Date.now(), lang: result.lang });
     scoreRef.child(myId).transaction(cur => {
       if (!cur) return { name, score: 1 };
