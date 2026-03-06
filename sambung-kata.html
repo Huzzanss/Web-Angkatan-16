@@ -711,6 +711,118 @@
     document.getElementById('nextLetter').textContent = nextLetter;
   }
 
+  /* ── Dictionary Cache ── */
+  const dictCache = new Map();
+
+  async function isValidWord(word) {
+    const w = word.toLowerCase();
+    if (dictCache.has(w)) return dictCache.get(w);
+
+    // 1. English — Free Dictionary API
+    try {
+      const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + w);
+      if (res.ok) {
+        const r = { valid: true, lang: 'EN' };
+        dictCache.set(w, r); return r;
+      }
+    } catch(e) {}
+
+    // 2. Indonesian — KBBI Kemdikbud
+    try {
+      const res = await fetch('https://api.kbbi.kemdikbud.go.id/kata/' + encodeURIComponent(w), {
+        signal: AbortSignal.timeout(4000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const r = { valid: true, lang: 'ID' };
+          dictCache.set(w, r); return r;
+        }
+      }
+    } catch(e) {}
+
+    // 3. Fallback KBBI community
+    try {
+      const res = await fetch('https://kbbi.vercel.app/api?q=' + encodeURIComponent(w), {
+        signal: AbortSignal.timeout(4000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && (data.found || (data.entries && data.entries.length > 0))) {
+          const r = { valid: true, lang: 'ID' };
+          dictCache.set(w, r); return r;
+        }
+      }
+    } catch(e) {}
+
+    const r = { valid: false, lang: null };
+    dictCache.set(w, r);
+    return r;
+  }
+
+  function showFeedback(type, msg, input, isOk) {
+    const fb = document.getElementById('feedbackMsg');
+    fb.className = 'feedback-msg ' + type;
+    fb.textContent = msg;
+    if (input && !input.disabled) {
+      input.className = 'word-input ' + (isOk ? 'success' : 'error');
+      setTimeout(() => { if (!input.disabled) input.className = 'word-input'; }, 800);
+    }
+    if (type !== 'warn') {
+      clearTimeout(window._fbTimer);
+      window._fbTimer = setTimeout(() => { fb.textContent = ''; fb.className = 'feedback-msg'; }, 3500);
+    }
+  }
+
+  async function sendWord() {
+    const name  = playerNameInput.value.trim() || 'Anonim';
+    localStorage.setItem('skPlayerName', name);
+    const raw   = document.getElementById('wordInput').value.trim().toLowerCase();
+    const input = document.getElementById('wordInput');
+    const btn   = document.getElementById('sendWordBtn');
+
+    if (!raw) return;
+
+    if (!/^[a-zA-Z]+$/.test(raw))
+      return showFeedback('fail', '⚠ Hanya huruf yang dibolehkan!', input);
+
+    if (wordSet.has(raw))
+      return showFeedback('fail', '❌ Kata "' + raw + '" sudah pernah dipakai!', input);
+
+    if (nextLetter && raw.charAt(0).toUpperCase() !== nextLetter)
+      return showFeedback('fail', '❌ Kata harus dimulai huruf ' + nextLetter + '!', input);
+
+    // Loading
+    btn.disabled = true;
+    btn.textContent = '🔍...';
+    input.disabled = true;
+    showFeedback('warn', '🔍 Mengecek kamus...', input);
+
+    const result = await isValidWord(raw);
+
+    btn.disabled = false;
+    btn.textContent = 'Kirim ✦';
+    input.disabled = false;
+    input.focus();
+
+    if (!result.valid)
+      return showFeedback('fail', '❌ "' + raw + '" tidak ada di kamus ID/EN!', input);
+
+    const flag = result.lang === 'EN' ? ' 🇬🇧' : ' 🇮🇩';
+    gameRef.push({ word: raw, player: name, userId: myId, timestamp: Date.now(), lang: result.lang });
+    scoreRef.child(myId).transaction(cur => {
+      if (!cur) return { name, score: 1 };
+      return { name, score: (cur.score || 0) + 1 };
+    });
+    document.getElementById('wordInput').value = '';
+    showFeedback('ok', '✓' + flag + ' Kata "' + raw + '" diterima!', input, true);
+  }
+
+  document.getElementById('sendWordBtn').addEventListener('click', () => sendWord());
+  document.getElementById('wordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); sendWord(); }
+  });
+
   /* ── Leaderboard ── */
   scoreRef.on('value', snap => {
     const data = snap.val() || {};
