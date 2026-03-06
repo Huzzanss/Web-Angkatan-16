@@ -116,13 +116,29 @@
     .tab-btn.active{background:linear-gradient(135deg,var(--navy),var(--navy3));color:#fff;border-color:transparent;}
 
     @media(max-width:600px){
-      .page{padding:76px 1rem 2rem;}
-      .hero{padding:1.2rem 1.2rem;}
-      .hero-title{font-size:1.5rem;}
-      .candidates-grid{grid-template-columns:repeat(2,1fr);}
+      .page{padding:70px .85rem 2rem;}
+      .hero{padding:1.1rem 1.1rem;border-radius:14px;}
+      .hero-title{font-size:1.4rem;}
+      .hero-desc{font-size:.78rem;}
+      .candidates-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;}
+      .candidate-btn{padding:.8rem .6rem;}
+      .cand-avatar{width:44px;height:44px;font-size:1.2rem;}
+      .cand-name{font-size:.82rem;}
       .create-row{flex-direction:column;}
-      .name-row{flex-wrap:wrap;}
+      .name-row{flex-wrap:wrap;gap:.5rem;}
       .name-lbl{width:100%;}
+      .input{font-size:.85rem;}
+      .btn{padding:.6rem 1.2rem;font-size:.84rem;}
+      .tabs{flex-wrap:wrap;}
+      .tab-btn{font-size:.78rem;padding:.45rem .9rem;}
+      .card{padding:1.2rem;}
+      .result-name{font-size:.82rem;}
+      .result-count{font-size:.72rem;min-width:2.5rem;}
+      .navbar{padding:.75rem 1rem;}
+      .navbar-logo{font-size:1.1rem;}
+    }
+    @media(max-width:360px){
+      .candidates-grid{grid-template-columns:1fr;}
     }
   </style>
 </head>
