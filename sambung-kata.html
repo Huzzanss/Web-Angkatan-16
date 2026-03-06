@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sambung Kata — Angkatan XVI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:   #0a1628;
+      --navy2:  #112240;
+      --navy3:  #1d3461;
+      --gold:   #c9a84c;
+      --gold2:  #e8c97a;
+      --cream:  #f8f4ed;
+      --white:  #ffffff;
+      --text:   #2d2d2d;
+      --muted:  #7a7a8a;
+      --green:  #22c55e;
+      --red:    #ef4444;
+      --orange: #f97316;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+    /* ── Navbar ── */
+    .navbar {
+      position: fixed; top: 0; width: 100%;
+      background: rgba(10,22,40,0.92);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(201,168,76,0.18);
+      padding: 0.9rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 100;
+    }
+
+    .navbar-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--white); text-decoration: none;
+    }
+
+    .navbar-logo span { color: var(--gold); }
+
+    .navbar-back {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 0.85rem; font-weight: 500;
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: all 0.2s;
+    }
+
+    .navbar-back:hover { color: var(--gold2); border-color: rgba(201,168,76,0.4); }
+
+    /* ── Layout ── */
+    .page {
+      padding-top: 70px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+    }
+
+    /* ── Game Panel ── */
+    .game-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      padding-top: 1.5rem;
+    }
+
+    /* Hero */
+    .game-hero {
+      background: linear-gradient(120deg, var(--navy) 0%, var(--navy3) 100%);
+      border-radius: 20px;
+      padding: 2rem 2.5rem;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-hero::before {
+      content: '';
+      position: absolute; right: -40px; top: -40px;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: rgba(201,168,76,0.07);
+    }
+
+    .game-hero-eyebrow {
+      font-size: 0.68rem; letter-spacing: 4px;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .game-hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .game-hero-title span { color: var(--gold2); font-style: italic; }
+
+    .game-hero-desc {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+      max-width: 500px;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 1.2rem 1.5rem;
+      display: flex; align-items: center; gap: 1.5rem;
+      box-shadow: 0 2px 12px rgba(10,22,40,0.07);
+      border: 1px solid rgba(201,168,76,0.1);
+      flex-wrap: wrap;
+    }
+
+    .status-item { display: flex; flex-direction: column; gap: 0.1rem; }
+    .status-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .status-value { font-size: 1rem; font-weight: 700; color: var(--navy); }
+    .status-value.next-letter {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .status-sep { width: 1px; height: 40px; background: rgba(10,22,40,0.08); }
+
+    .online-count {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.82rem; color: var(--muted);
+    }
+
+    .online-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+    /* Word Chain Display */
+    .chain-box {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(10,22,40,0.07);
+      border: 1px solid rgba(201,168,76,0.1);
+      min-height: 160px;
+    }
+
+    .chain-box-label {
+      font-size: 0.68rem; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 1rem; font-weight: 600;
+    }
+
+    .chain-words {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      max-height: 200px; overflow-y: auto;
+    }
+
+    .chain-word {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--cream);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 50px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.88rem; font-weight: 500;
+      animation: wordIn 0.25s ease;
+    }
+
+    @keyframes wordIn {
+      from { opacity:0; transform: scale(0.85); }
+      to   { opacity:1; transform: scale(1); }
+    }
+
+    .chain-word.latest {
+      background: linear-gradient(135deg, var(--navy), var(--navy3));
+      color: var(--white);
+      border-color: transparent;
+    }
+
+    .chain-word .word-initial {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 0.65rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .chain-empty {
+      color: var(--muted); font-size: 0.88rem;
+      text-align: center; padding: 2rem 0;
+      font-style: italic;
+    }
+
+    /* Input Area */
+    .input-area {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(10,22,40,0.07);
+      border: 1px solid rgba(201,168,76,0.1);
+    }
+
+    .name-input-wrap {
+      display: flex; gap: 0.7rem; margin-bottom: 1rem;
+      align-items: center;
+    }
+
+    .name-label {
+      font-size: 0.75rem; color: var(--muted);
+      font-weight: 600; white-space: nowrap;
+    }
+
+    .name-input {
+      flex: 1; padding: 0.55rem 1rem;
+      border: 1.5px solid rgba(10,22,40,0.1);
+      border-radius: 50px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; outline: none; color: var(--text);
+      transition: border-color 0.2s;
+    }
+
+    .name-input:focus { border-color: var(--gold); }
+
+    .word-input-row {
+      display: flex; gap: 0.7rem;
+    }
+
+    .word-input {
+      flex: 1; padding: 0.75rem 1.2rem;
+      border: 1.5px solid rgba(10,22,40,0.1);
+      border-radius: 50px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; outline: none; color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      text-transform: lowercase;
+    }
+
+    .word-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1); }
+    .word-input.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); animation: shake 0.3s ease; }
+    .word-input.success { border-color: var(--green); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .send-word-btn {
+      padding: 0.75rem 1.8rem;
+      background: linear-gradient(135deg, var(--navy), var(--navy3));
+      color: var(--white); border: none;
+      border-radius: 50px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+
+    .send-word-btn:hover {
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: var(--navy);
+      box-shadow: 0 6px 18px rgba(201,168,76,0.3);
+    }
+
+    .feedback-msg {
+      margin-top: 0.7rem; font-size: 0.82rem;
+      min-height: 1.2rem; font-weight: 500;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+
+    .feedback-msg.ok   { color: var(--green); }
+    .feedback-msg.fail { color: var(--red); }
+    .feedback-msg.warn { color: var(--orange); }
+
+    /* Leaderboard */
+    .leaderboard {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(10,22,40,0.07);
+      border: 1px solid rgba(201,168,76,0.1);
+    }
+
+    .lb-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--navy); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .lb-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .lb-item {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.6rem 0.8rem; border-radius: 10px;
+      background: var(--cream);
+    }
+
+    .lb-rank {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), var(--navy3));
+      color: var(--white); font-size: 0.72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .lb-rank.gold   { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: var(--navy); }
+    .lb-rank.silver { background: linear-gradient(135deg, #9ca3af, #d1d5db); color: var(--navy); }
+    .lb-rank.bronze { background: linear-gradient(135deg, #b45309, #d97706); color: var(--white); }
+
+    .lb-name { flex: 1; font-weight: 600; font-size: 0.88rem; }
+    .lb-score {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 700; color: var(--gold);
+    }
+
+    .reset-btn {
+      margin-top: 1rem; width: 100%;
+      padding: 0.6rem; border: 1.5px solid rgba(239,68,68,0.2);
+      border-radius: 10px; background: none;
+      color: var(--red); font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .reset-btn:hover { background: rgba(239,68,68,0.06); border-color: var(--red); }
+
+    /* ── Chat Panel ── */
+    .chat-panel {
+      padding-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      position: sticky;
+      top: 80px;
+      height: calc(100vh - 90px);
+    }
+
+    .chat-box {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(10,22,40,0.09);
+      border: 1px solid rgba(201,168,76,0.12);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .chat-head {
+      background: linear-gradient(120deg, var(--navy), var(--navy3));
+      padding: 1rem 1.2rem;
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+
+    .chat-head-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(201,168,76,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+
+    .chat-head-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700; font-size: 1rem; color: var(--white);
+    }
+
+    .chat-head-sub {
+      font-size: 0.7rem; color: rgba(255,255,255,0.45);
+    }
+
+    .chat-online-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      margin-left: auto;
+      animation: pulse 2s infinite;
+    }
+
+    .chat-messages {
+      flex: 1; overflow-y: auto;
+      padding: 1rem; background: #f7f8fc;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+
+    .chat-msg {
+      max-width: 85%; padding: 0.6rem 0.9rem;
+      border-radius: 14px; font-size: 0.84rem;
+      line-height: 1.45; animation: msgIn 0.2s ease;
+    }
+
+    @keyframes msgIn {
+      from { opacity:0; transform:translateY(6px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .chat-msg.mine {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--navy), var(--navy3));
+      color: var(--white); border-bottom-right-radius: 4px;
+    }
+
+    .chat-msg.theirs {
+      align-self: flex-start;
+      background: var(--white); color: var(--text);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(10,22,40,0.08);
+    }
+
+    .chat-msg-sender {
+      font-size: 0.68rem; font-weight: 700;
+      margin-bottom: 0.15rem; opacity: 0.6;
+    }
+
+    .chat-msg-time {
+      font-size: 0.62rem; opacity: 0.45;
+      margin-top: 0.2rem; text-align: right;
+    }
+
+    .chat-system {
+      text-align: center; font-size: 0.75rem;
+      color: var(--muted); padding: 0.3rem 0;
+      font-style: italic;
+    }
+
+    .chat-typing {
+      padding: 0.4rem 1rem; background: #f7f8fc;
+      font-size: 0.75rem; color: var(--muted);
+      font-style: italic; min-height: 1.6rem;
+    }
+
+    .chat-input-row {
+      display: flex; gap: 0.5rem;
+      padding: 0.75rem 0.9rem;
+      border-top: 1px solid rgba(10,22,40,0.07);
+    }
+
+    .chat-input {
+      flex: 1; padding: 0.6rem 1rem;
+      border: 1.5px solid rgba(10,22,40,0.1);
+      border-radius: 50px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem; outline: none; color: var(--text);
+      transition: border-color 0.2s;
+      background: var(--cream);
+    }
+
+    .chat-input:focus { border-color: var(--gold); background: var(--white); }
+
+    .chat-send-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: none; background: var(--navy);
+      color: var(--white); font-size: 0.85rem;
+      cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.2s;
+    }
+
+    .chat-send-btn:hover {
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: var(--navy);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; }
+      .chat-panel { position: static; height: auto; }
+      .chat-box { height: 380px; }
+    }
+
+    @media (max-width: 480px) {
+      .page { padding-left: 1rem; padding-right: 1rem; }
+      .game-hero { padding: 1.5rem; }
+      .status-bar { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-logo">Angkatan <span>XVI</span></a>
+    <a href="index.html" class="navbar-back">← Kembali</a>
+  </nav>
+
+  <div class="page">
+
+    <!-- ── Game Panel ── -->
+    <div class="game-panel">
+
+      <!-- Hero -->
+      <div class="game-hero">
+        <p class="game-hero-eyebrow">🎮 Mini Game</p>
+        <h1 class="game-hero-title">Sambung <span>Kata</span></h1>
+        <p class="game-hero-desc">Sambung kata dari huruf terakhir kata sebelumnya. Kata tidak boleh diulang. Siapa yang paling banyak menyumbang kata?</p>
+      </div>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <div class="status-item">
+          <span class="status-label">Kata Terakhir</span>
+          <span class="status-value" id="lastWord">—</span>
+        </div>
+        <div class="status-sep"></div>
+        <div class="status-item">
+          <span class="status-label">Huruf Berikutnya</span>
+          <span class="status-value next-letter" id="nextLetter">?</span>
+        </div>
+        <div class="status-sep"></div>
+        <div class="status-item">
+          <span class="status-label">Total Kata</span>
+          <span class="status-value" id="wordCount">0</span>
+        </div>
+        <div class="online-count">
+          <span class="online-dot"></span>
+          <span id="onlineCount">0 online</span>
+        </div>
+      </div>
+
+      <!-- Chain Display -->
+      <div class="chain-box">
+        <p class="chain-box-label">Rantai Kata</p>
+        <div class="chain-words" id="chainWords">
+          <div class="chain-empty" id="chainEmpty">Belum ada kata. Mulai duluan yuk! 🙂</div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div class="input-area">
+        <div class="name-input-wrap">
+          <span class="name-label">Nama kamu:</span>
+          <input class="name-input" id="playerName" placeholder="Tulis nama kamu..." maxlength="20">
+        </div>
+        <div class="word-input-row">
+          <input class="word-input" id="wordInput" placeholder="Ketik kata..." maxlength="30" autocomplete="off">
+          <button class="send-word-btn" id="sendWordBtn">Kirim ✦</button>
+        </div>
+        <div class="feedback-msg" id="feedbackMsg"></div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="leaderboard">
+        <div class="lb-title">🏆 Papan Skor</div>
+        <div class="lb-list" id="lbList">
+          <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:1rem 0">Belum ada skor</div>
+        </div>
+        <button class="reset-btn" id="resetBtn">🔄 Reset Game</button>
+      </div>
+
+    </div>
+
+    <!-- ── Chat Panel ── -->
+    <div class="chat-panel">
+      <div class="chat-box">
+        <div class="chat-head">
+          <div class="chat-head-icon">💬</div>
+          <div>
+            <div class="chat-head-title">Chat In-Game</div>
+            <div class="chat-head-sub">Ngobrol sambil main</div>
+          </div>
+          <span class="chat-online-dot"></span>
+        </div>
+        <div class="chat-messages" id="gameChatMessages"></div>
+        <div class="chat-typing" id="gameChatTyping"></div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="gameChatInput" placeholder="Tulis pesan...">
+          <button class="chat-send-btn" id="gameChatSend">➤</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+  /* ── Firebase Config ── */
+  const firebaseConfig = {
+    apiKey: "AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
+    authDomain: "chat-angkatan-16.firebaseapp.com",
+    databaseURL: "https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "chat-angkatan-16",
+    storageBucket: "chat-angkatan-16.appspot.com",
+    messagingSenderId: "47699501502",
+    appId: "1:47699501502:web:0d09e69d0b3ff39a7359ef"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  /* ── Refs ── */
+  const gameRef    = db.ref('sambungKata/words');
+  const scoreRef   = db.ref('sambungKata/scores');
+  const chatRef    = db.ref('sambungKata/chat');
+  const typingRef  = db.ref('sambungKata/typing');
+  const onlineRef  = db.ref('sambungKata/online');
+
+  /* ── Player ID & Name ── */
+  let myId   = localStorage.getItem('skUserId') || Math.random().toString(36).substr(2,9);
+  let myName = localStorage.getItem('skPlayerName') || '';
+  localStorage.setItem('skUserId', myId);
+
+  const playerNameInput = document.getElementById('playerName');
+  if (myName) playerNameInput.value = myName;
+  playerNameInput.addEventListener('input', () => {
+    myName = playerNameInput.value.trim() || 'Anonim';
+    localStorage.setItem('skPlayerName', myName);
+  });
+
+  /* ── Online Presence ── */
+  const myOnlineRef = onlineRef.child(myId);
+  myOnlineRef.set(true);
+  myOnlineRef.onDisconnect().remove();
+
+  onlineRef.on('value', snap => {
+    const count = snap.numChildren();
+    document.getElementById('onlineCount').textContent = count + ' online';
+  });
+
+  /* ── Game State ── */
+  let allWords    = [];
+  let wordSet     = new Set();
+  let lastWord    = '';
+  let nextLetter  = '';
+
+  gameRef.orderByChild('timestamp').on('value', snap => {
+    allWords = [];
+    wordSet  = new Set();
+    const data = snap.val() || {};
+    Object.values(data)
+      .sort((a,b) => a.timestamp - b.timestamp)
+      .forEach(w => {
+        allWords.push(w);
+        wordSet.add(w.word.toLowerCase());
+      });
+
+    renderChain();
+    updateStatus();
+  });
+
+  function renderChain() {
+    const container = document.getElementById('chainWords');
+    const empty     = document.getElementById('chainEmpty');
+    container.innerHTML = '';
+
+    if (allWords.length === 0) {
+      container.appendChild(empty || Object.assign(document.createElement('div'), {
+        className: 'chain-empty', textContent: 'Belum ada kata. Mulai duluan yuk! 🙂'
+      }));
+      return;
+    }
+
+    allWords.forEach((w, i) => {
+      const el = document.createElement('span');
+      el.className = 'chain-word' + (i === allWords.length - 1 ? ' latest' : '');
+      el.innerHTML = `<span class="word-initial">${(w.player||'?').charAt(0).toUpperCase()}</span>${esc(w.word)}`;
+      el.title = w.player || 'Anonim';
+      container.appendChild(el);
+    });
+
+    container.scrollLeft = container.scrollWidth;
+    document.getElementById('wordCount').textContent = allWords.length;
+  }
+
+  function updateStatus() {
+    if (allWords.length === 0) {
+      document.getElementById('lastWord').textContent = '—';
+      document.getElementById('nextLetter').textContent = '?';
+      lastWord = '';  nextLetter = '';
+      return;
+    }
+    const lw = allWords[allWords.length - 1].word;
+    lastWord   = lw;
+    nextLetter = lw.charAt(lw.length - 1).toUpperCase();
+    document.getElementById('lastWord').textContent   = lw;
+    document.getElementById('nextLetter').textContent = nextLetter;
+  }
+
+  /* ── Send Word ── */
+  function sendWord() {
+    const name = playerNameInput.value.trim() || 'Anonim';
+    myName = name;
+    localStorage.setItem('skPlayerName', name);
+
+    const raw  = document.getElementById('wordInput').value.trim().toLowerCase();
+    const input= document.getElementById('wordInput');
+    const fb   = document.getElementById('feedbackMsg');
+
+    if (!raw) return;
+
+    // Validasi
+    if (!/^[a-zA-Z]+$/.test(raw)) {
+      return showFeedback('fail', '⚠ Hanya huruf yang dibolehkan!', input);
+    }
+
+    if (wordSet.has(raw)) {
+      return showFeedback('fail', '❌ Kata "' + raw + '" sudah pernah dipakai!', input);
+    }
+
+    if (nextLetter && raw.charAt(0).toUpperCase() !== nextLetter) {
+      return showFeedback('fail', '❌ Kata harus dimulai huruf ' + nextLetter + '!', input);
+    }
+
+    // Kirim ke Firebase
+    gameRef.push({ word: raw, player: name, userId: myId, timestamp: Date.now() });
+
+    // Update skor
+    scoreRef.child(myId).transaction(cur => {
+      if (!cur) return { name, score: 1 };
+      return { name, score: (cur.score || 0) + 1 };
+    });
+
+    document.getElementById('wordInput').value = '';
+    showFeedback('ok', '✓ Kata "' + raw + '" diterima!', input, true);
+  }
+
+  function showFeedback(type, msg, input, isOk) {
+    const fb = document.getElementById('feedbackMsg');
+    fb.className = 'feedback-msg ' + type;
+    fb.textContent = msg;
+    if (input) {
+      input.className = 'word-input ' + (isOk ? 'success' : 'error');
+      setTimeout(() => input.className = 'word-input', 800);
+    }
+    clearTimeout(window._fbTimer);
+    window._fbTimer = setTimeout(() => { fb.textContent = ''; fb.className = 'feedback-msg'; }, 3000);
+  }
+
+  document.getElementById('sendWordBtn').addEventListener('click', sendWord);
+  document.getElementById('wordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); sendWord(); }
+  });
+
+  /* ── Leaderboard ── */
+  scoreRef.on('value', snap => {
+    const data = snap.val() || {};
+    const sorted = Object.entries(data)
+      .map(([id, v]) => v)
+      .sort((a,b) => b.score - a.score)
+      .slice(0, 8);
+
+    const rankClasses = ['gold','silver','bronze'];
+    const list = document.getElementById('lbList');
+    if (sorted.length === 0) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:1rem 0">Belum ada skor</div>';
+      return;
+    }
+    list.innerHTML = sorted.map((p,i) => `
+      <div class="lb-item">
+        <span class="lb-rank ${rankClasses[i]||''}">${i+1}</span>
+        <span class="lb-name">${esc(p.name)}</span>
+        <span class="lb-score">${p.score}</span>
+      </div>
+    `).join('');
+  });
+
+  /* ── Reset Game ── */
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (!confirm('Reset semua kata dan skor? Tidak bisa dibatalkan.')) return;
+    db.ref('sambungKata').remove();
+  });
+
+  /* ══════════════════════
+     IN-GAME CHAT
+  ══════════════════════ */
+  const chatMsgs   = document.getElementById('gameChatMessages');
+  const chatInput  = document.getElementById('gameChatInput');
+  const chatSend   = document.getElementById('gameChatSend');
+  const chatTyping = document.getElementById('gameChatTyping');
+
+  function sendChatMsg() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    const name = playerNameInput.value.trim() || 'Anonim';
+    chatRef.push({ text, name, userId: myId, timestamp: Date.now() });
+    chatInput.value = '';
+    typingRef.child(myId).set(false);
+  }
+
+  chatSend.addEventListener('click', sendChatMsg);
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMsg(); }
+  });
+
+  // Typing indicator
+  chatInput.addEventListener('input', () => {
+    typingRef.child(myId).set(playerNameInput.value.trim() || 'Anonim');
+    clearTimeout(window._typTimer);
+    window._typTimer = setTimeout(() => typingRef.child(myId).set(false), 1800);
+  });
+
+  typingRef.on('value', snap => {
+    const data = snap.val() || {};
+    const others = Object.entries(data)
+      .filter(([id, v]) => id !== myId && v)
+      .map(([, name]) => name);
+    chatTyping.textContent = others.length
+      ? others.join(', ') + (others.length > 1 ? ' sedang mengetik...' : ' sedang mengetik...')
+      : '';
+  });
+
+  chatRef.limitToLast(80).on('child_added', snap => {
+    const d = snap.val();
+    const isMine = d.userId === myId;
+    const time = new Date(d.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + (isMine ? 'mine' : 'theirs');
+    div.innerHTML = (isMine ? '' : `<div class="chat-msg-sender">${esc(d.name)}</div>`)
+      + `<div>${esc(d.text)}</div><div class="chat-msg-time">${time}</div>`;
+    chatMsgs.appendChild(div);
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  });
+
+  /* ── System messages for new words ── */
+  gameRef.limitToLast(1).on('child_added', snap => {
+    const d = snap.val();
+    if (!d || Date.now() - d.timestamp > 5000) return; // ignore old
+    const div = document.createElement('div');
+    div.className = 'chat-system';
+    div.textContent = '🔤 ' + (d.player||'Anonim') + ' menyumbang kata "' + d.word + '"';
+    chatMsgs.appendChild(div);
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  });
+
+  /* ── Cleanup ── */
+  window.addEventListener('beforeunload', () => {
+    myOnlineRef.remove();
+    typingRef.child(myId).remove();
+  });
+
+  function esc(t) {
+    return String(t||'')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  </script>
+
+</body>
+</html>
