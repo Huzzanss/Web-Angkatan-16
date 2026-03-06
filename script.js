@@ -215,7 +215,7 @@ const _BASE_BAD_WORDS = [
   'jackass','jerk','motherfucker','nigga','nigger','penis','piss',
   'porn','prick','pussy','rape','retard','shit','slut','twat','wank','whore',
   // custom
-  'puji','arthur','artur','arhtur','fuji','tanto','anwar','edi','edy','ade','yudi','doni','rudy','rudi',
+  'puji','arthur','artur','arhtur','fuji','tanto','anwar','edi','edy','ade','yudi','doni','rudy','rudi','rohansyah',
 ];
 
 // Gabungkan base + custom, buat regex sekali saja
