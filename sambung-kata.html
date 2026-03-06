@@ -805,19 +805,27 @@
   const scoreRef   = db.ref('sambungKata/scores');
   const chatRef    = db.ref('sambungKata/chat');
   const typingRef  = db.ref('sambungKata/typing');
-  const playersRef = db.ref('sambungKata/players');   // daftar pemain + urutan
-  const turnRef    = db.ref('sambungKata/currentTurn'); // userId giliran sekarang
+  const playersRef = db.ref('sambungKata/players');
+  const turnRef    = db.ref('sambungKata/currentTurn');
 
-  /* ── Player ID & Name ── */
-  let myId   = localStorage.getItem('skUserId') || Math.random().toString(36).substr(2,9);
-  let myName = localStorage.getItem('skPlayerName') || '';
-  let hasJoined = false;
+  /* ── State ── */
+  let myId          = localStorage.getItem('skUserId') || Math.random().toString(36).substr(2,9);
+  let myName        = localStorage.getItem('skPlayerName') || '';
+  let hasJoined     = false;
+  let playersOrdered = [];
+  let currentTurnId  = null;
+  let allWords       = [];
+  let wordSet        = new Set();
+  let lastWord       = '';
+  let nextLetter     = '';
   localStorage.setItem('skUserId', myId);
 
   const playerNameInput = document.getElementById('playerName');
   if (myName) playerNameInput.value = myName;
 
-  /* ── Join Game ── */
+  /* ══════════════════════
+     JOIN / LEAVE
+  ══════════════════════ */
   document.getElementById('joinBtn').addEventListener('click', joinGame);
   playerNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') joinGame(); });
 
@@ -827,124 +835,176 @@
     myName = name;
     localStorage.setItem('skPlayerName', name);
 
-    // Tambah ke daftar pemain dengan timestamp sebagai urutan
-    playersRef.child(myId).set({ name, joinedAt: Date.now(), active: true });
-
-    // Kalau belum ada yang lagi giliran, jadikan ini giliran pertama
-    turnRef.once('value', snap => {
-      if (!snap.val()) turnRef.set(myId);
+    // Set player active
+    playersRef.child(myId).set({ name, joinedAt: Date.now(), active: true }, () => {
+      // Setelah player tercatat di DB, cek & set giliran
+      turnRef.once('value', snap => {
+        const cur = snap.val();
+        if (!cur) {
+          // Belum ada giliran — jadikan giliran kita
+          turnRef.set(myId, () => {
+            hasJoined = true;
+            showWordSection(name);
+          });
+        } else {
+          // Sudah ada giliran orang lain
+          hasJoined = true;
+          showWordSection(name);
+        }
+      });
     });
-
-    hasJoined = true;
-    document.getElementById('joinSection').style.display = 'none';
-    document.getElementById('wordSection').style.display = 'block';
-    document.getElementById('playerJoinedLabel').innerHTML = '✓ Bergabung sebagai <strong>' + esc(name) + '</strong>';
-    // Force update input state setelah join (untuk kasus rejoin)
-    setTimeout(updateInputState, 300);
   }
 
-  /* ── Leave Game ── */
+  function showWordSection(name) {
+    document.getElementById('joinSection').style.display = 'none';
+    document.getElementById('wordSection').style.display = 'block';
+    document.getElementById('playerJoinedLabel').innerHTML =
+      '✓ Bergabung sebagai <strong>' + esc(name) + '</strong>';
+    // Force update input setelah semua state siap
+    updateInputState();
+    // Mulai timer kalau kebetulan giliran kita
+    if (currentTurnId === myId) startTurnTimer();
+  }
+
   document.getElementById('leaveBtn').addEventListener('click', leaveGame);
 
   function leaveGame() {
-    clearTurnTimer(); // stop timer
-    playersRef.child(myId).remove();
+    clearTurnTimer();
     hasJoined = false;
-    // Kalau giliran kita, pindah dulu sebelum remove
-    turnRef.once('value', snap => {
-      if (snap.val() === myId) advanceTurn();
-    });
     document.getElementById('joinSection').style.display = 'block';
     document.getElementById('wordSection').style.display = 'none';
+
+    const wasMyTurn = (currentTurnId === myId);
+
+    // Hapus dari daftar pemain dulu, baru advance
+    playersRef.child(myId).remove(() => {
+      if (wasMyTurn) {
+        // Beri waktu playersRef.on listener update playersOrdered
+        setTimeout(advanceTurn, 200);
+      }
+    });
   }
 
   /* ── Online Presence ── */
-  playersRef.child(myId).onDisconnect().update({ active: false });
+  playersRef.child(myId).onDisconnect().remove();
 
-  // Kalau disconnect pas giliran kita, pindah giliran otomatis
-  turnRef.once('value', snap => {
-    if (snap.val() === myId) {
-      turnRef.onDisconnect().transaction(cur => cur === myId ? null : cur);
-    }
-  });
-
-  /* ── Turn Logic ── */
-  let playersOrdered = []; // [{id, name, active}] urut joinedAt
-  let currentTurnId  = null;
-
+  /* ══════════════════════
+     PLAYERS LISTENER
+  ══════════════════════ */
   playersRef.orderByChild('joinedAt').on('value', snap => {
     playersOrdered = [];
-    snap.forEach(s => {
-      playersOrdered.push({ id: s.key, ...s.val() });
-    });
+    snap.forEach(s => { playersOrdered.push({ id: s.key, ...s.val() }); });
     renderTurnQueue();
     updateOnlineCount();
+    // Kalau sudah join, update input state juga
+    if (hasJoined) updateInputState();
   });
 
+  /* ══════════════════════
+     TURN LISTENER
+  ══════════════════════ */
   turnRef.on('value', snap => {
     currentTurnId = snap.val();
     renderTurnQueue();
-    updateInputState();
-    if (hasJoined && currentTurnId === myId) startTurnTimer();
-    else clearTurnTimer();
+    if (hasJoined) {
+      updateInputState();
+      if (currentTurnId === myId) startTurnTimer();
+      else clearTurnTimer();
+    }
   });
 
+  /* ── Advance Turn ── */
   function advanceTurn() {
-    const activePlayers = playersOrdered.filter(p => p.active !== false);
-    if (activePlayers.length === 0) { turnRef.remove(); return; }
-    if (activePlayers.length === 1) { turnRef.set(activePlayers[0].id); return; }
+    const active = playersOrdered.filter(p => p.id !== myId || hasJoined);
+    // Ambil semua pemain kecuali diri sendiri kalau sudah keluar
+    const list = hasJoined
+      ? playersOrdered
+      : playersOrdered.filter(p => p.id !== myId);
 
-    const idx = activePlayers.findIndex(p => p.id === currentTurnId);
-    const next = activePlayers[(idx + 1) % activePlayers.length];
+    if (list.length === 0) {
+      turnRef.remove();
+      return;
+    }
+    if (list.length === 1) {
+      turnRef.set(list[0].id);
+      return;
+    }
+    const idx  = list.findIndex(p => p.id === currentTurnId);
+    const next = list[(idx + 1) % list.length];
     turnRef.set(next.id);
   }
 
+  /* ── Render Queue ── */
   function renderTurnQueue() {
-    const activePlayers = playersOrdered.filter(p => p.active !== false);
-    const banner = document.getElementById('turnBanner');
     const nameEl = document.getElementById('turnName');
     const badge  = document.getElementById('turnBadge');
     const queue  = document.getElementById('turnQueue');
 
-    if (activePlayers.length === 0) {
+    if (playersOrdered.length === 0) {
       nameEl.textContent = 'Belum ada pemain';
-      nameEl.className = 'turn-name';
-      badge.textContent = '';
-      queue.innerHTML = '';
+      nameEl.className   = 'turn-name';
+      badge.textContent  = '';
+      queue.innerHTML    = '';
       return;
     }
 
-    const current = activePlayers.find(p => p.id === currentTurnId);
+    const current = playersOrdered.find(p => p.id === currentTurnId);
     if (current) {
       nameEl.textContent = current.name;
-      if (current.id === myId) {
-        nameEl.className = 'turn-name mine';
+      if (current.id === myId && hasJoined) {
+        nameEl.className  = 'turn-name mine';
         badge.textContent = '🎯 Giliran Kamu!';
-        badge.className = 'turn-badge mine-badge';
+        badge.className   = 'turn-badge mine-badge';
       } else {
-        nameEl.className = 'turn-name';
+        nameEl.className  = 'turn-name';
         badge.textContent = 'Menunggu...';
-        badge.className = 'turn-badge other-badge';
+        badge.className   = 'turn-badge other-badge';
       }
     } else {
       nameEl.textContent = 'Menunggu...';
-      nameEl.className = 'turn-name';
-      badge.textContent = '';
+      nameEl.className   = 'turn-name';
+      badge.textContent  = '';
     }
 
-    // Render antrian pemain
     queue.innerHTML = '<span class="turn-queue-label">Antrian:</span>';
-    activePlayers.forEach(p => {
+    playersOrdered.forEach(p => {
       const el = document.createElement('div');
       el.className = 'queue-player'
         + (p.id === currentTurnId ? ' active' : '')
-        + (p.id === myId ? ' is-me' : '');
-      el.innerHTML = `<span class="queue-avatar">${p.name.charAt(0).toUpperCase()}</span>${esc(p.name)}${p.id === myId ? ' (kamu)' : ''}`;
+        + (p.id === myId && hasJoined ? ' is-me' : '');
+      el.innerHTML = `<span class="queue-avatar">${p.name.charAt(0).toUpperCase()}</span>${esc(p.name)}${(p.id === myId && hasJoined) ? ' (kamu)' : ''}`;
       queue.appendChild(el);
     });
   }
 
-  /* ── Turn Timer (13 detik) ── */
+  /* ── Update Input State ── */
+  function updateInputState() {
+    if (!hasJoined) {
+      // Pastikan input terkunci kalau belum join
+      const wi = document.getElementById('wordInput');
+      const sb = document.getElementById('sendWordBtn');
+      if (wi) wi.disabled = true;
+      if (sb) sb.disabled = true;
+      return;
+    }
+    const isMyTurn = (currentTurnId === myId);
+    const wordInput = document.getElementById('wordInput');
+    const sendBtn   = document.getElementById('sendWordBtn');
+    const fb        = document.getElementById('feedbackMsg');
+
+    wordInput.disabled = !isMyTurn;
+    sendBtn.disabled   = !isMyTurn;
+    wordInput.placeholder = isMyTurn ? 'Ketik kata...' : 'Bukan giliran kamu...';
+    if (!isMyTurn && fb) { fb.textContent = ''; fb.className = 'feedback-msg'; }
+  }
+
+  function updateOnlineCount() {
+    document.getElementById('onlineCount').textContent = playersOrdered.length + ' pemain';
+  }
+
+  /* ══════════════════════
+     TURN TIMER (13 detik)
+  ══════════════════════ */
   const TURN_SECONDS = 13;
   let _timerInterval = null;
   let _timerLeft = TURN_SECONDS;
@@ -958,7 +1018,7 @@
 
   function startTurnTimer() {
     clearTurnTimer();
-    if (currentTurnId !== myId) return; // hanya jalankan di giliran kita
+    if (!hasJoined || currentTurnId !== myId) return;
     _timerLeft = TURN_SECONDS;
     _updateTimerDisplay();
     _timerInterval = setInterval(() => {
@@ -966,9 +1026,10 @@
       _updateTimerDisplay();
       if (_timerLeft <= 0) {
         clearTurnTimer();
-        // Waktu habis — skip giliran, kirim notif chat
-        const skipName = myName || 'Anonim';
-        chatRef.push({ text: '⏱ ' + skipName + ' kehabisan waktu! Giliran dilewati.', name: 'Sistem', userId: 'system', timestamp: Date.now() });
+        chatRef.push({
+          text: '⏱ ' + (myName||'Anonim') + ' kehabisan waktu! Giliran dilewati.',
+          name: 'Sistem', userId: 'system', timestamp: Date.now()
+        });
         advanceTurn();
       }
     }, 1000);
@@ -981,40 +1042,13 @@
     el.className = 'turn-timer' + (_timerLeft <= 5 ? ' urgent' : '');
   }
 
-    function updateInputState() {
-    if (!hasJoined) return;
-    const isMyTurn = (currentTurnId === myId);
-    const wordInput = document.getElementById('wordInput');
-    const sendBtn   = document.getElementById('sendWordBtn');
-    const fb        = document.getElementById('feedbackMsg');
-
-    wordInput.disabled = !isMyTurn;
-    sendBtn.disabled   = !isMyTurn;
-    wordInput.placeholder = isMyTurn ? 'Ketik kata...' : 'Bukan giliran kamu...';
-
-    if (!isMyTurn && fb) {
-      fb.className = 'feedback-msg';
-      fb.textContent = '';
-    }
-  }
-
-  function updateOnlineCount() {
-    const active = playersOrdered.filter(p => p.active !== false).length;
-    document.getElementById('onlineCount').textContent = active + ' pemain';
-  }
-
-  /* ── Game State ── */
-  let allWords   = [];
-  let wordSet    = new Set();
-  let lastWord   = '';
-  let nextLetter = '';
-
+  /* ══════════════════════
+     GAME STATE
+  ══════════════════════ */
   gameRef.orderByChild('timestamp').on('value', snap => {
-    allWords = [];
-    wordSet  = new Set();
+    allWords = []; wordSet = new Set();
     const data = snap.val() || {};
-    Object.values(data)
-      .sort((a,b) => a.timestamp - b.timestamp)
+    Object.values(data).sort((a,b) => a.timestamp - b.timestamp)
       .forEach(w => { allWords.push(w); wordSet.add(w.word.toLowerCase()); });
     renderChain();
     updateStatus();
@@ -1053,27 +1087,25 @@
     document.getElementById('nextLetter').textContent = nextLetter;
   }
 
-  /* ── Send Word ── */
+  /* ══════════════════════
+     SEND WORD
+  ══════════════════════ */
   function showFeedback(type, msg, input, isOk) {
     const fb = document.getElementById('feedbackMsg');
     fb.className = 'feedback-msg ' + type;
     fb.textContent = msg;
     if (input && !input.disabled) {
       input.className = 'word-input ' + (isOk ? 'success' : 'error');
-      setTimeout(() => { if (!input.disabled) input.className = 'word-input'; }, 800);
+      setTimeout(() => { if (input && !input.disabled) input.className = 'word-input'; }, 800);
     }
     clearTimeout(window._fbTimer);
     window._fbTimer = setTimeout(() => { fb.textContent = ''; fb.className = 'feedback-msg'; }, 3500);
   }
 
   function sendWord() {
-    if (!hasJoined) return;
-    if (currentTurnId !== myId) return; // bukan giliran
-
-    const name  = myName || 'Anonim';
+    if (!hasJoined || currentTurnId !== myId) return;
     const raw   = document.getElementById('wordInput').value.trim().toLowerCase();
     const input = document.getElementById('wordInput');
-
     if (!raw) return;
     if (!/^[a-zA-Z]+$/.test(raw))
       return showFeedback('fail', '⚠ Hanya huruf yang dibolehkan!', input);
@@ -1082,18 +1114,15 @@
     if (nextLetter && raw.charAt(0).toUpperCase() !== nextLetter)
       return showFeedback('fail', '❌ Kata harus dimulai huruf ' + nextLetter + '!', input);
 
-    // Kirim kata
-    gameRef.push({ word: raw, player: name, userId: myId, timestamp: Date.now() });
+    clearTurnTimer();
+    gameRef.push({ word: raw, player: myName||'Anonim', userId: myId, timestamp: Date.now() });
     scoreRef.child(myId).transaction(cur => {
-      if (!cur) return { name, score: 1 };
-      return { name, score: (cur.score || 0) + 1 };
+      if (!cur) return { name: myName||'Anonim', score: 1 };
+      return { name: myName||'Anonim', score: (cur.score||0) + 1 };
     });
     document.getElementById('wordInput').value = '';
-    showFeedback('ok', '✓ Kata "' + raw + '" diterima! Giliran berpindah...', input, true);
-
-    clearTurnTimer();
-    // Pindah giliran ke pemain berikutnya
-    setTimeout(advanceTurn, 400);
+    showFeedback('ok', '✓ Kata "' + raw + '" diterima!', input, true);
+    setTimeout(advanceTurn, 300);
   }
 
   document.getElementById('sendWordBtn').addEventListener('click', sendWord);
@@ -1103,30 +1132,27 @@
 
   /* ── Leaderboard ── */
   scoreRef.on('value', snap => {
-    const data = snap.val() || {};
-    const sorted = Object.entries(data)
-      .map(([id, v]) => v)
-      .sort((a,b) => b.score - a.score)
-      .slice(0, 8);
-
-    const rankClasses = ['gold','silver','bronze'];
+    const data   = snap.val() || {};
+    const sorted = Object.entries(data).map(([,v]) => v)
+      .sort((a,b) => b.score - a.score).slice(0, 8);
+    const rankCls = ['gold','silver','bronze'];
     const list = document.getElementById('lbList');
-    if (sorted.length === 0) {
+    if (!sorted.length) {
       list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:1rem 0">Belum ada skor</div>';
       return;
     }
     list.innerHTML = sorted.map((p,i) => `
       <div class="lb-item">
-        <span class="lb-rank ${rankClasses[i]||''}">${i+1}</span>
+        <span class="lb-rank ${rankCls[i]||''}">${i+1}</span>
         <span class="lb-name">${esc(p.name)}</span>
         <span class="lb-score">${p.score}</span>
-      </div>
-    `).join('');
+      </div>`).join('');
   });
 
-  /* ── Reset Game ── */
+  /* ── Reset ── */
   document.getElementById('resetBtn').addEventListener('click', () => {
-    if (!confirm('Reset semua kata dan skor? Tidak bisa dibatalkan.')) return;
+    if (!confirm('Reset semua kata dan skor?')) return;
+    clearTurnTimer();
     db.ref('sambungKata').remove();
     hasJoined = false;
     document.getElementById('joinSection').style.display = 'block';
@@ -1144,45 +1170,35 @@
   function sendChatMsg() {
     const text = chatInput.value.trim();
     if (!text) return;
-    const name = myName || playerNameInput.value.trim() || 'Anonim';
-    chatRef.push({ text, name, userId: myId, timestamp: Date.now() });
+    chatRef.push({ text, name: myName||'Anonim', userId: myId, timestamp: Date.now() });
     chatInput.value = '';
     typingRef.child(myId).set(false);
   }
-
   chatSend.addEventListener('click', sendChatMsg);
   chatInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMsg(); }
   });
-
   chatInput.addEventListener('input', () => {
-    typingRef.child(myId).set(myName || 'Anonim');
+    typingRef.child(myId).set(myName||'Anonim');
     clearTimeout(window._typTimer);
     window._typTimer = setTimeout(() => typingRef.child(myId).set(false), 1800);
   });
-
   typingRef.on('value', snap => {
     const data = snap.val() || {};
-    const others = Object.entries(data)
-      .filter(([id, v]) => id !== myId && v)
-      .map(([, name]) => name);
-    chatTyping.textContent = others.length
-      ? others.join(', ') + ' sedang mengetik...' : '';
+    const others = Object.entries(data).filter(([id,v]) => id !== myId && v).map(([,n]) => n);
+    chatTyping.textContent = others.length ? others.join(', ') + ' sedang mengetik...' : '';
   });
-
   chatRef.limitToLast(80).on('child_added', snap => {
     const d = snap.val();
     const isMine = d.userId === myId;
-    const time = new Date(d.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+    const time = new Date(d.timestamp).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
     const div = document.createElement('div');
-    div.className = 'chat-msg ' + (isMine ? 'mine' : 'theirs');
-    div.innerHTML = (isMine ? '' : `<div class="chat-msg-sender">${esc(d.name)}</div>`)
+    div.className = 'chat-msg ' + (isMine || d.userId==='system' ? 'mine' : 'theirs');
+    div.innerHTML = (isMine||d.userId==='system' ? '' : `<div class="chat-msg-sender">${esc(d.name)}</div>`)
       + `<div>${esc(d.text)}</div><div class="chat-msg-time">${time}</div>`;
     chatMsgs.appendChild(div);
     chatMsgs.scrollTop = chatMsgs.scrollHeight;
   });
-
-  /* ── System messages ── */
   gameRef.limitToLast(1).on('child_added', snap => {
     const d = snap.val();
     if (!d || Date.now() - d.timestamp > 5000) return;
@@ -1195,18 +1211,16 @@
 
   /* ── Cleanup ── */
   window.addEventListener('beforeunload', () => {
+    clearTurnTimer();
     if (hasJoined) {
-      playersRef.child(myId).update({ active: false });
-      turnRef.once('value', snap => {
-        if (snap.val() === myId) advanceTurn();
-      });
+      playersRef.child(myId).remove();
+      if (currentTurnId === myId) advanceTurn();
     }
     typingRef.child(myId).remove();
   });
 
   function esc(t) {
-    return String(t||'')
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
     </script>
 
