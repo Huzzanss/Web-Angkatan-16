@@ -172,7 +172,7 @@ db.ref('messages').on('value', snapshot => {
       div.className = `message ${isMine ? 'sent' : 'received'}`;
       div.innerHTML = `
         <div class="msg-sender">${isMine ? 'Saya' : 'Anonim'}</div>
-        <div class="msg-text">${escapeHtml(msg.text)}</div>
+        <div class="msg-text">${escapeHtml(censorText(msg.text))}</div>
         <div class="msg-time">${time}</div>
       `;
       messagesDiv.appendChild(div);
@@ -186,6 +186,48 @@ db.ref('typing').on('value', snapshot => {
   const someoneTyping = Object.keys(data).some(k => k !== userId && data[k]);
   typingIndicator.style.display = someoneTyping ? 'flex' : 'none';
 });
+
+
+/* ══════════════════════════════════════
+   CHAT CENSOR
+   Edit CUSTOM_BAD_WORDS untuk tambah kata
+   sendiri. Semua kata cocok diganti * 
+   sebanyak hurufnya (case-insensitive).
+══════════════════════════════════════ */
+const CUSTOM_BAD_WORDS = [
+  // Tambahkan kata kustom di sini, contoh:
+  // 'contohkata',
+  // 'kataburuk',
+];
+
+const _BASE_BAD_WORDS = [
+  // Indonesian
+  'anjing','anjir','anjrit','anying','asu','babi','bajingan','bangsat','bego',
+  'bejat','bencong','biadab','bodoh','brengsek','budek','coli','colmek',
+  'dancuk','dancok','edan','goblok','goblog','haram','idiot','jalang','jancok',
+  'jancuk','keparat','kimak','kontol','koplak','lonte','mampus','memek','monyet',
+  'ngentot','ngewe','pantat','pecundang','pelacur','perek','pukimak','setan',
+  'sialan','tai','tahi','tolol','jembut','pepek','puki','titit','butuh',
+  'nganye','ngocok','cibai','bokep',
+  // English
+  'ass','asshole','bastard','bitch','cock','crap','cum','cunt','damn','dick',
+  'dildo','fag','faggot','fuck','fucker','fucking','goddamn','horny',
+  'jackass','jerk','motherfucker','nigga','nigger','penis','piss',
+  'porn','prick','pussy','rape','retard','shit','slut','twat','wank','whore',
+  // custom
+  'puji','arthur','artur','arhtur','fuji','tanto','anwar','edi','edy','ade','yudi','doni','rudy','rudi',
+];
+
+// Gabungkan base + custom, buat regex sekali saja
+const _ALL_BAD = [...new Set([..._BASE_BAD_WORDS, ...CUSTOM_BAD_WORDS])];
+const _CENSOR_REGEX = new RegExp(
+  '\\b(' + _ALL_BAD.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b',
+  'gi'
+);
+
+function censorText(text) {
+  return text.replace(_CENSOR_REGEX, match => '*'.repeat(match.length));
+}
 
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
@@ -381,16 +423,9 @@ window.addEventListener('beforeunload', stopTyping);
 (function() {
   // ─── PLAYLIST — ganti sesuai nama file di ./music/ ───
   const PLAYLIST = [
-    { file: 'Tujuh Belas.mp3',  title: 'Tujuh Belas' },
-    { file: 'Kita Ke Sana.mp3',  title: 'Kita Ke Sana' },
-    { file: 'Kenangan Manis.mp3',  title: 'Kenangan Manis' },
-    { file: 'Ribuan Memori.mp3',  title: 'Ribuan Memori' },
-    { file: 'Lantas.mp3',  title: 'Lantas' },
-    { file: 'Monokrom.mp3',  title: 'Monokrom' },
-    { file: 'Terbuang Dalam Waktu.mp3',  title: 'Terbuang Dalam Waktu' },
-    { file: 'Monolog.mp3',  title: 'Monolog' },
-    { file: 'Secukupnya.mp3',  title: 'Secukpnya' },
-    { file: 'bergema sampai selamanya.mp3',  title: 'bergema sampai selamanya' },
+    { file: 'lagu1.mp3',  title: 'Lagu 1' },
+    { file: 'lagu2.mp3',  title: 'Lagu 2' },
+    { file: 'lagu3.mp3',  title: 'Lagu 3' },
   ];
 
   const BASE_PATH = './music/'; // folder musik di repo
