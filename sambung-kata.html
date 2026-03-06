@@ -493,6 +493,144 @@
       color: var(--navy);
     }
 
+
+    /* ── Turn Banner ── */
+    .turn-banner {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 1.2rem 1.5rem;
+      box-shadow: 0 2px 12px rgba(10,22,40,0.07);
+      border: 1.5px solid rgba(201,168,76,0.2);
+    }
+
+    .turn-banner-inner {
+      display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.9rem;
+    }
+
+    .turn-label {
+      font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--muted); font-weight: 600; white-space: nowrap;
+    }
+
+    .turn-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 700; color: var(--navy);
+      flex: 1;
+    }
+
+    .turn-name.mine { color: var(--gold); }
+
+    .turn-badge {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; padding: 0.25rem 0.8rem;
+      border-radius: 50px; white-space: nowrap;
+    }
+
+    .turn-badge.mine-badge {
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: var(--navy);
+      animation: badgePulse 1.5s ease-in-out infinite;
+    }
+
+    .turn-badge.other-badge {
+      background: rgba(10,22,40,0.07); color: var(--muted);
+    }
+
+    @keyframes badgePulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(201,168,76,0); }
+    }
+
+    .turn-queue {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+    }
+
+    .turn-queue-label {
+      font-size: 0.68rem; color: var(--muted); letter-spacing: 1px;
+      text-transform: uppercase; margin-right: 0.3rem;
+    }
+
+    .queue-player {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.3rem 0.8rem; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 500;
+      border: 1.5px solid rgba(10,22,40,0.08);
+      background: var(--cream);
+      transition: all 0.2s;
+    }
+
+    .queue-player.active {
+      background: linear-gradient(135deg, var(--navy), var(--navy3));
+      color: var(--white); border-color: transparent;
+      box-shadow: 0 3px 10px rgba(10,22,40,0.15);
+    }
+
+    .queue-player.is-me { border-color: var(--gold); }
+
+    .queue-avatar {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--gold); color: var(--navy);
+      font-size: 0.65rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .queue-player.active .queue-avatar { background: rgba(255,255,255,0.2); color: var(--white); }
+
+    /* ── Join / Word Section ── */
+    .join-btn {
+      padding: 0.55rem 1.3rem;
+      background: linear-gradient(135deg, var(--navy), var(--navy3));
+      color: var(--white); border: none;
+      border-radius: 50px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
+    }
+
+    .join-btn:hover {
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: var(--navy);
+    }
+
+    .join-hint {
+      font-size: 0.78rem; color: var(--muted);
+      margin-top: 0.5rem; font-style: italic;
+    }
+
+    .player-joined-label {
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--green); margin-bottom: 0.8rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+
+    .leave-btn {
+      margin-top: 0.8rem;
+      background: none; border: none;
+      color: var(--muted); font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem; cursor: pointer; padding: 0;
+      text-decoration: underline; transition: color 0.2s;
+    }
+
+    .leave-btn:hover { color: var(--red); }
+
+    /* Disabled word input when not your turn */
+    .word-input:disabled {
+      background: #f0f0f0; color: var(--muted);
+      cursor: not-allowed; border-color: rgba(10,22,40,0.06);
+    }
+
+    .send-word-btn:disabled {
+      opacity: 0.4; cursor: not-allowed;
+      background: linear-gradient(135deg, #9ca3af, #d1d5db);
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .not-your-turn-msg {
+      font-size: 0.8rem; color: var(--muted);
+      font-style: italic; margin-top: 0.5rem;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 900px) {
       .page { grid-template-columns: 1fr; }
@@ -524,7 +662,17 @@
       <div class="game-hero">
         <p class="game-hero-eyebrow">🎮 Mini Game</p>
         <h1 class="game-hero-title">Sambung <span>Kata</span></h1>
-        <p class="game-hero-desc">Sambung kata dari huruf terakhir kata sebelumnya. Kata tidak boleh diulang. Siapa yang paling banyak menyumbang kata?</p>
+        <p class="game-hero-desc">Sambung kata dari huruf terakhir kata sebelumnya secara bergantian. Masukkan nama dan klik <strong>Gabung</strong> untuk mulai bermain!</p>
+      </div>
+
+      <!-- Turn Banner -->
+      <div class="turn-banner" id="turnBanner">
+        <div class="turn-banner-inner">
+          <span class="turn-label">Giliran</span>
+          <span class="turn-name" id="turnName">Menunggu pemain...</span>
+          <span class="turn-badge" id="turnBadge"></span>
+        </div>
+        <div class="turn-queue" id="turnQueue"></div>
       </div>
 
       <!-- Status Bar -->
@@ -559,15 +707,26 @@
 
       <!-- Input -->
       <div class="input-area">
-        <div class="name-input-wrap">
-          <span class="name-label">Nama kamu:</span>
-          <input class="name-input" id="playerName" placeholder="Tulis nama kamu..." maxlength="20">
+        <!-- Join Section (tampil kalau belum join) -->
+        <div id="joinSection">
+          <div class="name-input-wrap">
+            <span class="name-label">Nama kamu:</span>
+            <input class="name-input" id="playerName" placeholder="Tulis nama kamu..." maxlength="20">
+            <button class="join-btn" id="joinBtn">Gabung ✦</button>
+          </div>
+          <p class="join-hint">Masukkan nama lalu klik Gabung untuk ikut bermain.</p>
         </div>
-        <div class="word-input-row">
-          <input class="word-input" id="wordInput" placeholder="Ketik kata..." maxlength="30" autocomplete="off">
-          <button class="send-word-btn" id="sendWordBtn">Kirim ✦</button>
+
+        <!-- Word Input (tampil setelah join) -->
+        <div id="wordSection" style="display:none">
+          <div class="player-joined-label" id="playerJoinedLabel"></div>
+          <div class="word-input-row">
+            <input class="word-input" id="wordInput" placeholder="Ketik kata..." maxlength="30" autocomplete="off">
+            <button class="send-word-btn" id="sendWordBtn">Kirim ✦</button>
+          </div>
+          <div class="feedback-msg" id="feedbackMsg"></div>
+          <button class="leave-btn" id="leaveBtn">Keluar dari game</button>
         </div>
-        <div class="feedback-msg" id="feedbackMsg"></div>
       </div>
 
       <!-- Leaderboard -->
@@ -627,35 +786,167 @@
   const scoreRef   = db.ref('sambungKata/scores');
   const chatRef    = db.ref('sambungKata/chat');
   const typingRef  = db.ref('sambungKata/typing');
-  const onlineRef  = db.ref('sambungKata/online');
+  const playersRef = db.ref('sambungKata/players');   // daftar pemain + urutan
+  const turnRef    = db.ref('sambungKata/currentTurn'); // userId giliran sekarang
 
   /* ── Player ID & Name ── */
   let myId   = localStorage.getItem('skUserId') || Math.random().toString(36).substr(2,9);
   let myName = localStorage.getItem('skPlayerName') || '';
+  let hasJoined = false;
   localStorage.setItem('skUserId', myId);
 
   const playerNameInput = document.getElementById('playerName');
   if (myName) playerNameInput.value = myName;
-  playerNameInput.addEventListener('input', () => {
-    myName = playerNameInput.value.trim() || 'Anonim';
-    localStorage.setItem('skPlayerName', myName);
-  });
+
+  /* ── Join Game ── */
+  document.getElementById('joinBtn').addEventListener('click', joinGame);
+  playerNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') joinGame(); });
+
+  function joinGame() {
+    const name = playerNameInput.value.trim();
+    if (!name) { playerNameInput.focus(); return; }
+    myName = name;
+    localStorage.setItem('skPlayerName', name);
+
+    // Tambah ke daftar pemain dengan timestamp sebagai urutan
+    playersRef.child(myId).set({ name, joinedAt: Date.now(), active: true });
+
+    // Kalau belum ada yang lagi giliran, jadikan ini giliran pertama
+    turnRef.once('value', snap => {
+      if (!snap.val()) turnRef.set(myId);
+    });
+
+    hasJoined = true;
+    document.getElementById('joinSection').style.display = 'none';
+    document.getElementById('wordSection').style.display = 'block';
+    document.getElementById('playerJoinedLabel').innerHTML = '✓ Bergabung sebagai <strong>' + esc(name) + '</strong>';
+  }
+
+  /* ── Leave Game ── */
+  document.getElementById('leaveBtn').addEventListener('click', leaveGame);
+
+  function leaveGame() {
+    playersRef.child(myId).remove();
+    hasJoined = false;
+    document.getElementById('joinSection').style.display = 'block';
+    document.getElementById('wordSection').style.display = 'none';
+    // Kalau ini giliran kita saat keluar, pindah ke berikutnya
+    turnRef.once('value', snap => {
+      if (snap.val() === myId) advanceTurn();
+    });
+  }
 
   /* ── Online Presence ── */
-  const myOnlineRef = onlineRef.child(myId);
-  myOnlineRef.set(true);
-  myOnlineRef.onDisconnect().remove();
+  playersRef.child(myId).onDisconnect().update({ active: false });
 
-  onlineRef.on('value', snap => {
-    const count = snap.numChildren();
-    document.getElementById('onlineCount').textContent = count + ' online';
+  // Kalau disconnect pas giliran kita, pindah giliran otomatis
+  turnRef.once('value', snap => {
+    if (snap.val() === myId) {
+      turnRef.onDisconnect().transaction(cur => cur === myId ? null : cur);
+    }
   });
 
+  /* ── Turn Logic ── */
+  let playersOrdered = []; // [{id, name, active}] urut joinedAt
+  let currentTurnId  = null;
+
+  playersRef.orderByChild('joinedAt').on('value', snap => {
+    playersOrdered = [];
+    snap.forEach(s => {
+      playersOrdered.push({ id: s.key, ...s.val() });
+    });
+    renderTurnQueue();
+    updateOnlineCount();
+  });
+
+  turnRef.on('value', snap => {
+    currentTurnId = snap.val();
+    renderTurnQueue();
+    updateInputState();
+  });
+
+  function advanceTurn() {
+    const activePlayers = playersOrdered.filter(p => p.active !== false);
+    if (activePlayers.length === 0) { turnRef.remove(); return; }
+    if (activePlayers.length === 1) { turnRef.set(activePlayers[0].id); return; }
+
+    const idx = activePlayers.findIndex(p => p.id === currentTurnId);
+    const next = activePlayers[(idx + 1) % activePlayers.length];
+    turnRef.set(next.id);
+  }
+
+  function renderTurnQueue() {
+    const activePlayers = playersOrdered.filter(p => p.active !== false);
+    const banner = document.getElementById('turnBanner');
+    const nameEl = document.getElementById('turnName');
+    const badge  = document.getElementById('turnBadge');
+    const queue  = document.getElementById('turnQueue');
+
+    if (activePlayers.length === 0) {
+      nameEl.textContent = 'Belum ada pemain';
+      nameEl.className = 'turn-name';
+      badge.textContent = '';
+      queue.innerHTML = '';
+      return;
+    }
+
+    const current = activePlayers.find(p => p.id === currentTurnId);
+    if (current) {
+      nameEl.textContent = current.name;
+      if (current.id === myId) {
+        nameEl.className = 'turn-name mine';
+        badge.textContent = '🎯 Giliran Kamu!';
+        badge.className = 'turn-badge mine-badge';
+      } else {
+        nameEl.className = 'turn-name';
+        badge.textContent = 'Menunggu...';
+        badge.className = 'turn-badge other-badge';
+      }
+    } else {
+      nameEl.textContent = 'Menunggu...';
+      nameEl.className = 'turn-name';
+      badge.textContent = '';
+    }
+
+    // Render antrian pemain
+    queue.innerHTML = '<span class="turn-queue-label">Antrian:</span>';
+    activePlayers.forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'queue-player'
+        + (p.id === currentTurnId ? ' active' : '')
+        + (p.id === myId ? ' is-me' : '');
+      el.innerHTML = `<span class="queue-avatar">${p.name.charAt(0).toUpperCase()}</span>${esc(p.name)}${p.id === myId ? ' (kamu)' : ''}`;
+      queue.appendChild(el);
+    });
+  }
+
+  function updateInputState() {
+    if (!hasJoined) return;
+    const isMyTurn = currentTurnId === myId;
+    const wordInput = document.getElementById('wordInput');
+    const sendBtn   = document.getElementById('sendWordBtn');
+    const fb        = document.getElementById('feedbackMsg');
+
+    wordInput.disabled = !isMyTurn;
+    sendBtn.disabled   = !isMyTurn;
+    wordInput.placeholder = isMyTurn ? 'Ketik kata...' : 'Bukan giliran kamu...';
+
+    if (!isMyTurn && fb) {
+      fb.className = 'feedback-msg';
+      fb.textContent = '';
+    }
+  }
+
+  function updateOnlineCount() {
+    const active = playersOrdered.filter(p => p.active !== false).length;
+    document.getElementById('onlineCount').textContent = active + ' pemain';
+  }
+
   /* ── Game State ── */
-  let allWords    = [];
-  let wordSet     = new Set();
-  let lastWord    = '';
-  let nextLetter  = '';
+  let allWords   = [];
+  let wordSet    = new Set();
+  let lastWord   = '';
+  let nextLetter = '';
 
   gameRef.orderByChild('timestamp').on('value', snap => {
     allWords = [];
@@ -663,36 +954,26 @@
     const data = snap.val() || {};
     Object.values(data)
       .sort((a,b) => a.timestamp - b.timestamp)
-      .forEach(w => {
-        allWords.push(w);
-        wordSet.add(w.word.toLowerCase());
-      });
-
+      .forEach(w => { allWords.push(w); wordSet.add(w.word.toLowerCase()); });
     renderChain();
     updateStatus();
   });
 
   function renderChain() {
     const container = document.getElementById('chainWords');
-    const empty     = document.getElementById('chainEmpty');
     container.innerHTML = '';
-
     if (allWords.length === 0) {
-      container.appendChild(empty || Object.assign(document.createElement('div'), {
-        className: 'chain-empty', textContent: 'Belum ada kata. Mulai duluan yuk! 🙂'
-      }));
+      container.innerHTML = '<div class="chain-empty">Belum ada kata. Mulai duluan yuk! 🙂</div>';
+      document.getElementById('wordCount').textContent = '0';
       return;
     }
-
     allWords.forEach((w, i) => {
       const el = document.createElement('span');
       el.className = 'chain-word' + (i === allWords.length - 1 ? ' latest' : '');
-      const flag = w.lang === 'EN' ? ' 🇬🇧' : (w.lang === 'ID' ? ' 🇮🇩' : '');
-      el.innerHTML = `<span class="word-initial">${(w.player||'?').charAt(0).toUpperCase()}</span>${esc(w.word)}${flag}`;
+      el.innerHTML = `<span class="word-initial">${(w.player||'?').charAt(0).toUpperCase()}</span>${esc(w.word)}`;
       el.title = w.player || 'Anonim';
       container.appendChild(el);
     });
-
     container.scrollLeft = container.scrollWidth;
     document.getElementById('wordCount').textContent = allWords.length;
   }
@@ -701,7 +982,7 @@
     if (allWords.length === 0) {
       document.getElementById('lastWord').textContent = '—';
       document.getElementById('nextLetter').textContent = '?';
-      lastWord = '';  nextLetter = '';
+      lastWord = ''; nextLetter = '';
       return;
     }
     const lw = allWords[allWords.length - 1].word;
@@ -711,89 +992,7 @@
     document.getElementById('nextLetter').textContent = nextLetter;
   }
 
-  /* ── Dictionary Cache ── */
-  const dictCache = new Map();
-
-  async function isValidWord(word) {
-    const w = word.toLowerCase();
-    if (dictCache.has(w)) return dictCache.get(w);
-
-    const timeout = ms => new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms));
-
-    // 1. English — Free Dictionary API (paling reliable, ada CORS)
-    try {
-      const res = await Promise.race([
-        fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + w),
-        timeout(5000)
-      ]);
-      if (res.ok) {
-        const r = { valid: true, lang: 'EN' };
-        dictCache.set(w, r); return r;
-      }
-      // 404 = kata tidak ada di EN, lanjut cek ID
-    } catch(e) {
-      // network error / timeout — lanjut ke cek ID
-    }
-
-    // 2. Indonesian — Coba beberapa endpoint KBBI aktif
-    // Endpoint A: kbbi.dev (community, aktif)
-    try {
-      const res = await Promise.race([
-        fetch('https://kbbi.dev/api/cari?q=' + encodeURIComponent(w)),
-        timeout(5000)
-      ]);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.hasil && data.hasil.length > 0) {
-          const r = { valid: true, lang: 'ID' };
-          dictCache.set(w, r); return r;
-        }
-        if (res.ok && res.status === 200) {
-          // Beberapa endpoint return 200 kosong untuk tidak ditemukan
-          // lanjut ke endpoint berikutnya
-        }
-      }
-    } catch(e) {}
-
-    // Endpoint B: api.kbbi.web.id
-    try {
-      const res = await Promise.race([
-        fetch('https://api.kbbi.web.id/kata/' + encodeURIComponent(w)),
-        timeout(5000)
-      ]);
-      if (res.ok) {
-        const data = await res.json();
-        // Valid jika ada data lema/arti
-        if (data && (Array.isArray(data) ? data.length > 0 : data.lema || data.arti)) {
-          const r = { valid: true, lang: 'ID' };
-          dictCache.set(w, r); return r;
-        }
-      }
-    } catch(e) {}
-
-    // Endpoint C: Datamuse (EN words by pattern — fallback terakhir untuk EN)
-    try {
-      const res = await Promise.race([
-        fetch('https://api.datamuse.com/words?sp=' + encodeURIComponent(w) + '&max=1'),
-        timeout(4000)
-      ]);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0 && data[0].word === w) {
-          const r = { valid: true, lang: 'EN' };
-          dictCache.set(w, r); return r;
-        }
-      }
-    } catch(e) {}
-
-    // Semua API gagal (mati / CORS / timeout) → anggap valid
-    // supaya game tidak macet karena masalah jaringan
-    // Tandai sebagai 'unknown' bukan invalid
-    const r = { valid: false, lang: null, apiError: true };
-    dictCache.set(w, r);
-    return r;
-  }
-
+  /* ── Send Word ── */
   function showFeedback(type, msg, input, isOk) {
     const fb = document.getElementById('feedbackMsg');
     fb.className = 'feedback-msg ' + type;
@@ -802,57 +1001,40 @@
       input.className = 'word-input ' + (isOk ? 'success' : 'error');
       setTimeout(() => { if (!input.disabled) input.className = 'word-input'; }, 800);
     }
-    if (type !== 'warn') {
-      clearTimeout(window._fbTimer);
-      window._fbTimer = setTimeout(() => { fb.textContent = ''; fb.className = 'feedback-msg'; }, 3500);
-    }
+    clearTimeout(window._fbTimer);
+    window._fbTimer = setTimeout(() => { fb.textContent = ''; fb.className = 'feedback-msg'; }, 3500);
   }
 
-  async function sendWord() {
-    const name  = playerNameInput.value.trim() || 'Anonim';
-    localStorage.setItem('skPlayerName', name);
+  function sendWord() {
+    if (!hasJoined) return;
+    if (currentTurnId !== myId) return; // bukan giliran
+
+    const name  = myName || 'Anonim';
     const raw   = document.getElementById('wordInput').value.trim().toLowerCase();
     const input = document.getElementById('wordInput');
-    const btn   = document.getElementById('sendWordBtn');
 
     if (!raw) return;
-
     if (!/^[a-zA-Z]+$/.test(raw))
       return showFeedback('fail', '⚠ Hanya huruf yang dibolehkan!', input);
-
     if (wordSet.has(raw))
       return showFeedback('fail', '❌ Kata "' + raw + '" sudah pernah dipakai!', input);
-
     if (nextLetter && raw.charAt(0).toUpperCase() !== nextLetter)
       return showFeedback('fail', '❌ Kata harus dimulai huruf ' + nextLetter + '!', input);
 
-    // Loading
-    btn.disabled = true;
-    btn.textContent = '🔍...';
-    input.disabled = true;
-    showFeedback('warn', '🔍 Mengecek kamus...', input);
-
-    const result = await isValidWord(raw);
-
-    btn.disabled = false;
-    btn.textContent = 'Kirim ✦';
-    input.disabled = false;
-    input.focus();
-
-    if (!result.valid && !result.apiError)
-      return showFeedback('fail', '❌ "' + raw + '" tidak ditemukan di kamus Bahasa Indonesia / English!', input);
-
-    const flag = result.lang === 'EN' ? ' 🇬🇧' : (result.lang === 'ID' ? ' 🇮🇩' : ' ⚠️');
-    gameRef.push({ word: raw, player: name, userId: myId, timestamp: Date.now(), lang: result.lang });
+    // Kirim kata
+    gameRef.push({ word: raw, player: name, userId: myId, timestamp: Date.now() });
     scoreRef.child(myId).transaction(cur => {
       if (!cur) return { name, score: 1 };
       return { name, score: (cur.score || 0) + 1 };
     });
     document.getElementById('wordInput').value = '';
-    showFeedback('ok', '✓' + flag + ' Kata "' + raw + '" diterima!', input, true);
+    showFeedback('ok', '✓ Kata "' + raw + '" diterima! Giliran berpindah...', input, true);
+
+    // Pindah giliran ke pemain berikutnya
+    setTimeout(advanceTurn, 400);
   }
 
-  document.getElementById('sendWordBtn').addEventListener('click', () => sendWord());
+  document.getElementById('sendWordBtn').addEventListener('click', sendWord);
   document.getElementById('wordInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); sendWord(); }
   });
@@ -884,6 +1066,9 @@
   document.getElementById('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset semua kata dan skor? Tidak bisa dibatalkan.')) return;
     db.ref('sambungKata').remove();
+    hasJoined = false;
+    document.getElementById('joinSection').style.display = 'block';
+    document.getElementById('wordSection').style.display = 'none';
   });
 
   /* ══════════════════════
@@ -897,7 +1082,7 @@
   function sendChatMsg() {
     const text = chatInput.value.trim();
     if (!text) return;
-    const name = playerNameInput.value.trim() || 'Anonim';
+    const name = myName || playerNameInput.value.trim() || 'Anonim';
     chatRef.push({ text, name, userId: myId, timestamp: Date.now() });
     chatInput.value = '';
     typingRef.child(myId).set(false);
@@ -908,9 +1093,8 @@
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMsg(); }
   });
 
-  // Typing indicator
   chatInput.addEventListener('input', () => {
-    typingRef.child(myId).set(playerNameInput.value.trim() || 'Anonim');
+    typingRef.child(myId).set(myName || 'Anonim');
     clearTimeout(window._typTimer);
     window._typTimer = setTimeout(() => typingRef.child(myId).set(false), 1800);
   });
@@ -921,15 +1105,13 @@
       .filter(([id, v]) => id !== myId && v)
       .map(([, name]) => name);
     chatTyping.textContent = others.length
-      ? others.join(', ') + (others.length > 1 ? ' sedang mengetik...' : ' sedang mengetik...')
-      : '';
+      ? others.join(', ') + ' sedang mengetik...' : '';
   });
 
   chatRef.limitToLast(80).on('child_added', snap => {
     const d = snap.val();
     const isMine = d.userId === myId;
     const time = new Date(d.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-
     const div = document.createElement('div');
     div.className = 'chat-msg ' + (isMine ? 'mine' : 'theirs');
     div.innerHTML = (isMine ? '' : `<div class="chat-msg-sender">${esc(d.name)}</div>`)
@@ -938,20 +1120,25 @@
     chatMsgs.scrollTop = chatMsgs.scrollHeight;
   });
 
-  /* ── System messages for new words ── */
+  /* ── System messages ── */
   gameRef.limitToLast(1).on('child_added', snap => {
     const d = snap.val();
-    if (!d || Date.now() - d.timestamp > 5000) return; // ignore old
+    if (!d || Date.now() - d.timestamp > 5000) return;
     const div = document.createElement('div');
     div.className = 'chat-system';
-    div.textContent = '🔤 ' + (d.player||'Anonim') + ' menyumbang kata "' + d.word + '"';
+    div.textContent = '🔤 ' + (d.player||'Anonim') + ' → "' + d.word + '"';
     chatMsgs.appendChild(div);
     chatMsgs.scrollTop = chatMsgs.scrollHeight;
   });
 
   /* ── Cleanup ── */
   window.addEventListener('beforeunload', () => {
-    myOnlineRef.remove();
+    if (hasJoined) {
+      playersRef.child(myId).update({ active: false });
+      turnRef.once('value', snap => {
+        if (snap.val() === myId) advanceTurn();
+      });
+    }
     typingRef.child(myId).remove();
   });
 
@@ -959,7 +1146,7 @@
     return String(t||'')
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
-  </script>
+    </script>
 
 </body>
 </html>
