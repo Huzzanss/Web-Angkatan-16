@@ -174,7 +174,7 @@ function initDB(){
 function loadData(){
   if(!db){initDB();return;}
   document.getElementById('lbCard').innerHTML='<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
-  db.ref('shared/lb').once('value',snap=>{
+  db.ref('shared/lb2').once('value',snap=>{
     lbData=snap.val()||{};
     renderTab();
     updateMyBadge();
