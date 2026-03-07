@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Leaderboard — Angkatan XVI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0a1628;--gold:#c9a84c;--gold2:#e8c97a;--night:#0f172a;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;background:var(--night);overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--gold);border-radius:10px;}
+
+.navbar{position:fixed;top:0;width:100%;background:rgba(10,22,40,.95);backdrop-filter:blur(18px);border-bottom:1px solid rgba(201,168,76,.2);padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;z-index:200;}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:#fff;text-decoration:none;}
+.nav-logo span{color:var(--gold);}
+.nav-back{color:rgba(255,255,255,.55);text-decoration:none;font-size:.78rem;padding:.3rem .75rem;border-radius:50px;border:1px solid rgba(255,255,255,.15);}
+
+.page{max-width:760px;margin:0 auto;padding:80px 1rem 3rem;}
+
+/* Hero */
+.hero{text-align:center;padding:2rem 0 1.5rem;}
+.hero-icon{font-size:3.5rem;margin-bottom:.6rem;filter:drop-shadow(0 0 20px rgba(201,168,76,.5));}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;margin-bottom:.3rem;}
+.hero-title em{color:var(--gold2);font-style:italic;}
+.hero-sub{font-size:.85rem;color:rgba(255,255,255,.4);line-height:1.6;}
+
+/* Tabs */
+.tabs{display:flex;gap:.4rem;background:rgba(255,255,255,.04);border-radius:12px;padding:.3rem;margin-bottom:1.2rem;border:1px solid rgba(255,255,255,.07);}
+.tab{flex:1;padding:.6rem;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;color:rgba(255,255,255,.4);background:transparent;}
+.tab.active{background:rgba(201,168,76,.18);color:var(--gold2);border:1px solid rgba(201,168,76,.25);}
+
+/* Online Banner */
+.online-banner{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:14px;padding:.9rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;}
+.ob-dot{width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;flex-shrink:0;animation:pulse 1.5s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.ob-text{font-size:.82rem;color:rgba(255,255,255,.6);flex:1;}
+.ob-names{font-size:.8rem;color:#6ee7b7;font-weight:600;}
+
+/* Leaderboard Table */
+.lb-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;}
+.lb-row{display:grid;align-items:center;padding:.9rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.05);transition:background .18s;gap:.6rem;}
+.lb-row:last-child{border-bottom:none;}
+.lb-row:hover{background:rgba(255,255,255,.04);}
+.lb-row.header{background:rgba(201,168,76,.06);border-bottom:1px solid rgba(201,168,76,.12);font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);font-weight:600;padding:.7rem 1.2rem;}
+
+/* Points tab: rank | avatar+name | points | wins | games */
+.row-pts{grid-template-columns:40px 1fr 90px 70px 60px;}
+/* Time tab: rank | avatar+name | online time | last seen */
+.row-time{grid-template-columns:40px 1fr 120px 110px;}
+
+.rank{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;text-align:center;line-height:1;}
+.rank-1{color:#FFD700;}
+.rank-2{color:#C0C0C0;}
+.rank-3{color:#CD7F32;}
+.rank-n{color:rgba(255,255,255,.3);font-size:1rem;}
+.medal{font-size:1.2rem;text-align:center;}
+
+.player-cell{display:flex;align-items:center;gap:.65rem;min-width:0;}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.88rem;font-weight:700;color:#fff;flex-shrink:0;}
+.av.me{box-shadow:0 0 0 2px var(--gold);}
+.pname{font-size:.88rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pname .you{font-size:.62rem;color:var(--gold);font-weight:700;margin-left:.3rem;}
+
+.pts-cell{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--gold2);text-align:right;}
+.wins-cell{font-size:.85rem;font-weight:600;text-align:right;color:#6ee7b7;}
+.games-cell{font-size:.82rem;color:rgba(255,255,255,.35);text-align:right;}
+.time-cell{font-size:.85rem;font-weight:600;color:#93c5fd;text-align:right;}
+.seen-cell{font-size:.75rem;color:rgba(255,255,255,.3);text-align:right;}
+
+.lb-row.top-1{background:linear-gradient(120deg,rgba(255,215,0,.06),transparent);border-left:3px solid #FFD700;}
+.lb-row.top-2{background:linear-gradient(120deg,rgba(192,192,192,.05),transparent);border-left:3px solid #C0C0C0;}
+.lb-row.top-3{background:linear-gradient(120deg,rgba(205,127,50,.05),transparent);border-left:3px solid #CD7F32;}
+.lb-row.is-me{background:rgba(201,168,76,.06)!important;}
+
+.empty{text-align:center;padding:3rem;color:rgba(255,255,255,.25);font-size:.88rem;}
+.empty-icon{font-size:3rem;margin-bottom:.8rem;display:block;}
+
+/* Loading */
+.loading{display:flex;justify-content:center;padding:2.5rem;gap:.5rem;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:blink 1.2s ease infinite;}
+.dot:nth-child(2){animation-delay:.2s;}
+.dot:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,100%{opacity:.2;}50%{opacity:1;}}
+
+/* Refresh */
+.refresh-row{display:flex;justify-content:flex-end;margin-bottom:.7rem;}
+.refresh-btn{padding:.4rem .9rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:50px;color:rgba(255,255,255,.45);font-family:'DM Sans',sans-serif;font-size:.76rem;cursor:pointer;transition:all .18s;}
+.refresh-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* My row highlight */
+.my-rank-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:.6rem 1rem;margin-bottom:1rem;font-size:.82rem;}
+.my-rank-badge strong{color:var(--gold2);}
+
+@media(max-width:600px){
+  .row-pts{grid-template-columns:32px 1fr 70px 50px;}
+  .games-cell{display:none;}
+  .row-time{grid-template-columns:32px 1fr 90px;}
+  .seen-cell{display:none;}
+  .pts-cell{font-size:1.2rem;}
+  .lb-row{padding:.75rem .9rem;}
+  .hero-title{font-size:2rem;}
+  .tabs{gap:.3rem;}
+  .tab{font-size:.75rem;padding:.5rem .3rem;}
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">Angkatan <span>XVI</span></a>
+  <a href="index.html" class="nav-back">← Kembali</a>
+</nav>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-icon">🏆</div>
+    <h1 class="hero-title">Leader<em>board</em></h1>
+    <p class="hero-sub">Kumpulan poin dari semua game + waktu online. Updated realtime!</p>
+  </div>
+
+  <!-- Online now -->
+  <div class="online-banner" id="onlineBanner" style="display:none">
+    <div class="ob-dot"></div>
+    <div class="ob-text">Sedang online sekarang:</div>
+    <div class="ob-names" id="onlineNames">—</div>
+  </div>
+
+  <!-- My rank -->
+  <div id="myRankBadge" style="display:none" class="my-rank-badge">
+    🏅 Rankingmu saat ini: <strong id="myRankNum">—</strong> &nbsp;|&nbsp;
+    ⭐ Poin: <strong id="myRankPts">—</strong> &nbsp;|&nbsp;
+    🕐 Online: <strong id="myRankTime">—</strong>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('points')" id="tabPts">⭐ Poin Terbanyak</button>
+    <button class="tab" onclick="switchTab('online')" id="tabTime">🕐 Waktu Online</button>
+    <button class="tab" onclick="switchTab('wins')" id="tabWins">🏆 Kemenangan</button>
+  </div>
+
+  <div class="refresh-row">
+    <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+  </div>
+
+  <div class="lb-card" id="lbCard">
+    <div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="shared.js"></script>
+<script>
+let db, lbData={}, onlineData={};
+let currentTab='points';
+let myId=localStorage.getItem('lbUid')||'';
+
+function initDB(){
+  try{
+    const app=firebase.apps.find(a=>a.name==='shared')||firebase.initializeApp({
+      apiKey:'AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg',
+      authDomain:'chat-angkatan-16.firebaseapp.com',
+      databaseURL:'https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app',
+      projectId:'chat-angkatan-16',storageBucket:'chat-angkatan-16.appspot.com',
+      messagingSenderId:'47699501502',appId:'1:47699501502:web:0d09e69d0b3ff39a7359ef'
+    },'lbpage');
+    db=app.database();
+    loadData();
+    listenOnline();
+  }catch(e){setTimeout(initDB,400);}
+}
+
+function loadData(){
+  if(!db){initDB();return;}
+  document.getElementById('lbCard').innerHTML='<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  db.ref('shared/lb').once('value',snap=>{
+    lbData=snap.val()||{};
+    renderTab();
+    updateMyBadge();
+  });
+}
+
+function listenOnline(){
+  if(!db) return;
+  db.ref('shared/online').on('value',snap=>{
+    onlineData=snap.val()||{};
+    const names=Object.values(onlineData).map(p=>p.name||'?').filter(Boolean);
+    const banner=document.getElementById('onlineBanner');
+    if(names.length>0){
+      banner.style.display='flex';
+      document.getElementById('onlineNames').textContent=names.join(', ')+` (${names.length} orang)`;
+    } else {
+      banner.style.display='none';
+    }
+  });
+}
+
+function switchTab(t){
+  currentTab=t;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab'+{points:'Pts',online:'Time',wins:'Wins'}[t]).classList.add('active');
+  renderTab();
+}
+
+function renderTab(){
+  const rows=Object.entries(lbData);
+  if(rows.length===0){
+    document.getElementById('lbCard').innerHTML='<div class="empty"><span class="empty-icon">🎮</span>Belum ada data. Main game dulu!</div>';
+    return;
+  }
+
+  let sorted;
+  if(currentTab==='points'){
+    sorted=rows.sort((a,b)=>(b[1].points||0)-(a[1].points||0));
+  } else if(currentTab==='online'){
+    sorted=rows.sort((a,b)=>(b[1].onlineMs||0)-(a[1].onlineMs||0));
+  } else {
+    sorted=rows.sort((a,b)=>(b[1].wins||0)-(a[1].wins||0));
+  }
+
+  const isOnline=(uid)=>!!onlineData[uid];
+
+  let html='';
+
+  if(currentTab==='points'){
+    html+=`<div class="lb-row row-pts header">
+      <div>Rank</div><div>Pemain</div><div style="text-align:right">Poin</div><div style="text-align:right">Menang</div><div style="text-align:right">Game</div>
+    </div>`;
+    sorted.forEach(([uid,p],i)=>{
+      const rank=i+1;
+      const rankCls=rank<=3?`top-${rank}`:'';
+      const me=uid===myId?'is-me':'';
+      const hue=Math.round(i/sorted.length*300);
+      html+=`<div class="lb-row row-pts ${rankCls} ${me}">
+        <div class="rank ${rank<=3?'rank-'+rank:'rank-n'}">${rank<=3?['🥇','🥈','🥉'][rank-1]:rank}</div>
+        <div class="player-cell">
+          <div class="av${uid===myId?' me':''}" style="background:linear-gradient(135deg,hsl(${hue},55%,38%),hsl(${hue+20},45%,52%))">${(p.name||'?').charAt(0).toUpperCase()}</div>
+          <div>
+            <div class="pname">${esc(p.name||'?')}${uid===myId?'<span class="you">kamu</span>':''}${isOnline(uid)?'<span style="font-size:.6rem;color:#22c55e;margin-left:.3rem">●</span>':''}</div>
+          </div>
+        </div>
+        <div class="pts-cell">${(p.points||0).toLocaleString()}</div>
+        <div class="wins-cell">${p.wins||0} 🏆</div>
+        <div class="games-cell">${p.games||0}</div>
+      </div>`;
+    });
+  } else if(currentTab==='online'){
+    html+=`<div class="lb-row row-time header">
+      <div>Rank</div><div>Pemain</div><div style="text-align:right">Total Online</div><div style="text-align:right">Terakhir Seen</div>
+    </div>`;
+    sorted.forEach(([uid,p],i)=>{
+      const rank=i+1;
+      const rankCls=rank<=3?`top-${rank}`:'';
+      const me=uid===myId?'is-me':'';
+      const hue=Math.round(i/sorted.length*300);
+      html+=`<div class="lb-row row-time ${rankCls} ${me}">
+        <div class="rank ${rank<=3?'rank-'+rank:'rank-n'}">${rank<=3?['🥇','🥈','🥉'][rank-1]:rank}</div>
+        <div class="player-cell">
+          <div class="av${uid===myId?' me':''}" style="background:linear-gradient(135deg,hsl(${hue},55%,38%),hsl(${hue+20},45%,52%))">${(p.name||'?').charAt(0).toUpperCase()}</div>
+          <div class="pname">${esc(p.name||'?')}${uid===myId?'<span class="you">kamu</span>':''}${isOnline(uid)?'<span style="font-size:.6rem;color:#22c55e;margin-left:.3rem">● online</span>':''}</div>
+        </div>
+        <div class="time-cell">${fmtMs(p.onlineMs||0)}</div>
+        <div class="seen-cell">${fmtAgo(p.lastSeen||0)}</div>
+      </div>`;
+    });
+  } else {
+    html+=`<div class="lb-row row-pts header">
+      <div>Rank</div><div>Pemain</div><div style="text-align:right">Menang</div><div style="text-align:right">Poin</div><div style="text-align:right">Game</div>
+    </div>`;
+    sorted.forEach(([uid,p],i)=>{
+      const rank=i+1;
+      const rankCls=rank<=3?`top-${rank}`:'';
+      const me=uid===myId?'is-me':'';
+      const hue=Math.round(i/sorted.length*300);
+      html+=`<div class="lb-row row-pts ${rankCls} ${me}">
+        <div class="rank ${rank<=3?'rank-'+rank:'rank-n'}">${rank<=3?['🥇','🥈','🥉'][rank-1]:rank}</div>
+        <div class="player-cell">
+          <div class="av${uid===myId?' me':''}" style="background:linear-gradient(135deg,hsl(${hue},55%,38%),hsl(${hue+20},45%,52%))">${(p.name||'?').charAt(0).toUpperCase()}</div>
+          <div class="pname">${esc(p.name||'?')}${uid===myId?'<span class="you">kamu</span>':''}${isOnline(uid)?'<span style="font-size:.6rem;color:#22c55e;margin-left:.3rem">●</span>':''}</div>
+        </div>
+        <div class="wins-cell" style="font-size:1.3rem;font-family:'Cormorant Garamond',serif;font-weight:700;color:#fcd34d">${p.wins||0}</div>
+        <div class="pts-cell" style="font-size:1.1rem">${(p.points||0).toLocaleString()}</div>
+        <div class="games-cell">${p.games||0}</div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('lbCard').innerHTML=html;
+}
+
+function updateMyBadge(){
+  if(!myId||!lbData[myId]) return;
+  const badge=document.getElementById('myRankBadge');
+  const sorted=Object.entries(lbData).sort((a,b)=>(b[1].points||0)-(a[1].points||0));
+  const rank=sorted.findIndex(([id])=>id===myId)+1;
+  const me=lbData[myId];
+  document.getElementById('myRankNum').textContent='#'+rank;
+  document.getElementById('myRankPts').textContent=(me.points||0).toLocaleString();
+  document.getElementById('myRankTime').textContent=fmtMs(me.onlineMs||0);
+  badge.style.display='flex';
+}
+
+function fmtMs(ms){
+  const s=Math.floor(ms/1000),m=Math.floor(s/60),h=Math.floor(m/60);
+  if(h>0) return `${h}j ${m%60}m`;
+  if(m>0) return `${m}m`;
+  return `${s}d`;
+}
+
+function fmtAgo(ts){
+  if(!ts) return '—';
+  const diff=Date.now()-ts;
+  const m=Math.floor(diff/60000),h=Math.floor(m/60),d=Math.floor(h/24);
+  if(d>0) return `${d} hari lalu`;
+  if(h>0) return `${h} jam lalu`;
+  if(m>0) return `${m} menit lalu`;
+  return 'Baru saja';
+}
+
+function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Auto-refresh every 30s
+setInterval(loadData,30000);
+
+// Wait for shared.js to init Firebase, then init db
+setTimeout(initDB,800);
+</script>
+</body>
+</html>
