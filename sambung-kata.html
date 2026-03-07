@@ -1356,5 +1356,27 @@
   }
     </script>
 
+
+<script src="shared.js"></script>
+<script>
+
+// Leaderboard integration
+window._skOriginalAddWord = null;
+document.addEventListener('DOMContentLoaded', function() {
+  // Hook into submitWord if exists - patch via global override
+  const origSubmit = window.submitWord;
+  if (typeof origSubmit === 'function') {
+    window.submitWord = function() {
+      origSubmit.apply(this, arguments);
+    };
+  }
+});
+// Award points when player adds valid word - called from game
+window.LB_wordPlayed = function(name, uid, wordLen) {
+  const pts = Math.max(1, wordLen - 2) * 5;
+  if (window.LB_addPoints) window.LB_addPoints(name, uid, pts);
+};
+
+</script>
 </body>
 </html>
