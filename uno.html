@@ -668,6 +668,8 @@ function commitPlay(card,idx,chosenColor){
   if(newHand.length===0){
     gRef.update({phase:'end',winnerId:myId,winnerName:myName});
     sysChat(`🏆 ${myName} MENANG! Semua kartu habis!`);
+    if(window.LB_addPoints) window.LB_addPoints(myName, myId, 200);
+    if(window.LB_addWin) window.LB_addWin(myName, myId);
   }
 }
 
@@ -710,6 +712,7 @@ function callUno(){
 function renderEndScreen(){
   showScreen('sEnd');
   const isWinner=gameData.winnerId===myId;
+  if(!isWinner && window.LB_addPoints) window.LB_addPoints(myName, myId, 30);
   document.getElementById('endIcon').textContent=isWinner?'🏆':'😅';
   document.getElementById('endTitle').textContent=isWinner?'Kamu Menang!':'Kamu Kalah!';
   document.getElementById('endSub').textContent=isWinner
@@ -762,5 +765,7 @@ window.addEventListener('beforeunload',()=>pRef.child(myId).remove());
 showScreen('sJoin');
 if(myName) document.getElementById('jName').value=myName;
 </script>
+
+<script src="shared.js"></script>
 </body>
 </html>
