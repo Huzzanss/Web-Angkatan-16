@@ -770,6 +770,14 @@ function renderEndScreen(){
   clearTimer();
   showScreen('sEnd');
   const w=gameData.winner;
+  // Award points
+  if(window.LB_addPoints){
+    const spyWin=w==='spy'||w==='spy_guess';
+    const isSpy = myRole==='spy';
+    if(spyWin && isSpy){ window.LB_addPoints(myName,myId,150); window.LB_addWin&&window.LB_addWin(myName,myId); }
+    else if(!spyWin && !isSpy){ window.LB_addPoints(myName,myId,100); window.LB_addWin&&window.LB_addWin(myName,myId); }
+    else { window.LB_addPoints(myName,myId,20); }
+  }
   const spyWin=w==='spy'||w==='spy_guess';
   document.getElementById('endBig').textContent=spyWin?'🕵️':'🏘️';
   document.getElementById('endTitle').textContent=spyWin?'Mata-mata Menang!':'Warga Menang!';
@@ -856,5 +864,7 @@ window.addEventListener('beforeunload',()=>pRef.child(myId).remove());
 showScreen('sJoin');
 if(myName) document.getElementById('jName').value=myName;
 </script>
+
+<script src="shared.js"></script>
 </body>
 </html>
