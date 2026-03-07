@@ -836,5 +836,38 @@ window.addEventListener('beforeunload', () => {
   }
 });
 </script>
+
+<script src="shared.js"></script>
+<script>
+
+// Hook leaderboard to existing score system
+const _gbOrigEnd = window.endRound;
+window._lbGbHooked = false;
+setInterval(function(){
+  if(window._lbGbHooked) return;
+  // Watch for game end via Firebase
+  try {
+    const fbApp = firebase.apps[0];
+    if(!fbApp) return;
+    const db = fbApp.database();
+    db.ref('gambarBareng/game/phase').on('value', snap => {
+      if(snap.val()==='lobby' && window._gbLastPhase==='playing') {
+        // Game ended — award points based on scores
+        db.ref('gambarBareng/players').once('value', psnap => {
+          psnap.forEach(ps => {
+            const p = ps.val();
+            if(p && p.score && p.score > 0 && window.LB_addPoints) {
+              window.LB_addPoints(p.name, ps.key, Math.round(p.score * 0.5));
+            }
+          });
+        });
+      }
+      window._gbLastPhase = snap.val();
+    });
+    window._lbGbHooked = true;
+  } catch(e) {}
+}, 1000);
+
+</script>
 </body>
 </html>
