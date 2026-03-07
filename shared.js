@@ -1,12 +1,12 @@
 /* ============================================================
    shared.js — Angkatan XVI
-   Voice Chat (WebRTC) + Leaderboard Tracking + Name Prompt
-   Include di semua halaman: <script src="shared.js"></script>
+   Voice Chat (WebRTC) + Leaderboard + Name Prompt
+   FIX: name-based LB key (no duplicates) + fixed voice audio
 ============================================================ */
 (function () {
   'use strict';
 
-  const FB = {
+  const FB_CFG = {
     apiKey: 'AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg',
     authDomain: 'chat-angkatan-16.firebaseapp.com',
     databaseURL: 'https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app',
@@ -16,416 +16,469 @@
     appId: '1:47699501502:web:0d09e69d0b3ff39a7359ef'
   };
 
-  const STUN = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
+  const ICE = { iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' }
+  ]};
 
-  /* ── Init Firebase (shared instance) ── */
-  let sdb;
-  function initFB() {
-    if (sdb) return;
+  /* ── Firebase ── */
+  let sdb = null;
+  function getDB() {
+    if (sdb) return sdb;
     try {
-      if (!firebase.apps.filter(a => a.name === 'shared').length) {
-        firebase.initializeApp(FB, 'shared');
-      }
-      sdb = firebase.app('shared').database();
-    } catch (e) {
-      setTimeout(initFB, 300);
-    }
+      let app = firebase.apps.find(a => a.name === '_sh_');
+      if (!app) app = firebase.initializeApp(FB_CFG, '_sh_');
+      sdb = app.database();
+    } catch(e) {}
+    return sdb;
   }
 
-  /* ── Identity ── */
-  let myId   = localStorage.getItem('lbUid')   || Math.random().toString(36).substr(2, 9);
-  let myName = localStorage.getItem('lbName')  || '';
+  /* ── Identity — keyed by NAME (sanitized) to avoid duplicates ── */
+  let myId   = localStorage.getItem('lbUid')  || ('u_' + Math.random().toString(36).substr(2,9));
+  let myName = localStorage.getItem('lbName') || '';
   localStorage.setItem('lbUid', myId);
 
-  /* ── Expose globals ── */
+  // lbKey = sanitized name used as Firebase key (so same name = same record)
+  function lbKey(name) {
+    return (name || '').toLowerCase().replace(/[^a-z0-9ก-๙]/g, '_').substr(0, 40) || myId;
+  }
+
+  /* ── Globals ── */
   window.LB_addPoints = addPoints;
   window.LB_addWin    = addWin;
   window.LB_myId      = () => myId;
   window.LB_myName    = () => myName;
 
-  /* ── Wait for DOM ── */
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
+  /* ── Boot ── */
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 
   function boot() {
     injectStyles();
     injectHTML();
-    initFB();
-
-    if (!myName) {
-      showNameModal();
-    } else {
-      afterName();
-    }
+    if (!myName) showNameModal();
+    else afterName();
   }
 
-  /* ── Name Modal ── */
+  /* ══════════════════════════════════════════
+     NAME MODAL
+  ══════════════════════════════════════════ */
   function showNameModal() {
-    const m = document.getElementById('_sh_nameModal');
+    const m = document.getElementById('_sh_nm');
     if (m) m.style.display = 'flex';
-    const inp = document.getElementById('_sh_nameInp');
+    const inp = document.getElementById('_sh_nminp');
     if (inp) {
-      inp.focus();
+      setTimeout(() => inp.focus(), 100);
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') confirmName(); });
     }
-    document.getElementById('_sh_nameBtn').addEventListener('click', confirmName);
+    const btn = document.getElementById('_sh_nmbtn');
+    if (btn) btn.addEventListener('click', confirmName);
   }
 
   function confirmName() {
-    const val = (document.getElementById('_sh_nameInp').value || '').trim();
-    if (!val) { document.getElementById('_sh_nameInp').focus(); return; }
-    myName = val;
-    localStorage.setItem('lbName', myName);
-    // Propagate to all game name keys so games pick it up
-    ['lbName', 'wwName', 'unoName', 'spyName', 'gbPlayerName', 'wwPlayerName'].forEach(k => localStorage.setItem(k, myName));
-    document.getElementById('_sh_nameModal').style.display = 'none';
+    const v = (document.getElementById('_sh_nminp').value || '').trim();
+    if (!v) { document.getElementById('_sh_nminp').focus(); return; }
+    myName = v;
+    localStorage.setItem('lbName', v);
+    // Sync to all game name keys
+    ['lbName','wwName','unoName','spyName','gbPlayerName','wwPlayerName'].forEach(k => localStorage.setItem(k, v));
+    document.getElementById('_sh_nm').style.display = 'none';
     afterName();
   }
 
   function afterName() {
+    getDB();
     startOnlineTracking();
     buildVoiceWidget();
   }
 
-  /* ── Online Tracking ── */
+  /* ══════════════════════════════════════════
+     ONLINE + LEADERBOARD TRACKING
+  ══════════════════════════════════════════ */
   let sessionStart = Date.now();
+
   function startOnlineTracking() {
-    if (!sdb) { setTimeout(startOnlineTracking, 500); return; }
-    const ref = sdb.ref('shared/online/' + myId);
+    const db = getDB();
+    if (!db) { setTimeout(startOnlineTracking, 600); return; }
+    const ref = db.ref('shared/online/' + myId);
     ref.set({ name: myName, since: Date.now() });
     ref.onDisconnect().remove();
-
-    // On unload, save session duration
+    // Ensure LB entry exists with correct name
+    db.ref('shared/lb2/' + lbKey(myName)).transaction(cur => {
+      if (!cur) return { name: myName, points: 0, onlineMs: 0, wins: 0, games: 0, lastSeen: Date.now() };
+      return { ...cur, name: myName, lastSeen: Date.now() };
+    });
     window.addEventListener('beforeunload', () => {
-      const ms = Date.now() - sessionStart;
-      updateOnlineTime(ms);
+      saveOnlineTime();
       ref.remove();
     });
-
-    // Periodic heartbeat every 30s (also saves time)
-    setInterval(() => {
-      ref.update({ name: myName, since: sessionStart, beat: Date.now() });
-    }, 30000);
+    // Heartbeat every 60s
+    setInterval(() => ref.update({ name: myName, beat: Date.now() }), 60000);
+    // Save time every 5 min
+    setInterval(saveOnlineTime, 300000);
   }
 
-  function updateOnlineTime(ms) {
-    if (!sdb || ms < 5000) return;
-    sdb.ref('shared/lb/' + myId).transaction(cur => {
+  function saveOnlineTime() {
+    const db = getDB();
+    if (!db) return;
+    const ms = Date.now() - sessionStart;
+    if (ms < 5000) return;
+    sessionStart = Date.now(); // reset so we don't double-count
+    db.ref('shared/lb2/' + lbKey(myName)).transaction(cur => {
       if (!cur) return { name: myName, points: 0, onlineMs: ms, wins: 0, games: 0, lastSeen: Date.now() };
       return { ...cur, name: myName, onlineMs: (cur.onlineMs || 0) + ms, lastSeen: Date.now() };
     });
   }
 
-  /* ── Score Tracking ── */
   function addPoints(name, uid, pts) {
-    if (!sdb || !pts) return;
-    const n = name || myName; const u = uid || myId;
-    sdb.ref('shared/lb/' + u).transaction(cur => {
+    const db = getDB();
+    if (!db || !pts) return;
+    const n = name || myName;
+    db.ref('shared/lb2/' + lbKey(n)).transaction(cur => {
       if (!cur) return { name: n, points: pts, onlineMs: 0, wins: 0, games: 1, lastSeen: Date.now() };
       return { ...cur, name: n, points: (cur.points || 0) + pts, games: (cur.games || 0) + 1, lastSeen: Date.now() };
     });
   }
 
   function addWin(name, uid) {
-    if (!sdb) return;
-    const n = name || myName; const u = uid || myId;
-    sdb.ref('shared/lb/' + u).transaction(cur => {
+    const db = getDB();
+    if (!db) return;
+    const n = name || myName;
+    db.ref('shared/lb2/' + lbKey(n)).transaction(cur => {
       if (!cur) return { name: n, points: 0, onlineMs: 0, wins: 1, games: 1, lastSeen: Date.now() };
       return { ...cur, name: n, wins: (cur.wins || 0) + 1, lastSeen: Date.now() };
     });
   }
 
-  /* ═══════════════════════════════════════════
-     VOICE CHAT — WebRTC Mesh
-  ═══════════════════════════════════════════ */
-  const peers = {};       // uid → RTCPeerConnection
-  const streams = {};     // uid → MediaStream
+  /* ══════════════════════════════════════════
+     VOICE CHAT — WebRTC
+     Architecture: each peer stores signaling
+     under shared/voice/sig/{targetId}/{msgId}
+  ══════════════════════════════════════════ */
+  const pcs   = {};   // peerId → RTCPeerConnection
   let localStream = null;
-  let inCall = false;
+  let inVoice = false;
+  let voiceRoomRef = null;
+  let sigListener = null;
 
   function buildVoiceWidget() {
-    const widget = document.getElementById('_sh_voice');
-    if (!widget) return;
-    document.getElementById('_sh_voiceBtn').addEventListener('click', toggleVoice);
-    document.getElementById('_sh_lbBtn').addEventListener('click', () => window.open('leaderboard.html', '_blank'));
-    listenVoiceRoom();
+    document.getElementById('_sh_vcbtn').addEventListener('click', toggleVoice);
+    document.getElementById('_sh_lbbtn').addEventListener('click', () => {
+      window.open('leaderboard.html', '_blank');
+    });
+    // Watch room presence always (to show who's in voice)
+    const db = getDB();
+    if (!db) { setTimeout(buildVoiceWidget, 500); return; }
+    db.ref('shared/voice/room').on('value', snap => updateVoiceList(snap.val() || {}));
   }
 
   async function toggleVoice() {
-    if (inCall) {
-      leaveVoice();
-    } else {
-      await joinVoice();
-    }
+    if (inVoice) leaveVoice();
+    else await joinVoice();
   }
 
   async function joinVoice() {
-    if (!sdb) { showToast('Koneksi belum siap...'); return; }
+    const db = getDB();
+    if (!db) { showToast('Koneksi belum siap...'); return; }
+
+    // Request mic
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     } catch (e) {
-      showToast('❌ Tidak bisa akses mikrofon. Cek izin browser!');
+      if (e.name === 'NotAllowedError') showToast('❌ Izin mikrofon ditolak. Cek pengaturan browser!');
+      else if (e.name === 'NotFoundError') showToast('❌ Mikrofon tidak ditemukan!');
+      else showToast('❌ Gagal akses mikrofon: ' + e.message);
       return;
     }
-    inCall = true;
+
+    inVoice = true;
     updateVoiceBtn();
-    showToast('🎙️ Kamu bergabung ke voice chat!');
 
-    const myPeerRef = sdb.ref('shared/voice/peers/' + myId);
-    myPeerRef.set({ name: myName, joined: Date.now() });
-    myPeerRef.onDisconnect().remove();
+    // Announce presence
+    voiceRoomRef = db.ref('shared/voice/room/' + myId);
+    voiceRoomRef.set({ name: myName, joined: Date.now() });
+    voiceRoomRef.onDisconnect().remove();
+    showToast('🎙️ Gabung voice chat!');
 
-    // Listen for incoming signals
-    sdb.ref('shared/voice/sig/' + myId).on('child_added', snap => {
-      handleSignal(snap.key, snap.val());
+    // Listen for incoming signals (offers/answers/ICE)
+    const mySigRef = db.ref('shared/voice/sig/' + myId);
+    mySigRef.remove(); // clear old signals
+    sigListener = mySigRef.on('child_added', snap => {
+      const data = snap.val();
       snap.ref.remove();
+      if (data) handleSignal(data);
+    });
+
+    // Connect to everyone already in room
+    db.ref('shared/voice/room').once('value', snap => {
+      const room = snap.val() || {};
+      Object.keys(room).forEach(peerId => {
+        if (peerId !== myId) {
+          createPC(peerId, true); // we send offer to existing members
+        }
+      });
     });
   }
 
   function leaveVoice() {
-    inCall = false;
-    Object.keys(peers).forEach(uid => closePeer(uid));
+    inVoice = false;
+    Object.keys(pcs).forEach(id => closePC(id));
     if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
-    if (sdb) {
-      sdb.ref('shared/voice/peers/' + myId).remove();
-      sdb.ref('shared/voice/sig/' + myId).remove();
+    const db = getDB();
+    if (db) {
+      if (voiceRoomRef) voiceRoomRef.remove();
+      if (sigListener) db.ref('shared/voice/sig/' + myId).off('child_added', sigListener);
+      db.ref('shared/voice/sig/' + myId).remove();
     }
     updateVoiceBtn();
-    updateVoiceList({});
-    showToast('🔇 Kamu keluar dari voice chat');
+    showToast('🔇 Keluar dari voice chat');
   }
 
-  function listenVoiceRoom() {
-    if (!sdb) { setTimeout(listenVoiceRoom, 500); return; }
-    sdb.ref('shared/voice/peers').on('value', snap => {
-      const peers_data = snap.val() || {};
-      updateVoiceList(peers_data);
+  function createPC(peerId, isOfferer) {
+    if (pcs[peerId]) return pcs[peerId];
+    const db = getDB();
+    if (!db) return null;
 
-      if (!inCall) return;
+    const pc = new RTCPeerConnection(ICE);
+    pcs[peerId] = pc;
 
-      // Connect to new peers
-      Object.keys(peers_data).forEach(uid => {
-        if (uid !== myId && !peers[uid]) {
-          createPeerConnection(uid, true); // we initiate offer
-        }
-      });
-
-      // Disconnect from removed peers
-      Object.keys(peers).forEach(uid => {
-        if (!peers_data[uid]) closePeer(uid);
-      });
-    });
-  }
-
-  function createPeerConnection(uid, isInitiator) {
-    if (peers[uid]) return;
-    const pc = new RTCPeerConnection(STUN);
-    peers[uid] = pc;
-
-    // Add local stream
+    // Add local tracks
     if (localStream) {
       localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
     }
 
-    // Handle remote audio
-    pc.ontrack = e => {
-      streams[uid] = e.streams[0];
-      playRemoteAudio(uid, e.streams[0]);
+    // Receive remote audio
+    pc.ontrack = evt => {
+      const stream = evt.streams[0];
+      if (!stream) return;
+      let audio = document.getElementById('_sh_aud_' + peerId);
+      if (!audio) {
+        audio = document.createElement('audio');
+        audio.id = '_sh_aud_' + peerId;
+        audio.autoplay = true;
+        audio.playsInline = true;
+        document.body.appendChild(audio);
+      }
+      audio.srcObject = stream;
+      // Force play (handle autoplay policy)
+      audio.play().catch(() => {
+        // Need user gesture — add click-to-unmute
+        showToast('🔊 Klik di mana saja untuk aktifkan suara');
+        const unlock = () => { audio.play(); document.removeEventListener('click', unlock); };
+        document.addEventListener('click', unlock);
+      });
     };
 
-    // ICE candidates
+    // Send ICE candidates to peer
     pc.onicecandidate = e => {
-      if (e.candidate && sdb) {
-        sdb.ref('shared/voice/sig/' + uid).push({
-          from: myId, type: 'ice', candidate: JSON.stringify(e.candidate)
-        });
-      }
+      if (!e.candidate || !db) return;
+      db.ref('shared/voice/sig/' + peerId).push({
+        from: myId, type: 'ice',
+        candidate: e.candidate.candidate,
+        sdpMid: e.candidate.sdpMid,
+        sdpMLineIndex: e.candidate.sdpMLineIndex
+      });
     };
 
     pc.onconnectionstatechange = () => {
-      if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
-        closePeer(uid);
+      if (['disconnected','failed','closed'].includes(pc.connectionState)) {
+        closePC(peerId);
       }
     };
 
-    if (isInitiator) {
-      pc.createOffer().then(offer => {
-        pc.setLocalDescription(offer);
-        if (sdb) sdb.ref('shared/voice/sig/' + uid).push({ from: myId, type: 'offer', sdp: offer.sdp });
-      });
+    if (isOfferer) {
+      pc.onnegotiationneeded = async () => {
+        try {
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+          db.ref('shared/voice/sig/' + peerId).push({
+            from: myId, type: 'offer', sdp: pc.localDescription.sdp
+          });
+        } catch(e) { console.warn('offer err', e); }
+      };
     }
 
     return pc;
   }
 
-  async function handleSignal(fromUid, data) {
-    if (!data || !inCall) return;
-    const { type, sdp, candidate, from } = data;
-    const uid = from || fromUid;
-    if (!uid || uid === myId) return;
+  async function handleSignal(data) {
+    if (!data || !inVoice) return;
+    const { from, type, sdp, candidate, sdpMid, sdpMLineIndex } = data;
+    if (!from || from === myId) return;
+    const db = getDB();
 
     if (type === 'offer') {
-      const pc = createPeerConnection(uid, false);
-      await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp }));
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      if (sdb) sdb.ref('shared/voice/sig/' + uid).push({ from: myId, type: 'answer', sdp: answer.sdp });
-    } else if (type === 'answer') {
-      if (peers[uid]) {
-        await peers[uid].setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp })).catch(() => {});
+      let pc = pcs[from];
+      if (!pc) pc = createPC(from, false);
+      if (!pc) return;
+      try {
+        await pc.setRemoteDescription({ type: 'offer', sdp });
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        db.ref('shared/voice/sig/' + from).push({
+          from: myId, type: 'answer', sdp: pc.localDescription.sdp
+        });
+      } catch(e) { console.warn('answer err', e); }
+    }
+    else if (type === 'answer') {
+      const pc = pcs[from];
+      if (pc && pc.signalingState !== 'stable') {
+        try { await pc.setRemoteDescription({ type: 'answer', sdp }); } catch(e) { console.warn('set answer err', e); }
       }
-    } else if (type === 'ice') {
-      if (peers[uid] && candidate) {
-        try { await peers[uid].addIceCandidate(new RTCIceCandidate(JSON.parse(candidate))); } catch (e) {}
+    }
+    else if (type === 'ice') {
+      const pc = pcs[from];
+      if (pc && candidate) {
+        try {
+          await pc.addIceCandidate({ candidate, sdpMid, sdpMLineIndex });
+        } catch(e) { /* ignore */ }
       }
     }
   }
 
-  function closePeer(uid) {
-    if (peers[uid]) { try { peers[uid].close(); } catch (e) {} delete peers[uid]; }
-    const el = document.getElementById('_sh_audio_' + uid);
-    if (el) el.remove();
-    delete streams[uid];
-  }
-
-  function playRemoteAudio(uid, stream) {
-    let el = document.getElementById('_sh_audio_' + uid);
-    if (!el) {
-      el = document.createElement('audio');
-      el.id = '_sh_audio_' + uid;
-      el.autoplay = true;
-      document.body.appendChild(el);
-    }
-    el.srcObject = stream;
+  function closePC(peerId) {
+    if (pcs[peerId]) { try { pcs[peerId].close(); } catch(e) {} delete pcs[peerId]; }
+    const a = document.getElementById('_sh_aud_' + peerId);
+    if (a) { a.srcObject = null; a.remove(); }
   }
 
   function updateVoiceBtn() {
-    const btn = document.getElementById('_sh_voiceBtn');
+    const btn = document.getElementById('_sh_vcbtn');
     if (!btn) return;
-    if (inCall) {
-      btn.innerHTML = '🔴';
-      btn.title = 'Keluar dari voice chat';
+    if (inVoice) {
+      btn.innerHTML = '🔴<span id="_sh_vccnt"></span>';
+      btn.title = 'Keluar voice chat';
       btn.style.background = 'linear-gradient(135deg,#dc2626,#b91c1c)';
+      btn.style.animation = 'sh_pulse 2s ease infinite';
     } else {
-      btn.innerHTML = '🎙️';
+      btn.innerHTML = '🎙️<span id="_sh_vccnt"></span>';
       btn.title = 'Masuk voice chat';
       btn.style.background = 'linear-gradient(135deg,#1d3461,#0f3460)';
+      btn.style.animation = '';
     }
   }
 
-  function updateVoiceList(peersData) {
-    const list = document.getElementById('_sh_voiceList');
+  function updateVoiceList(roomData) {
+    const list = document.getElementById('_sh_vclist');
+    const panel = document.getElementById('_sh_vcpanel');
     if (!list) return;
-    const entries = Object.entries(peersData);
+    const entries = Object.entries(roomData);
+    const cnt = document.getElementById('_sh_vccnt');
+    if (cnt) cnt.textContent = entries.length > 0 ? entries.length : '';
+    if (panel) panel.style.display = (entries.length > 0 || inVoice) ? 'block' : 'none';
     list.innerHTML = entries.length === 0
-      ? '<div style="color:rgba(255,255,255,.3);font-size:.72rem;text-align:center;padding:.3rem">Belum ada yang di voice</div>'
+      ? '<p style="color:rgba(255,255,255,.3);font-size:.72rem;text-align:center;margin:.3rem 0">Kosong — klik 🎙️ untuk gabung!</p>'
       : entries.map(([uid, p]) =>
-        `<div style="display:flex;align-items:center;gap:.4rem;padding:.25rem 0;">
-          <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;${uid===myId?'box-shadow:0 0 6px #22c55e;':''}"></div>
-          <span style="font-size:.75rem;font-weight:600;color:${uid===myId?'#e8c97a':'#fff'}">${esc(p.name||'?')}${uid===myId?' (kamu)':''}</span>
-        </div>`).join('');
-    // Show/hide panel
-    const panel = document.getElementById('_sh_voicePanel');
-    if (panel) panel.style.display = entries.length > 0 || inCall ? 'block' : 'none';
-    document.getElementById('_sh_voiceCount').textContent = entries.length || '';
+          `<div style="display:flex;align-items:center;gap:.45rem;padding:.22rem 0">
+            <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0${uid===myId?';box-shadow:0 0 6px #22c55e':''};"></span>
+            <span style="font-size:.77rem;font-weight:600;color:${uid===myId?'#e8c97a':'#fff'}">${esc(p.name||'?')}${uid===myId?' (kamu)':''}</span>
+          </div>`).join('');
+
+    // Connect to newly arrived peers
+    if (inVoice) {
+      entries.forEach(([peerId]) => {
+        if (peerId !== myId && !pcs[peerId]) createPC(peerId, true);
+      });
+      // Disconnect from left peers
+      Object.keys(pcs).forEach(peerId => {
+        if (!roomData[peerId]) closePC(peerId);
+      });
+    }
   }
 
-  /* ── Toast ── */
+  /* ══════════════════════════════════════════
+     TOAST
+  ══════════════════════════════════════════ */
   function showToast(msg) {
-    let t = document.getElementById('_sh_toast');
+    const t = document.getElementById('_sh_toast');
     if (!t) return;
     t.textContent = msg; t.style.opacity = '1';
-    clearTimeout(window._shtt);
-    window._shtt = setTimeout(() => { t.style.opacity = '0'; }, 2800);
+    clearTimeout(window._shTT);
+    window._shTT = setTimeout(() => { t.style.opacity = '0'; }, 3000);
   }
 
-  /* ── Escape HTML ── */
-  function esc(t) { return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function esc(t) { return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  /* ════════════════════════════════════════
-     INJECT STYLES
-  ════════════════════════════════════════ */
+  /* ══════════════════════════════════════════
+     STYLES
+  ══════════════════════════════════════════ */
   function injectStyles() {
-    if (document.getElementById('_sh_styles')) return;
+    if (document.getElementById('_sh_css')) return;
     const s = document.createElement('style');
-    s.id = '_sh_styles';
+    s.id = '_sh_css';
     s.textContent = `
-      #_sh_nameModal{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:9999;display:none;align-items:center;justify-content:center;padding:1rem;font-family:'DM Sans',sans-serif;}
-      #_sh_nameModal .nm-card{background:#111827;border-radius:24px;padding:2.5rem 2rem;max-width:400px;width:100%;text-align:center;border:1px solid rgba(255,255,255,.12);}
-      #_sh_nameModal .nm-icon{font-size:3.5rem;margin-bottom:.8rem;}
-      #_sh_nameModal .nm-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#fff;margin-bottom:.3rem;}
-      #_sh_nameModal .nm-title em{color:#e8c97a;font-style:italic;}
-      #_sh_nameModal .nm-sub{font-size:.84rem;color:rgba(255,255,255,.4);margin-bottom:1.5rem;line-height:1.6;}
-      #_sh_nameInp{width:100%;padding:.85rem 1.2rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:50px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;text-align:center;margin-bottom:.9rem;transition:border-color .2s;}
-      #_sh_nameInp::placeholder{color:rgba(255,255,255,.3);}
-      #_sh_nameInp:focus{border-color:#c9a84c;}
-      #_sh_nameBtn{width:100%;padding:.9rem;background:linear-gradient(135deg,#c9a84c,#e8c97a);color:#0a1628;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;}
-      #_sh_nameBtn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,.4);}
+@keyframes sh_pulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.5)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
 
-      #_sh_voice{position:fixed;bottom:1.2rem;left:1.2rem;z-index:900;font-family:'DM Sans',sans-serif;}
-      #_sh_voiceBtn{width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.18);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5);transition:all .2s;background:linear-gradient(135deg,#1d3461,#0f3460);position:relative;}
-      #_sh_voiceBtn:hover{transform:scale(1.08);}
-      #_sh_voiceCount{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;border-radius:50%;background:#22c55e;color:#fff;font-size:.55rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;border:1.5px solid #0a1628;}
-      #_sh_lbBtn{width:46px;height:46px;border-radius:50%;border:1px solid rgba(201,168,76,.3);color:#e8c97a;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5);transition:all .2s;background:linear-gradient(135deg,#0a1628,#1d3461);margin-top:.5rem;}
-      #_sh_lbBtn:hover{transform:scale(1.08);border-color:#e8c97a;}
-      #_sh_voicePanel{display:none;position:absolute;bottom:50px;left:0;width:200px;background:#111827;border-radius:14px;padding:.9rem;border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 32px rgba(0,0,0,.6);}
-      #_sh_vpHead{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:#c9a84c;font-weight:600;margin-bottom:.55rem;}
-      #_sh_voiceList{display:flex;flex-direction:column;}
+#_sh_nm{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:9999;display:none;align-items:center;justify-content:center;padding:1rem;font-family:'DM Sans',sans-serif;}
+._sh_nmc{background:#111827;border-radius:26px;padding:2.5rem 2rem;max-width:400px;width:100%;text-align:center;border:1px solid rgba(255,255,255,.12);}
+._sh_nmi{font-size:3.5rem;margin-bottom:.7rem;display:block;}
+._sh_nmt{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#fff;margin-bottom:.25rem;}
+._sh_nmt em{color:#e8c97a;font-style:italic;}
+._sh_nms{font-size:.83rem;color:rgba(255,255,255,.4);margin-bottom:1.5rem;line-height:1.6;}
+#_sh_nminp{width:100%;padding:.85rem 1.2rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:50px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;text-align:center;margin-bottom:.9rem;transition:border-color .2s;}
+#_sh_nminp::placeholder{color:rgba(255,255,255,.3);}
+#_sh_nminp:focus{border-color:#c9a84c;}
+#_sh_nmbtn{width:100%;padding:.9rem;background:linear-gradient(135deg,#c9a84c,#e8c97a);color:#0a1628;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;}
+#_sh_nmbtn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,.4);}
 
-      #_sh_toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.95);backdrop-filter:blur(10px);color:#fff;padding:.62rem 1.4rem;border-radius:50px;font-size:.82rem;font-weight:500;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(201,168,76,.22);white-space:nowrap;max-width:90vw;}
+#_sh_vc{position:fixed;bottom:1.2rem;left:1.2rem;z-index:900;display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+#_sh_vcbtn,#_sh_lbbtn{width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.18);color:#fff;font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5);transition:background .25s,transform .18s;position:relative;line-height:1;}
+#_sh_vcbtn{background:linear-gradient(135deg,#1d3461,#0f3460);}
+#_sh_lbbtn{background:linear-gradient(135deg,#0a1628,#1d3461);border-color:rgba(201,168,76,.3);color:#e8c97a;}
+#_sh_vcbtn:hover,#_sh_lbbtn:hover{transform:scale(1.1);}
+#_sh_vccnt{position:absolute;top:-3px;right:-3px;min-width:15px;height:15px;border-radius:50%;background:#22c55e;color:#fff;font-size:.52rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 2px;border:1.5px solid #0a1628;pointer-events:none;}
+#_sh_vcpanel{display:none;position:absolute;bottom:52px;left:0;width:200px;background:#111827;border-radius:14px;padding:.9rem;border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 32px rgba(0,0,0,.6);}
+._sh_vph{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:#c9a84c;font-weight:700;margin-bottom:.5rem;}
+#_sh_vclist{}
 
-      @media(max-width:480px){
-        #_sh_voice{bottom:.75rem;left:.75rem;}
-        #_sh_voiceBtn,#_sh_lbBtn{width:40px;height:40px;font-size:1rem;}
-      }
-    `;
+#_sh_toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.95);backdrop-filter:blur(10px);color:#fff;padding:.62rem 1.4rem;border-radius:50px;font-size:.82rem;font-weight:500;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(201,168,76,.22);white-space:nowrap;max-width:92vw;}
+
+@media(max-width:480px){
+  #_sh_vc{bottom:.75rem;left:.75rem;}
+  #_sh_vcbtn,#_sh_lbbtn{width:40px;height:40px;font-size:1rem;}
+}`;
     document.head.appendChild(s);
   }
 
-  /* ════════════════════════════════════════
-     INJECT HTML
-  ════════════════════════════════════════ */
+  /* ══════════════════════════════════════════
+     HTML
+  ══════════════════════════════════════════ */
   function injectHTML() {
-    if (document.getElementById('_sh_nameModal')) return;
+    if (document.getElementById('_sh_nm')) return;
 
     // Name modal
     const nm = document.createElement('div');
-    nm.id = '_sh_nameModal';
-    nm.innerHTML = `<div class="nm-card">
-      <div class="nm-icon">🏰</div>
-      <div class="nm-title">Angkatan <em>XVI</em></div>
-      <div class="nm-sub">Masukkan namamu untuk bermain, chat, dan bergabung ke voice chat bersama teman-teman!</div>
-      <input id="_sh_nameInp" placeholder="Nama kamu..." maxlength="24" autocomplete="off">
-      <button id="_sh_nameBtn">Masuk ✦</button>
+    nm.id = '_sh_nm';
+    nm.innerHTML = `<div class="_sh_nmc">
+      <span class="_sh_nmi">🏰</span>
+      <div class="_sh_nmt">Angkatan <em>XVI</em></div>
+      <div class="_sh_nms">Masukkan namamu untuk mulai bermain, melihat leaderboard, dan gabung voice chat!</div>
+      <input id="_sh_nminp" placeholder="Nama kamu..." maxlength="24" autocomplete="off">
+      <button id="_sh_nmbtn">Masuk ✦</button>
     </div>`;
     document.body.appendChild(nm);
 
     // Voice widget
     const vc = document.createElement('div');
-    vc.id = '_sh_voice';
+    vc.id = '_sh_vc';
     vc.innerHTML = `
-      <div id="_sh_voicePanel">
-        <div id="_sh_vpHead">🎙️ Voice Chat</div>
-        <div id="_sh_voiceList"></div>
+      <div id="_sh_vcpanel">
+        <div class="_sh_vph">🎙️ Voice Chat</div>
+        <div id="_sh_vclist"></div>
       </div>
-      <button id="_sh_voiceBtn" title="Voice Chat">🎙️<span id="_sh_voiceCount"></span></button>
-      <button id="_sh_lbBtn" title="Leaderboard">🏆</button>`;
+      <button id="_sh_vcbtn">🎙️<span id="_sh_vccnt"></span></button>
+      <button id="_sh_lbbtn" title="Leaderboard">🏆</button>`;
     document.body.appendChild(vc);
 
-    // Toggle panel on hover/click of voice area
-    const btn = document.getElementById('_sh_voiceBtn');
-    btn.addEventListener('mouseenter', () => {
-      const panel = document.getElementById('_sh_voicePanel');
-      if (panel) panel.style.display = 'block';
+    // Hover to show panel
+    vc.addEventListener('mouseenter', () => {
+      const p = document.getElementById('_sh_vcpanel');
+      if (p) p.style.display = 'block';
     });
     vc.addEventListener('mouseleave', () => {
-      if (!inCall) {
-        const panel = document.getElementById('_sh_voicePanel');
-        if (panel) panel.style.display = 'none';
-      }
+      const p = document.getElementById('_sh_vcpanel');
+      if (p && !inVoice) p.style.display = 'none';
     });
 
     // Toast
