@@ -284,60 +284,96 @@ const TASKS_PER_PLAYER=3;
 const MEETING_SECS=40;
 
 // Map rooms
-const MAP_W=1200, MAP_H=800;
-const ROOMS=[
-  {name:'Kafe',         x:60,  y:60,  w:280, h:200, col:'#1a2e1a', light:'#2d4d2d'},
-  {name:'Lab',          x:460, y:60,  w:280, h:200, col:'#1a1a2e', light:'#2d2d4d'},
-  {name:'Mesin',        x:860, y:60,  w:280, h:200, col:'#2e1a1a', light:'#4d2d2d'},
-  {name:'Koridor Atas', x:340, y:80,  w:120, h:160, col:'#1e1e1e', light:'#2a2a2a'},
-  {name:'Koridor Kiri', x:80,  y:260, w:160, h:280, col:'#1e1e1e', light:'#2a2a2a'},
-  {name:'Pusat',        x:380, y:280, w:440, h:240, col:'#1e2a1e', light:'#2a3d2a'},
-  {name:'Mekanik',      x:860, y:260, w:280, h:200, col:'#2a1e2a', light:'#3d2a3d'},
-  {name:'Gudang',       x:60,  y:560, w:280, h:200, col:'#2a2a1e', light:'#3d3d2a'},
-  {name:'Reaktor',      x:460, y:540, w:280, h:220, col:'#2e1a1a', light:'#4d2d2d'},
-  {name:'Engine',       x:860, y:480, w:280, h:280, col:'#1a1e2a', light:'#2a2d3d'},
-  {name:'Vent Atas L',  x:340, y:60,  w:120, h:20,  col:'#111',    light:'#222'},
-  {name:'Vent Bawah',   x:460, y:760, w:280, h:20,  col:'#111',    light:'#222'},
+const MAP_W=1400, MAP_H=960;
+
+/*
+  Map layout — spaceship "Skeld" style
+  All positions are floor rectangles that are WALKABLE.
+  Everything outside these rects = solid wall.
+  Rooms + corridors are both listed here.
+  Corridors are narrow (width ~68px) to force single-file passage.
+*/
+const WALKABLE = [
+  // ── ROOMS ──
+  // Kafetaria (top-center, large)
+  {x:420, y:70,  w:360, h:250, room:'Kafetaria',     col:'#1c2e1c', floor:'#243524', accent:'#3a5a3a'},
+  // Lab / MedBay (top-right)
+  {x:920, y:70,  w:240, h:200, room:'Lab',           col:'#1a1a2e', floor:'#22223d', accent:'#35358f'},
+  // Listrik (top-left)
+  {x:90,  y:70,  w:240, h:200, room:'Listrik',       col:'#2e2200', floor:'#3d2e00', accent:'#8f6e00'},
+  // Engine Kiri (mid-left)
+  {x:50,  y:370, w:170, h:240, room:'Engine Kiri',   col:'#1a0a0a', floor:'#2a1010', accent:'#8b2222'},
+  // Security (center)
+  {x:490, y:440, w:200, h:180, room:'Security',      col:'#0a1a2e', floor:'#0e243d', accent:'#1a5276'},
+  // Komunikasi (center-right)
+  {x:810, y:440, w:200, h:180, room:'Komuni',        col:'#1a0a2e', floor:'#24103d', accent:'#4a235a'},
+  // Engine Kanan (far-right)
+  {x:1150,y:370, w:170, h:240, room:'Engine Kanan',  col:'#1a0a0a', floor:'#2a1010', accent:'#8b2222'},
+  // Storage (bottom-left)
+  {x:90,  y:720, w:240, h:200, room:'Storage',       col:'#2e2800', floor:'#3d3500', accent:'#7a6800'},
+  // Navigasi (bottom-center)
+  {x:420, y:740, w:360, h:180, room:'Navigasi',      col:'#001a2e', floor:'#00243d', accent:'#00698f'},
+  // Reaktor (bottom-right)
+  {x:920, y:680, w:240, h:250, room:'Reaktor',       col:'#2e0000', floor:'#3d0000', accent:'#8f0000'},
+
+  // ── CORRIDORS ──
+  // Kafetaria ↔ Listrik (top horizontal left)
+  {x:330, y:140, w:90,  h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Kafetaria ↔ Lab (top horizontal right)
+  {x:780, y:120, w:140, h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Kafetaria ↔ Security (vertical center-left)
+  {x:514, y:320, w:68,  h:120, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Kafetaria ↔ Komuni (vertical center-right)
+  {x:836, y:320, w:68,  h:120, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Listrik ↔ Engine Kiri (left vertical)
+  {x:100, y:270, w:68,  h:100, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Engine Kiri ↔ Storage (far-left vertical)
+  {x:100, y:610, w:68,  h:110, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Storage ↔ Navigasi (bottom horizontal left)
+  {x:330, y:762, w:90,  h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Navigasi ↔ Reaktor (bottom horizontal right)
+  {x:780, y:762, w:140, h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Reaktor ↔ Engine Kanan (right vertical)
+  {x:1200,y:610, w:68,  h:70,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Engine Kanan ↔ Lab (right top vertical)
+  {x:1200,y:270, w:68,  h:100, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Security ↔ Komuni (center horizontal)
+  {x:690, y:490, w:120, h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Komuni ↔ Engine Kanan (right horizontal)
+  {x:1010,y:490, w:140, h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Security ↔ Storage (lower-left vertical)
+  {x:180, y:490, w:68,  h:230, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // Reaktor ↔ Navigasi side connection
+  {x:920, y:760, w:68,  h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
 ];
 
-const WALLS=[
-  // Outer walls
-  {x:40,y:40,w:1120,h:20},{x:40,y:740,w:1120,h:20},
-  {x:40,y:40,w:20,h:720},{x:1140,y:40,w:20,h:720},
-  // Inner dividers
-  {x:340,y:60,w:20,h:200},{x:460,y:60,w:20,h:200},
-  {x:740,y:60,w:20,h:200},{x:860,y:60,w:20,h:200},
-  {x:60,y:260,w:320,h:20},{x:500,y:260,w:600,h:20},
-  {x:340,y:200,w:140,h:80},
-  {x:60,y:520,w:320,h:20},{x:380,y:520,w:460,h:20},{x:860,y:460,w:280,h:20},
-  {x:380,y:260,w:20,h:260},{x:820,y:260,w:20,h:260},
-];
+// Rooms for label/style lookup (name, display info)
+const ROOMS = WALKABLE.filter(w=>w.room);
 
-// Task positions (roomName, x, y, id)
+// Task positions
 const TASK_SPOTS=[
-  {id:'t0',room:'Kafe',       x:120, y:140, label:'Tuang Kopi ☕',    type:'mash'},
-  {id:'t1',room:'Kafe',       x:240, y:100, label:'Bersihkan Meja 🧹',type:'mash'},
-  {id:'t2',room:'Lab',        x:520, y:120, label:'Kalibrasi Mesin 🔧',type:'wire'},
-  {id:'t3',room:'Lab',        x:660, y:160, label:'Scan Sampel 🔬',    type:'scan'},
-  {id:'t4',room:'Mesin',      x:920, y:100, label:'Isi BBM ⛽',        type:'mash'},
-  {id:'t5',room:'Mesin',      x:1060,y:160, label:'Sambung Kabel 🔌',  type:'wire'},
-  {id:'t6',room:'Pusat',      x:500, y:360, label:'Perbaiki Panel 🗂', type:'wire'},
-  {id:'t7',room:'Pusat',      x:660, y:320, label:'Cek CCTV 📹',       type:'simon'},
-  {id:'t8',room:'Reaktor',    x:520, y:600, label:'Reaktor Nuklir ☢', type:'scan'},
-  {id:'t9',room:'Gudang',     x:140, y:620, label:'Sortir Kotak 📦',   type:'mash'},
-  {id:'t10',room:'Mekanik',   x:940, y:320, label:'Ganti Busi 🔩',     type:'wire'},
-  {id:'t11',room:'Engine',    x:980, y:540, label:'Engine Check 🚀',   type:'simon'},
+  {id:'t0', x:160,  y:140, label:'Tuang Kopi ☕',     type:'mash'},
+  {id:'t1', x:240,  y:120, label:'Perbaiki Kabel ⚡', type:'wire'},
+  {id:'t2', x:980,  y:120, label:'Scan MedBay 🔬',    type:'scan'},
+  {id:'t3', x:1050, y:180, label:'Kalibrasi Lab 🧪',  type:'wire'},
+  {id:'t4', x:490,  y:140, label:'Data Upload 💻',    type:'simon'},
+  {id:'t5', x:680,  y:160, label:'Bersihkan Filter 🧹',type:'mash'},
+  {id:'t6', x:550,  y:500, label:'Cek CCTV 📹',       type:'simon'},
+  {id:'t7', x:870,  y:500, label:'Dekripsi Sinyal 📡', type:'wire'},
+  {id:'t8', x:980,  y:740, label:'Reaktor Nuklir ☢',  type:'scan'},
+  {id:'t9', x:160,  y:790, label:'Sortir Kargo 📦',    type:'mash'},
+  {id:'t10',x:500,  y:810, label:'Navigasi Plot 🗺',   type:'simon'},
+  {id:'t11',x:100,  y:450, label:'Engine Kiri 🔧',     type:'mash'},
+  {id:'t12',x:1210, y:450, label:'Engine Kanan 🔧',    type:'mash'},
 ];
 
-const VENT_PAIRS=[
-  ['v0','v1'],['v0','v2'],['v1','v2'],['v3','v4']
-];
+const VENT_PAIRS=[['v0','v1'],['v1','v2'],['v2','v3'],['v3','v4']];
 const VENTS=[
-  {id:'v0',x:180,y:480,room:'Koridor Kiri'},
-  {id:'v1',x:600,y:400,room:'Pusat'},
-  {id:'v2',x:960,y:360,room:'Mekanik'},
-  {id:'v3',x:200,y:650,room:'Gudang'},
-  {id:'v4',x:600,y:650,room:'Reaktor'},
+  {id:'v0',x:180,  y:480, label:'Listrik'},
+  {id:'v1',x:560,  y:520, label:'Security'},
+  {id:'v2',x:870,  y:520, label:'Komuni'},
+  {id:'v3',x:180,  y:800, label:'Storage'},
+  {id:'v4',x:1000, y:750, label:'Reaktor'},
 ];
 
 /* ══════════════════════════════════════════════
@@ -365,7 +401,7 @@ let isMobile=/Mobi|Android/i.test(navigator.userAgent);
 // Movement
 const keys={};
 let joy={x:0,y:0};
-let myX=600,myY=400;
+let myX=600,myY=195;
 let nearTask=null, nearBody=null;
 let posThrottle=0;
 
@@ -470,8 +506,8 @@ function startGame(){
   const posUp={};
   ids.forEach((id,i)=>{
     const a=spawnAngles[i];
-    posUp[id+'/x']=600+Math.cos(a)*60;
-    posUp[id+'/y']=400+Math.sin(a)*60;
+    posUp[id+'/x']=600+Math.cos(a)*55;
+    posUp[id+'/y']=195+Math.sin(a)*55;
     posUp[id+'/alive']=true;
     posUp[id+'/role']=roles[id];
     posUp[id+'/tasks']=JSON.stringify(taskAssign[id]);
@@ -586,10 +622,12 @@ function handleMovement(){
 }
 
 function hitWall(x,y){
-  for(const w of WALLS){
-    if(x-PLAYER_R<w.x+w.w&&x+PLAYER_R>w.x&&y-PLAYER_R<w.y+w.h&&y+PLAYER_R>w.y) return true;
+  // Player is blocked unless center+radius fits inside at least one walkable zone
+  const r=PLAYER_R;
+  for(const z of WALKABLE){
+    if(x-r>=z.x&&x+r<=z.x+z.w&&y-r>=z.y&&y+r<=z.y+z.h) return false;
   }
-  return false;
+  return true;
 }
 
 function updateCamera(){
@@ -605,123 +643,201 @@ function render(){
   ctx.save();
   ctx.translate(-camX,-camY);
 
-  // Background
-  ctx.fillStyle='#0d1b2a';
+  // ── Space background ──
+  ctx.fillStyle='#060d18';
   ctx.fillRect(0,0,MAP_W,MAP_H);
 
-  // Stars
-  ctx.fillStyle='rgba(255,255,255,.4)';
-  for(let i=0;i<60;i++){
-    const sx=(i*137+13)%MAP_W, sy=(i*97+7)%MAP_H;
-    ctx.fillRect(sx,sy,1.5,1.5);
+  // Stars (seeded, stable)
+  for(let i=0;i<120;i++){
+    const sx=(i*233+71)%MAP_W, sy=(i*157+43)%MAP_H;
+    const sz=((i*17)%3)*.5+.5;
+    ctx.fillStyle=`rgba(255,255,255,${.15+((i*7)%10)*.06})`;
+    ctx.fillRect(sx,sy,sz,sz);
   }
 
-  // Rooms
-  ROOMS.forEach(r=>{
-    ctx.fillStyle=r.light;
-    ctx.fillRect(r.x,r.y,r.w,r.h);
-    // Room border
-    ctx.strokeStyle='rgba(255,255,255,.06)';
-    ctx.lineWidth=2;
-    ctx.strokeRect(r.x,r.y,r.w,r.h);
-    // Room label
-    ctx.fillStyle='rgba(255,255,255,.2)';
-    ctx.font='bold 11px Nunito';
-    ctx.textAlign='center';
-    ctx.fillText(r.name,r.x+r.w/2,r.y+18);
+  // ── Ship hull outline (bevel shadow) ──
+  WALKABLE.forEach(z=>{
+    ctx.fillStyle='rgba(0,0,0,.55)';
+    ctx.fillRect(z.x+4,z.y+4,z.w,z.h);
   });
 
-  // Walls
-  ctx.fillStyle='#1a1a2e';
-  WALLS.forEach(w=>ctx.fillRect(w.x,w.y,w.w,w.h));
+  // ── Floor tiles ──
+  WALKABLE.forEach(z=>{
+    // Base floor
+    ctx.fillStyle=z.floor;
+    ctx.fillRect(z.x,z.y,z.w,z.h);
+    // Subtle tile grid
+    ctx.strokeStyle='rgba(0,0,0,.25)';
+    ctx.lineWidth=1;
+    const tileSize=32;
+    for(let tx=z.x;tx<z.x+z.w;tx+=tileSize){
+      ctx.beginPath();ctx.moveTo(tx,z.y);ctx.lineTo(tx,z.y+z.h);ctx.stroke();
+    }
+    for(let ty=z.y;ty<z.y+z.h;ty+=tileSize){
+      ctx.beginPath();ctx.moveTo(z.x,ty);ctx.lineTo(z.x+z.w,ty);ctx.stroke();
+    }
+    // Accent edge stripe (top+left)
+    ctx.fillStyle=z.accent;
+    ctx.fillRect(z.x,z.y,z.w,3);
+    ctx.fillRect(z.x,z.y,3,z.h);
+  });
 
-  // Task spots
+  // ── Wall border around each walkable zone ──
+  WALKABLE.forEach(z=>{
+    ctx.strokeStyle=z.room?'rgba(255,255,255,.18)':'rgba(255,255,255,.07)';
+    ctx.lineWidth=z.room?2:1.5;
+    ctx.strokeRect(z.x,z.y,z.w,z.h);
+  });
+
+  // ── Room labels + decorations ──
+  ROOMS.forEach(r=>{
+    // Label background pill
+    const lx=r.x+r.w/2, ly=r.y+20;
+    const txt=r.room;
+    ctx.font='bold 12px Nunito';
+    const tw=ctx.measureText(txt).width;
+    ctx.fillStyle='rgba(0,0,0,.5)';
+    ctx.beginPath();
+    ctx.roundRect(lx-tw/2-8,ly-13,tw+16,18,5);
+    ctx.fill();
+    ctx.fillStyle=r.accent+'dd';
+    ctx.textAlign='center';
+    ctx.fillText(txt,lx,ly);
+
+    // Corner bolts
+    const boltColor='rgba(255,255,255,.15)';
+    [[r.x+8,r.y+8],[r.x+r.w-8,r.y+8],[r.x+8,r.y+r.h-8],[r.x+r.w-8,r.y+r.h-8]].forEach(([bx,by])=>{
+      ctx.beginPath();ctx.arc(bx,by,3,0,Math.PI*2);
+      ctx.fillStyle=boltColor;ctx.fill();
+    });
+
+    // Vent grate decoration (just visual)
+    if(r.w>150){
+      ctx.strokeStyle='rgba(255,255,255,.06)';
+      ctx.lineWidth=1.5;
+      for(let gx=r.x+20;gx<r.x+r.w-10;gx+=10){
+        ctx.beginPath();ctx.moveTo(gx,r.y+r.h-18);ctx.lineTo(gx,r.y+r.h-6);ctx.stroke();
+      }
+    }
+  });
+
+  // ── Vents (impostor only) ──
+  if(myRole==='impostor'||!myAlive){
+    VENTS.forEach(v=>{
+      ctx.save();
+      // Grate background
+      ctx.fillStyle='rgba(20,10,40,.8)';
+      ctx.beginPath();ctx.roundRect(v.x-18,v.y-10,36,20,4);ctx.fill();
+      // Grate bars
+      ctx.strokeStyle='rgba(155,89,182,.7)';
+      ctx.lineWidth=2;
+      for(let gx=-10;gx<=10;gx+=7){
+        ctx.beginPath();ctx.moveTo(v.x+gx,v.y-8);ctx.lineTo(v.x+gx,v.y+8);ctx.stroke();
+      }
+      ctx.strokeStyle='rgba(155,89,182,.4)';
+      ctx.lineWidth=1.5;
+      ctx.strokeRect(v.x-18,v.y-10,36,20);
+      // Glow
+      ctx.beginPath();ctx.ellipse(v.x,v.y,18,10,0,0,Math.PI*2);
+      ctx.strokeStyle='rgba(155,89,182,.5)';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  // ── Task spots ──
   const myDoneTasks=tasksData[myId]||{};
+  const t_now=Date.now();
   TASK_SPOTS.forEach(t=>{
     const done=myDoneTasks[t.id];
     const isMine=myTasks.includes(t.id);
     if(!isMine&&myRole!=='impostor') return;
-    ctx.beginPath();
-    ctx.arc(t.x,t.y,10,0,Math.PI*2);
-    ctx.fillStyle=done?'rgba(122,223,159,.3)':isMine?'rgba(233,196,106,.7)':'rgba(255,255,255,.1)';
-    ctx.fill();
-    ctx.strokeStyle=done?'#7adf9f':'#e9c46a';
-    ctx.lineWidth=2;
-    ctx.stroke();
-    if(!done&&isMine){
-      ctx.fillStyle='#e9c46a';
-      ctx.font='bold 9px Nunito';
-      ctx.textAlign='center';
-      ctx.fillText('!',t.x,t.y+3);
+
+    const pulse=Math.sin(t_now*.003+t.x*.05)*.3+.7;
+    if(done){
+      // Done: green checkmark
+      ctx.fillStyle='rgba(122,223,159,.15)';
+      ctx.beginPath();ctx.arc(t.x,t.y,13,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#7adf9f';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(t.x,t.y,13,0,Math.PI*2);ctx.stroke();
+      ctx.fillStyle='#7adf9f';ctx.font='bold 12px Arial';ctx.textAlign='center';
+      ctx.fillText('✓',t.x,t.y+4);
+    } else if(isMine) {
+      // Pending: pulsing yellow hexagon-ish
+      ctx.save();
+      ctx.globalAlpha=pulse;
+      ctx.fillStyle='rgba(233,196,106,.25)';
+      ctx.beginPath();ctx.arc(t.x,t.y,16,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle='#e9c46a';ctx.lineWidth=2.5;
+      ctx.beginPath();ctx.arc(t.x,t.y,12,0,Math.PI*2);ctx.stroke();
+      ctx.fillStyle='#e9c46a';ctx.font='bold 11px Nunito';ctx.textAlign='center';
+      ctx.fillText('!',t.x,t.y+4);
+    } else {
+      ctx.fillStyle='rgba(255,255,255,.06)';
+      ctx.beginPath();ctx.arc(t.x,t.y,10,0,Math.PI*2);ctx.fill();
     }
   });
 
-  // Vents (impostor only)
-  if(myRole==='impostor'){
-    VENTS.forEach(v=>{
-      ctx.beginPath();
-      ctx.ellipse(v.x,v.y,18,10,0,0,Math.PI*2);
-      ctx.fillStyle='rgba(155,89,182,.35)';
-      ctx.fill();
-      ctx.strokeStyle='rgba(155,89,182,.7)';
-      ctx.lineWidth=2;
-      ctx.stroke();
-    });
-  }
-
-  // Bodies
+  // ── Bodies ──
   Object.entries(bodiesData).forEach(([uid,b])=>{
     const p=playersData[uid];
-    const c=p?.color||'#888';
+    const bc=p?.color||'#888';
     ctx.save();
-    ctx.globalAlpha=0.7;
-    // Bone/cross shape
-    ctx.strokeStyle=c;
-    ctx.lineWidth=3;
-    ctx.beginPath();
-    ctx.moveTo(b.x-12,b.y);ctx.lineTo(b.x+12,b.y);
-    ctx.moveTo(b.x,b.y-12);ctx.lineTo(b.x,b.y+12);
-    ctx.stroke();
-    ctx.fillStyle='#111';
-    ctx.beginPath();
-    ctx.arc(b.x,b.y,7,0,Math.PI*2);
-    ctx.fill();
-    ctx.strokeStyle=c;
-    ctx.lineWidth=2;
-    ctx.stroke();
-    ctx.fillStyle='rgba(255,0,0,.6)';
-    ctx.font='11px Arial';
-    ctx.textAlign='center';
-    ctx.fillText('☠',b.x,b.y+4);
+    // Body bone shape (laying sideways)
+    ctx.globalAlpha=0.85;
+    // Glow
+    const grad=ctx.createRadialGradient(b.x,b.y,2,b.x,b.y,22);
+    grad.addColorStop(0,'rgba(255,0,0,.3)');
+    grad.addColorStop(1,'rgba(255,0,0,0)');
+    ctx.fillStyle=grad;
+    ctx.beginPath();ctx.arc(b.x,b.y,22,0,Math.PI*2);ctx.fill();
+    // Mini among-us shape lying down
+    ctx.fillStyle=bc;
+    ctx.beginPath();ctx.ellipse(b.x,b.y+4,16,9,0,0,Math.PI*2);ctx.fill();
+    // Visor (small)
+    ctx.fillStyle='rgba(100,200,255,.7)';
+    ctx.beginPath();ctx.ellipse(b.x+5,b.y,7,5,0,0,Math.PI*2);ctx.fill();
+    // Bone indicator
+    ctx.fillStyle='rgba(255,80,80,.9)';
+    ctx.font='12px Arial';ctx.textAlign='center';
+    ctx.fillText('💀',b.x,b.y-10);
     ctx.restore();
   });
 
-  // Other players
+  // ── Other players ──
   Object.entries(playersData).forEach(([uid,p])=>{
     if(uid===myId) return;
-    if(!p.alive&&myRole==='crewmate'&&myAlive) return; // ghosts invisible to living crew
-    const alpha=p.alive?1:0.35;
-    drawPlayer(ctx,p.x||600,p.y||400,p.color||'#888',p.name||'?',alpha,p.role==='impostor'&&(!p.alive||myRole==='impostor'||!myAlive));
+    if(!p.alive&&myRole==='crewmate'&&myAlive) return;
+    const alpha=p.alive?1:0.32;
+    drawPlayer(ctx,p.x||600,p.y||195,p.color||'#888',p.name||'?',alpha,
+      p.role==='impostor'&&(!p.alive||myRole==='impostor'||!myAlive));
   });
 
-  // My player
-  drawPlayer(ctx,myX,myY,myColor,myName,myAlive?1:.4,false,true);
+  // ── My player ──
+  drawPlayer(ctx,myX,myY,myColor,myName,myAlive?1:.38,false,true);
 
-  // Proximity indicators
+  // ── Proximity indicators ──
   if(nearTask){
     const t=TASK_SPOTS.find(t=>t.id===nearTask);
     if(t){
-      ctx.beginPath();ctx.arc(t.x,t.y,18,0,Math.PI*2);
-      ctx.strokeStyle='rgba(233,196,106,.8)';ctx.lineWidth=2.5;
-      ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+      ctx.save();
+      const pulse2=Math.sin(Date.now()*.006)*.2+.8;
+      ctx.globalAlpha=pulse2;
+      ctx.beginPath();ctx.arc(t.x,t.y,22,0,Math.PI*2);
+      ctx.strokeStyle='#e9c46a';ctx.lineWidth=2;
+      ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);
+      ctx.font='bold 10px Nunito';ctx.textAlign='center';
+      ctx.fillStyle='#e9c46a';
+      ctx.fillText('[E] Tugas',t.x,t.y-26);
+      ctx.restore();
     }
   }
   if(nearBody){
     const b=bodiesData[nearBody];
     if(b){
-      ctx.beginPath();ctx.arc(b.x,b.y,20,0,Math.PI*2);
-      ctx.strokeStyle='rgba(230,57,70,.8)';ctx.lineWidth=2.5;
-      ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.arc(b.x,b.y,26,0,Math.PI*2);
+      ctx.strokeStyle='rgba(230,57,70,.9)';ctx.lineWidth=2;
+      ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);
     }
   }
 
