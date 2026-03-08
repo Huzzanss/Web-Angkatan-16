@@ -7,10 +7,131 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+/* ─── Notif Bell ─── */
+.notif-bell{background:none;border:none;cursor:pointer;font-size:1.2rem;position:relative;padding:.3rem .4rem;border-radius:8px;transition:background .2s;}
+.notif-bell:hover{background:rgba(255,255,255,.08);}
+.notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ff6b6b;border:2px solid #0d1117;}
+#notifPanel{position:fixed;top:60px;right:1rem;width:300px;max-height:400px;overflow-y:auto;background:#1a1f2e;border:1px solid rgba(255,255,255,.1);border-radius:16px;z-index:500;display:none;padding:.8rem;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+#notifPanel.open{display:block;}
+.notif-item{padding:.6rem .8rem;border-radius:10px;font-size:.82rem;color:rgba(255,255,255,.75);border-left:3px solid #7adf9f;background:rgba(122,223,159,.05);margin-bottom:.4rem;}
+.notif-item.unread{background:rgba(122,223,159,.12);color:#fff;}
+.notif-time{font-size:.68rem;color:rgba(255,255,255,.3);margin-top:.15rem;}
+.notif-empty{text-align:center;padding:1rem;color:rgba(255,255,255,.3);font-size:.82rem;}
+
+/* ─── Online strip ─── */
+#onlineStrip{background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.05);padding:.5rem 1.2rem;display:flex;align-items:center;gap:.6rem;overflow-x:auto;scrollbar-width:none;}
+#onlineStrip::-webkit-scrollbar{display:none;}
+.online-chip{display:flex;align-items:center;gap:.35rem;padding:.25rem .7rem;background:rgba(255,255,255,.06);border-radius:50px;font-size:.75rem;white-space:nowrap;cursor:pointer;transition:all .2s;border:1px solid rgba(255,255,255,.08);flex-shrink:0;}
+.online-chip:hover{background:rgba(255,255,255,.12);}
+.online-dot-sm{width:7px;height:7px;border-radius:50%;background:#7adf9f;flex-shrink:0;}
+.online-mood{font-size:.8rem;}
+.online-label{font-size:.65rem;color:rgba(255,255,255,.4);margin-right:.3rem;flex-shrink:0;}
+
+/* ─── Mading ─── */
+#mading-section{padding:3rem 1.5rem;max-width:900px;margin:0 auto;}
+.mading-header{text-align:center;margin-bottom:1.8rem;}
+.mading-eyebrow{font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:#7adf9f;font-weight:700;display:block;margin-bottom:.4rem;}
+.mading-title{font-size:2rem;font-weight:800;margin-bottom:.3rem;}
+.mading-title span{color:#7adf9f;}
+.mading-sub{font-size:.85rem;color:rgba(255,255,255,.45);}
+.mading-compose{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:18px;padding:1rem 1.2rem;margin-bottom:1.2rem;transition:border-color .2s;}
+.mading-compose:focus-within{border-color:rgba(122,223,159,.4);}
+.mading-compose-row{display:flex;gap:.6rem;align-items:flex-start;}
+.mading-avatar-sm{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;background:rgba(255,255,255,.08);}
+.mading-input{flex:1;background:none;border:none;outline:none;color:#fff;font-family:'Nunito',sans-serif;font-size:.9rem;resize:none;min-height:60px;placeholder-color:rgba(255,255,255,.3);}
+.mading-input::placeholder{color:rgba(255,255,255,.3);}
+.mading-tools{display:flex;align-items:center;justify-content:space-between;margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.07);}
+.mading-type-pills{display:flex;gap:.4rem;}
+.mading-pill{padding:.25rem .7rem;border-radius:50px;font-size:.72rem;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,.15);background:none;color:rgba(255,255,255,.5);transition:all .18s;}
+.mading-pill.active,.mading-pill:hover{background:rgba(122,223,159,.15);border-color:#7adf9f;color:#7adf9f;}
+.mading-pill.type-pengumuman.active{background:rgba(249,199,79,.15);border-color:#f9c74f;color:#f9c74f;}
+.mading-pill.type-poll.active{background:rgba(0,180,216,.15);border-color:#00b4d8;color:#00b4d8;}
+.post-btn{padding:.4rem 1.1rem;background:linear-gradient(135deg,#7adf9f,#2dc653);border:none;border-radius:50px;color:#1a3a2a;font-weight:800;font-size:.82rem;cursor:pointer;transition:all .18s;}
+.post-btn:hover{transform:scale(1.05);}
+.poll-inputs{margin-top:.6rem;display:flex;flex-direction:column;gap:.4rem;}
+.poll-opt-row{display:flex;gap:.4rem;align-items:center;}
+.poll-opt-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.35rem .7rem;color:#fff;font-size:.83rem;outline:none;}
+.poll-opt-input::placeholder{color:rgba(255,255,255,.3);}
+.poll-opt-input:focus{border-color:#00b4d8;}
+.add-opt-btn{background:none;border:1px dashed rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.4);padding:.3rem .7rem;cursor:pointer;font-size:.75rem;}
+.add-opt-btn:hover{border-color:rgba(255,255,255,.5);color:#fff;}
+.mading-feed{display:flex;flex-direction:column;gap:.9rem;}
+.mading-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1rem 1.2rem;transition:border-color .2s;}
+.mading-card:hover{border-color:rgba(255,255,255,.14);}
+.mading-card.type-pengumuman{border-left:4px solid #f9c74f;}
+.mading-card.type-poll{border-left:4px solid #00b4d8;}
+.mading-card.type-post{border-left:4px solid #7adf9f;}
+.mc-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.55rem;}
+.mc-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.mc-meta{flex:1;}
+.mc-name{font-size:.83rem;font-weight:700;}
+.mc-time{font-size:.68rem;color:rgba(255,255,255,.35);}
+.mc-type-tag{font-size:.65rem;padding:.15rem .5rem;border-radius:50px;font-weight:700;}
+.tag-post{background:rgba(122,223,159,.15);color:#7adf9f;}
+.tag-pengumuman{background:rgba(249,199,79,.15);color:#f9c74f;}
+.tag-poll{background:rgba(0,180,216,.15);color:#00b4d8;}
+.mc-body{font-size:.88rem;color:rgba(255,255,255,.8);line-height:1.55;margin-bottom:.7rem;white-space:pre-wrap;}
+.mc-actions{display:flex;align-items:center;gap:.7rem;}
+.mc-action-btn{background:none;border:none;color:rgba(255,255,255,.4);font-size:.8rem;cursor:pointer;padding:.25rem .5rem;border-radius:8px;transition:all .18s;display:flex;align-items:center;gap:.3rem;}
+.mc-action-btn:hover{background:rgba(255,255,255,.07);color:#fff;}
+.mc-action-btn.liked{color:#ff6b6b;}
+.mc-comments{margin-top:.7rem;padding-top:.7rem;border-top:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;gap:.4rem;}
+.mc-comment{font-size:.8rem;color:rgba(255,255,255,.65);}
+.mc-comment b{color:#fff;}
+.mc-comment-input-row{display:flex;gap:.4rem;margin-top:.4rem;}
+.mc-comment-input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.3rem .7rem;color:#fff;font-size:.8rem;outline:none;}
+.mc-comment-input:focus{border-color:rgba(122,223,159,.4);}
+.mc-comment-send{background:rgba(122,223,159,.2);border:none;border-radius:8px;color:#7adf9f;padding:.3rem .6rem;cursor:pointer;font-size:.82rem;}
+/* Poll */
+.poll-results{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem;}
+.poll-opt-result{cursor:pointer;}
+.poll-opt-label{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.18rem;}
+.poll-bar-bg{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
+.poll-bar-fill{height:100%;background:linear-gradient(90deg,#00b4d8,#0096c7);border-radius:4px;transition:width .4s;}
+.poll-bar-fill.voted{background:linear-gradient(90deg,#7adf9f,#2dc653);}
+
+/* ─── Song Request ─── */
+#songRequestSection{padding:2.5rem 1.5rem;max-width:900px;margin:0 auto;}
+.sr-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem;}
+.sr-title{font-size:1.4rem;font-weight:800;}
+.sr-form{display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap;}
+.sr-input{flex:1;min-width:180px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:50px;padding:.6rem 1.1rem;color:#fff;font-size:.88rem;outline:none;}
+.sr-input:focus{border-color:rgba(122,223,159,.5);}
+.sr-btn{padding:.6rem 1.2rem;background:linear-gradient(135deg,#7adf9f,#2dc653);border:none;border-radius:50px;color:#1a3a2a;font-weight:800;font-size:.85rem;cursor:pointer;white-space:nowrap;}
+.sr-list{display:flex;flex-direction:column;gap:.5rem;}
+.sr-item{display:flex;align-items:center;gap:.7rem;padding:.55rem .9rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;transition:all .18s;}
+.sr-item:hover{background:rgba(255,255,255,.07);}
+.sr-item.playing{border-color:rgba(122,223,159,.4);background:rgba(122,223,159,.07);}
+.sr-rank{font-size:.75rem;color:rgba(255,255,255,.3);font-weight:700;width:18px;text-align:center;flex-shrink:0;}
+.sr-song{flex:1;font-size:.85rem;font-weight:600;}
+.sr-req{font-size:.72rem;color:rgba(255,255,255,.4);}
+.sr-votes{display:flex;align-items:center;gap:.3rem;font-size:.78rem;font-weight:700;color:#7adf9f;}
+.sr-vote-btn{background:none;border:1px solid rgba(122,223,159,.3);border-radius:50px;color:#7adf9f;padding:.15rem .5rem;cursor:pointer;font-size:.72rem;transition:all .18s;}
+.sr-vote-btn:hover{background:rgba(122,223,159,.15);}
+.sr-vote-btn.voted{background:rgba(122,223,159,.25);border-color:#7adf9f;}
+.sr-now{font-size:.7rem;color:#7adf9f;font-weight:700;animation:pulse 1.5s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ─── Game tags ─── */
+.game-tag{font-size:.62rem;font-weight:800;padding:.18rem .55rem;border-radius:50px;margin-left:.4rem;vertical-align:middle;letter-spacing:.5px;}
+.game-tag-new{background:linear-gradient(135deg,#f9c74f,#f3a712);color:#1a1a00;}
+.game-tag-rec{background:linear-gradient(135deg,#ff6b6b,#e63946);color:#fff;}
+.game-tag-hot{background:linear-gradient(135deg,#ff9f1c,#ff6b35);color:#fff;}
+.game-card-badge-wrap{display:flex;align-items:center;flex-wrap:wrap;gap:.3rem;justify-content:flex-end;}
+</style>
 </head>
 <body>
 
-  <nav id="navbar">
+  <div id="notifPanel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+    <span style="font-size:.85rem;font-weight:800">🔔 Notifikasi</span>
+    <button onclick="clearNotifs()" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:.75rem;cursor:pointer">Hapus semua</button>
+  </div>
+  <div id="notifList"><div class="notif-empty">Belum ada notifikasi</div></div>
+</div>
+<nav id="navbar">
     <div class="nav-left">
       <h1>Angkatan <span>XVI</span></h1>
     </div>
@@ -20,8 +141,12 @@
       <a href="#mahakam">VI Mahakam</a>
       <a href="#countdown-hero">🎓 Wisuda</a>
       <a href="#gallery-section">📸 Gallery</a>
+      <a href="#mading-section">📝 Mading</a>
       <a href="#chat-section">💬 Chat</a>
       <a href="#games-section">🎮 Games</a>
+      <a href="#mading-section">📝 Mading</a>
+      <a href="profil.html" id="navProfil">👤 Profil</a>
+      <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" title="Notifikasi">🔔<span class="notif-dot" id="notifDot" style="display:none"></span></button>
     </div>
   </nav>
 
@@ -56,6 +181,12 @@
     </div>
     <div class="scroll-cue">Scroll</div>
   </section>
+
+  <!-- Online strip -->
+  <div id="onlineStrip">
+    <span class="online-label">🟢 Online:</span>
+    <div id="onlineChips" style="display:flex;gap:.5rem;align-items:center"></div>
+  </div>
 
   <main>
 
@@ -264,6 +395,62 @@
     </section>
 
 
+
+    <!-- ─── Mading Digital ─── -->
+    <section id="mading-section">
+      <div class="mading-header">
+        <span class="mading-eyebrow">✦ Papan Pengumuman Digital ✦</span>
+        <h2 class="mading-title">Mading <span>Angkatan XVI</span></h2>
+        <p class="mading-sub">Berbagi info, pengumuman, dan poll untuk angkatan!</p>
+      </div>
+
+      <!-- Compose -->
+      <div class="mading-compose">
+        <div class="mading-compose-row">
+          <div class="mading-avatar-sm" id="madingAvatarSm">👤</div>
+          <textarea class="mading-input" id="madingInput" placeholder="Tulis sesuatu untuk angkatan..."></textarea>
+        </div>
+        <!-- Poll options (shown when type=poll) -->
+        <div class="poll-inputs" id="pollInputs" style="display:none">
+          <input class="poll-opt-input" id="pollOpt1" placeholder="Pilihan 1...">
+          <input class="poll-opt-input" id="pollOpt2" placeholder="Pilihan 2...">
+          <div id="pollExtraOpts"></div>
+          <button class="add-opt-btn" onclick="addPollOpt()">+ Tambah pilihan</button>
+        </div>
+        <div class="mading-tools">
+          <div class="mading-type-pills">
+            <button class="mading-pill active" data-type="post" onclick="setMadingType('post')">💬 Post</button>
+            <button class="mading-pill type-pengumuman" data-type="pengumuman" onclick="setMadingType('pengumuman')">📢 Pengumuman</button>
+            <button class="mading-pill type-poll" data-type="poll" onclick="setMadingType('poll')">📊 Poll</button>
+          </div>
+          <button class="post-btn" onclick="submitMading()">Kirim →</button>
+        </div>
+      </div>
+
+      <!-- Feed -->
+      <div class="mading-feed" id="madingFeed">
+        <div style="text-align:center;padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem">Belum ada postingan. Jadilah yang pertama! ✨</div>
+      </div>
+    </section>
+
+    <!-- ─── Song Request ─── -->
+    <section id="songRequestSection">
+      <div class="sr-header">
+        <span style="font-size:1.5rem">🎵</span>
+        <div>
+          <div class="sr-title">Request Lagu</div>
+          <div style="font-size:.78rem;color:rgba(255,255,255,.4)">Request lagu ke DJ angkatan, vote lagu favorit kalian!</div>
+        </div>
+      </div>
+      <div class="sr-form">
+        <input class="sr-input" id="srSongInput" placeholder="Judul lagu + artis... (cth: Bohemian Rhapsody - Queen)">
+        <button class="sr-btn" onclick="requestSong()">🎵 Request</button>
+      </div>
+      <div class="sr-list" id="srList">
+        <div style="text-align:center;padding:1rem;color:rgba(255,255,255,.3);font-size:.82rem">Belum ada request. Mulai request lagu!</div>
+      </div>
+    </section>
+
     <!-- ─── Game List ─── -->
     <section id="games-section" class="games-section">
       <div class="games-header">
@@ -273,7 +460,41 @@
       </div>
       <div class="games-grid">
 
-        <!-- Leaderboard -->
+        <!-- Sambung Kata -->
+        <a href="sambung-kata.html" class="game-card" data-game="sambung-kata">
+          <div class="game-card-icon">🔤</div>
+          <div class="game-card-info">
+            <h3>Sambung Kata<span id="tag-sambung-kata"></span></h3>
+            <p>Sambung kata dari huruf terakhir — siapa yang mentok duluan kalah!</p>
+          </div>
+          <div class="game-card-badge">Realtime</div>
+          <div class="game-card-arrow">→</div>
+        </a>
+
+        <!-- Gambar Bareng -->
+        <a href="gambar-bareng.html" class="game-card" data-game="gambar-bareng">
+          <div class="game-card-icon">🎨</div>
+          <div class="game-card-info">
+            <h3>Gambar Bareng<span id="tag-gambar-bareng"></span></h3>
+            <p>Satu orang gambar, yang lain tebak! Mirip Skribbl.io</p>
+          </div>
+          <div class="game-card-badge">Realtime</div>
+          <div class="game-card-arrow">→</div>
+        </a>
+
+        <!-- Werewolf -->
+        <a href="werewolf.html" class="game-card" data-game="werewolf">
+          <div class="game-card-icon">🐺</div>
+          <div class="game-card-info">
+            <h3>Werewolf<span id="tag-werewolf"></span></h3>
+            <p>Temukan werewolf di antara kalian sebelum semua warga dimangsa!</p>
+          </div>
+          <div class="game-card-badge">4-16 Pemain</div>
+          <div class="game-card-arrow">→</div>
+        </a>
+
+        <!-- UNO -->
+                <!-- Leaderboard -->
         <a href="leaderboard.html" class="game-card" style="border-color:rgba(201,168,76,.3);background:linear-gradient(120deg,rgba(201,168,76,.08),transparent);">
           <div class="game-card-icon">🏆</div>
           <div class="game-card-info">
@@ -283,45 +504,11 @@
           <div class="game-card-badge" style="background:rgba(201,168,76,.2);color:#e8c97a">Realtime</div>
           <div class="game-card-arrow">→</div>
         </a>
-        
-        <!-- Sambung Kata -->
-        <a href="sambung-kata.html" class="game-card">
-          <div class="game-card-icon">🔤</div>
-          <div class="game-card-info">
-            <h3>Sambung Kata</h3>
-            <p>Sambung kata dari huruf terakhir — siapa yang mentok duluan kalah!</p>
-          </div>
-          <div class="game-card-badge">Realtime</div>
-          <div class="game-card-arrow">→</div>
-        </a>
 
-        <!-- Gambar Bareng -->
-        <a href="gambar-bareng.html" class="game-card">
-          <div class="game-card-icon">🎨</div>
-          <div class="game-card-info">
-            <h3>Gambar Bareng</h3>
-            <p>Satu orang gambar, yang lain tebak! Mirip Skribbl.io</p>
-          </div>
-          <div class="game-card-badge">Realtime</div>
-          <div class="game-card-arrow">→</div>
-        </a>
-
-        <!-- Werewolf -->
-        <a href="werewolf.html" class="game-card">
-          <div class="game-card-icon">🐺</div>
-          <div class="game-card-info">
-            <h3>Werewolf</h3>
-            <p>Temukan werewolf di antara kalian sebelum semua warga dimangsa!</p>
-          </div>
-          <div class="game-card-badge">4-16 Pemain</div>
-          <div class="game-card-arrow">→</div>
-        </a>
-
-        <!-- UNO -->
-        <a href="uno.html" class="game-card">
+        <a href="uno.html" class="game-card" data-game="uno">
           <div class="game-card-icon">🃏</div>
           <div class="game-card-info">
-            <h3>UNO</h3>
+            <h3>UNO<span id="tag-uno"></span></h3>
             <p>Game kartu klasik! Habiskan kartu duluan, jangan lupa teriak UNO!</p>
           </div>
           <div class="game-card-badge">2-8 Pemain</div>
@@ -330,36 +517,38 @@
 
         <!-- Who Is The Spy -->
         <!-- Mini Golf 3D -->
-
-        <a href="spy.html" class="game-card">
-          <div class="game-card-icon">🕵️</div>
-          <div class="game-card-info">
-            <h3>Who Is The Spy?</h3>
-            <p>Semua dapat kata mirip, satu dapat kata berbeda. Temukan mata-matanya!</p>
-          </div>
-          <div class="game-card-badge">3-12 Pemain</div>
-          <div class="game-card-arrow">→</div>
-        </a>
-
-         <a href="minigolf.html" class="game-card">
+        <a href="minigolf.html" class="game-card" data-game="minigolf">
           <div class="game-card-icon">⛳</div>
           <div class="game-card-info">
-            <h3>New! Mini Golf 3D</h3>
+            <h3>Mini Golf 3D<span class="game-tag game-tag-new">NEW</span></h3>
             <p>Game golf 3D! Masukkan bola ke lubang dengan pukulan sesedikit mungkin.</p>
           </div>
           <div class="game-card-badge">1-6 Pemain</div>
           <div class="game-card-arrow">→</div>
         </a>
 
-        <a href="among-us.html" class="game-card">
+        <a href="spy.html" class="game-card" data-game="spy">
+          <div class="game-card-icon">🕵️</div>
+          <div class="game-card-info">
+            <h3>Who Is The Spy?<span id="tag-spy"></span></h3>
+            <p>Semua dapat kata mirip, satu dapat kata berbeda. Temukan mata-matanya!</p>
+          </div>
+          <div class="game-card-badge">3-12 Pemain</div>
+          <div class="game-card-arrow">→</div>
+        </a>
+
+        <!-- Among Us -->
+        <a href="among-us.html" class="game-card" data-game="among-us">
           <div class="game-card-icon">🚀</div>
           <div class="game-card-info">
-            <h3>New! Among Us</h3>
+            <h3>Among Us<span class="game-tag game-tag-new">NEW</span></h3>
             <p>Temukan siapa impostornya! Selesaikan tugas, laporkan mayat, dan jangan dibunuh.</p>
           </div>
           <div class="game-card-badge">2-10 Pemain</div>
           <div class="game-card-arrow">→</div>
         </a>
+
+        <!-- Sambung Kata tag -->
 
       </div>
     </section>
@@ -390,6 +579,322 @@
   <audio id="bgAudio" preload="auto"></audio>
 
   <script src="script.js"></script>
+
+
+<script>
+/* ══════════════════════════
+   SHARED FIREBASE REF (already init'd in script.js)
+══════════════════════════ */
+const madingRef  = firebase.database().ref('mading/posts');
+const songReqRef = firebase.database().ref('songReq');
+const notifRef   = firebase.database().ref('notif');
+const onlineRef  = firebase.database().ref('shared/online');
+const moodRef    = firebase.database().ref('shared/mood');
+const gamePlayRef= firebase.database().ref('shared/gamePlays');
+
+function myUid(){return localStorage.getItem('auUid')||localStorage.getItem('mgUid')||('u'+Math.random().toString(36).substr(2,7));}
+function myNameStr(){return localStorage.getItem('lbName')||localStorage.getItem('auName')||localStorage.getItem('mgName')||'Anonim';}
+function myAvatarStr(){return localStorage.getItem('profileAvatar')||'👤';}
+function esc2(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtAgo2(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return 'barusan';if(s<3600)return Math.floor(s/60)+'m lalu';if(s<86400)return Math.floor(s/3600)+'j lalu';return Math.floor(s/86400)+'h lalu';}
+
+/* ═══ ONLINE STRIP ═══ */
+onlineRef.on('value',snap=>{
+  const data=snap.val()||{};
+  const me=myUid();
+  const chips=document.getElementById('onlineChips');
+  if(!chips) return;
+  let html='';
+  let count=0;
+  Object.entries(data).forEach(([uid,v])=>{
+    if(!v) return;
+    count++;
+    const mood=v.mood||'';
+    const name=(v.name||'?').split(' ')[0];
+    const isMe=uid===me;
+    html+=`<div class="online-chip" onclick="window.location='profil.html?uid=${uid}'" title="${esc2(v.name||'?')}">
+      <div class="online-dot-sm"></div>
+      ${mood?`<span class="online-mood">${mood}</span>`:''}
+      <span>${esc2(name)}${isMe?' (kamu)':''}</span>
+    </div>`;
+  });
+  chips.innerHTML=html||'<span style="font-size:.75rem;color:rgba(255,255,255,.3)">Tidak ada yang online</span>';
+});
+
+/* ═══ NOTIFICATIONS ═══ */
+let notifData={};
+let unreadCount=0;
+notifRef.orderByChild('ts').limitToLast(20).on('value',snap=>{
+  notifData={};
+  snap.forEach(s=>{notifData[s.key]=s.val();});
+  renderNotifs();
+});
+
+function renderNotifs(){
+  const list=document.getElementById('notifList');
+  if(!list) return;
+  const items=Object.values(notifData).reverse();
+  if(!items.length){list.innerHTML='<div class="notif-empty">Belum ada notifikasi</div>';return;}
+  const readSet=JSON.parse(localStorage.getItem('readNotifs')||'[]');
+  unreadCount=items.filter(n=>!readSet.includes(n.id)).length;
+  const dot=document.getElementById('notifDot');
+  if(dot) dot.style.display=unreadCount>0?'block':'none';
+  list.innerHTML=items.map(n=>{
+    const unread=!readSet.includes(n.id);
+    return `<div class="notif-item${unread?' unread':''}">
+      ${esc2(n.msg||'')}
+      <div class="notif-time">${fmtAgo2(n.ts||0)}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleNotifPanel(){
+  const p=document.getElementById('notifPanel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')){
+    // Mark all read
+    const ids=Object.keys(notifData);
+    localStorage.setItem('readNotifs',JSON.stringify(ids));
+    unreadCount=0;
+    const dot=document.getElementById('notifDot');
+    if(dot) dot.style.display='none';
+    renderNotifs();
+  }
+}
+function clearNotifs(){document.getElementById('notifList').innerHTML='<div class="notif-empty">Belum ada notifikasi</div>';}
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('notifPanel');
+  const bell=document.getElementById('notifBell');
+  if(panel&&bell&&!panel.contains(e.target)&&!bell.contains(e.target)){
+    panel.classList.remove('open');
+  }
+});
+
+/* ═══ MADING ═══ */
+let madingType='post';
+let pollOptCount=2;
+let madingPosts={};
+
+function setMadingType(t){
+  madingType=t;
+  document.querySelectorAll('.mading-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`[data-type="${t}"]`).classList.add('active');
+  document.getElementById('pollInputs').style.display=t==='poll'?'flex':'none';
+}
+
+function addPollOpt(){
+  pollOptCount++;
+  const div=document.createElement('input');
+  div.className='poll-opt-input'; div.placeholder=`Pilihan ${pollOptCount}...`;
+  div.id='pollOpt'+pollOptCount;
+  document.getElementById('pollExtraOpts').appendChild(div);
+}
+
+function submitMading(){
+  const txt=document.getElementById('madingInput').value.trim();
+  if(!txt) return;
+  const post={
+    uid:myUid(), name:myNameStr(), avatar:myAvatarStr(),
+    type:madingType, text:txt, ts:Date.now(), likes:{}, comments:{}
+  };
+  if(madingType==='poll'){
+    const opts=[];
+    for(let i=1;i<=pollOptCount;i++){
+      const v=document.getElementById('pollOpt'+i)?.value.trim();
+      if(v) opts.push(v);
+    }
+    if(opts.length<2){alert('Poll butuh minimal 2 pilihan!');return;}
+    post.pollOpts=opts; post.pollVotes={};
+  }
+  madingRef.push(post);
+  document.getElementById('madingInput').value='';
+  // Send notification
+  notifRef.push({msg:`📝 ${myNameStr()} membuat ${madingType==='pengumuman'?'pengumuman':madingType==='poll'?'poll':'postingan'} baru!`,ts:Date.now(),id:Date.now().toString()});
+}
+
+madingRef.orderByChild('ts').limitToLast(30).on('value',snap=>{
+  madingPosts={};
+  snap.forEach(s=>{madingPosts[s.key]=s.val();});
+  renderMading();
+});
+
+function renderMading(){
+  const feed=document.getElementById('madingFeed');
+  if(!feed) return;
+  const posts=Object.entries(madingPosts).reverse();
+  if(!posts.length){
+    feed.innerHTML='<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem">Belum ada postingan. Jadilah yang pertama! ✨</div>';
+    return;
+  }
+  feed.innerHTML=posts.map(([id,p])=>buildMadingCard(id,p)).join('');
+}
+
+function buildMadingCard(id,p){
+  const me=myUid();
+  const likeCount=Object.keys(p.likes||{}).length;
+  const liked=(p.likes||{})[me];
+  const commentCount=Object.keys(p.comments||{}).length;
+  const typeTag={post:'tag-post',pengumuman:'tag-pengumuman',poll:'tag-poll'}[p.type]||'tag-post';
+  const typeLabel={post:'Post',pengumuman:'📢 Pengumuman',poll:'📊 Poll'}[p.type]||'Post';
+
+  let bodyHtml=`<div class="mc-body">${esc2(p.text)}</div>`;
+
+  if(p.type==='poll'&&p.pollOpts){
+    const totalVotes=Object.values(p.pollVotes||{}).length;
+    const myVote=(p.pollVotes||{})[me];
+    bodyHtml+=`<div class="mc-body" style="margin-bottom:.3rem">${esc2(p.text)}</div><div class="poll-results">`;
+    p.pollOpts.forEach((opt,i)=>{
+      const voteCount=Object.values(p.pollVotes||{}).filter(v=>v===i).length;
+      const pct=totalVotes>0?Math.round(voteCount/totalVotes*100):0;
+      const isVoted=myVote===i;
+      bodyHtml+=`<div class="poll-opt-result" onclick="votePoll('${id}',${i})">
+        <div class="poll-opt-label"><span>${esc2(opt)}</span><span>${pct}% (${voteCount})</span></div>
+        <div class="poll-bar-bg"><div class="poll-bar-fill${isVoted?' voted':''}" style="width:${pct}%"></div></div>
+      </div>`;
+    });
+    bodyHtml+=`<div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:.3rem">${totalVotes} suara</div></div>`;
+  }
+
+  const comments=Object.values(p.comments||{}).slice(-3);
+  const commHtml=comments.map(c=>`<div class="mc-comment"><b>${esc2(c.name)}</b> ${esc2(c.text)}</div>`).join('');
+
+  return `<div class="mading-card type-${p.type}">
+    <div class="mc-head">
+      <div class="mc-avatar">${p.avatar||'👤'}</div>
+      <div class="mc-meta">
+        <div class="mc-name">${esc2(p.name||'?')}</div>
+        <div class="mc-time">${fmtAgo2(p.ts||0)}</div>
+      </div>
+      <span class="mc-type-tag ${typeTag}">${typeLabel}</span>
+    </div>
+    ${bodyHtml}
+    <div class="mc-actions">
+      <button class="mc-action-btn${liked?' liked':''}" onclick="likeMading('${id}')">❤️ ${likeCount}</button>
+      <button class="mc-action-btn" onclick="toggleComments('${id}')">💬 ${commentCount}</button>
+      ${p.uid===me?`<button class="mc-action-btn" onclick="deleteMading('${id}')" style="margin-left:auto;color:rgba(255,100,100,.5)">🗑</button>`:''}
+    </div>
+    <div class="mc-comments" id="mc-comm-${id}" style="display:none">
+      ${commHtml}
+      <div class="mc-comment-input-row">
+        <input class="mc-comment-input" id="ci-${id}" placeholder="Tulis komentar...">
+        <button class="mc-comment-send" onclick="sendComment('${id}')">➤</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function likeMading(id){
+  const me=myUid();
+  const ref=madingRef.child(id+'/likes/'+me);
+  ref.once('value',s=>{s.val()?ref.remove():ref.set(true);});
+}
+function toggleComments(id){
+  const el=document.getElementById('mc-comm-'+id);
+  if(el) el.style.display=el.style.display==='none'?'flex':'none';
+  if(el) el.style.flexDirection='column';
+}
+function sendComment(id){
+  const input=document.getElementById('ci-'+id);
+  if(!input||!input.value.trim()) return;
+  madingRef.child(id+'/comments').push({name:myNameStr(),text:input.value.trim(),ts:Date.now()});
+  input.value='';
+}
+function deleteMading(id){madingRef.child(id).remove();}
+function votePoll(id,optIdx){
+  const me=myUid();
+  madingRef.child(id+'/pollVotes/'+me).set(optIdx);
+}
+
+/* ═══ SONG REQUEST ═══ */
+let songData={};
+let myVotedSongs=JSON.parse(localStorage.getItem('srVotes')||'[]');
+
+songReqRef.orderByChild('votes').limitToLast(20).on('value',snap=>{
+  songData={};
+  snap.forEach(s=>{songData[s.key]=s.val();});
+  renderSongReq();
+});
+
+function requestSong(){
+  const inp=document.getElementById('srSongInput');
+  const song=inp.value.trim();
+  if(!song) return;
+  songReqRef.push({song,reqBy:myNameStr(),votes:1,voters:{[myUid()]:true},ts:Date.now()});
+  inp.value='';
+  notifRef.push({msg:`🎵 ${myNameStr()} request lagu: ${song}`,ts:Date.now(),id:Date.now().toString()});
+}
+
+function voteForSong(id){
+  const me=myUid();
+  if(myVotedSongs.includes(id)){
+    songReqRef.child(id+'/voters/'+me).remove();
+    songReqRef.child(id+'/votes').transaction(v=>(v||1)-1);
+    myVotedSongs=myVotedSongs.filter(x=>x!==id);
+  } else {
+    songReqRef.child(id+'/voters/'+me).set(true);
+    songReqRef.child(id+'/votes').transaction(v=>(v||0)+1);
+    myVotedSongs.push(id);
+  }
+  localStorage.setItem('srVotes',JSON.stringify(myVotedSongs));
+  renderSongReq();
+}
+
+function renderSongReq(){
+  const list=document.getElementById('srList');
+  if(!list) return;
+  const sorted=Object.entries(songData).sort((a,b)=>(b[1].votes||0)-(a[1].votes||0));
+  if(!sorted.length){
+    list.innerHTML='<div style="text-align:center;padding:1rem;color:rgba(255,255,255,.3);font-size:.82rem">Belum ada request. Mulai request lagu!</div>';
+    return;
+  }
+  list.innerHTML=sorted.map(([id,s],i)=>{
+    const voted=(s.voters||{})[myUid()]||myVotedSongs.includes(id);
+    return `<div class="sr-item">
+      <span class="sr-rank">${i+1}</span>
+      <div style="flex:1"><div class="sr-song">${esc2(s.song)}</div><div class="sr-req">req. ${esc2(s.reqBy||'?')}</div></div>
+      <button class="sr-vote-btn${voted?' voted':''}" onclick="voteForSong('${id}')">▲</button>
+      <span class="sr-votes">${s.votes||0}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ═══ GAME PLAY TRACKING + TAGS ═══ */
+gamePlayRef.on('value',snap=>{
+  const data=snap.val()||{};
+  const games=Object.entries(data).sort((a,b)=>b[1]-a[1]);
+  // Most played = Recommended
+  if(games.length>0){
+    const topId=games[0][0].replace(/_/g,'-');
+    const topEl=document.getElementById('tag-'+topId);
+    if(topEl) topEl.innerHTML='<span class="game-tag game-tag-rec">⭐ RECOMMENDED</span>';
+    // Second most = Hot
+    if(games.length>1){
+      const secId=games[1][0].replace(/_/g,'-');
+      const secEl=document.getElementById('tag-'+secId);
+      if(secEl&&!secEl.innerHTML.includes('NEW')) secEl.innerHTML='<span class="game-tag game-tag-hot">🔥 HOT</span>';
+    }
+  }
+});
+
+// Track when leaving to a game (clicks on game cards)
+document.querySelectorAll('.game-card[data-game]').forEach(card=>{
+  card.addEventListener('click',()=>{
+    const game=card.dataset.game.replace(/-/g,'_');
+    gamePlayRef.child(game).transaction(v=>(v||0)+1);
+  });
+});
+
+/* ═══ PROFILE AVATAR UPDATE ═══ */
+const navProfil=document.getElementById('navProfil');
+if(navProfil){
+  const av=localStorage.getItem('profileAvatar');
+  if(av) navProfil.textContent=av+' Profil';
+}
+const madAv=document.getElementById('madingAvatarSm');
+if(madAv){
+  madAv.textContent=localStorage.getItem('profileAvatar')||'👤';
+}
+</script>
 
 <script src="shared.js"></script>
 </body>
