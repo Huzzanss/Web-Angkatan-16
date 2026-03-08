@@ -295,56 +295,44 @@ const MAP_W=1400, MAP_H=960;
 */
 const WALKABLE = [
   // ── ROOMS ──
-  // Kafetaria (top-center, large)
-  {x:420, y:70,  w:360, h:250, room:'Kafetaria',     col:'#1c2e1c', floor:'#243524', accent:'#3a5a3a'},
-  // Lab / MedBay (top-right)
-  {x:920, y:70,  w:240, h:200, room:'Lab',           col:'#1a1a2e', floor:'#22223d', accent:'#35358f'},
-  // Listrik (top-left)
-  {x:90,  y:70,  w:240, h:200, room:'Listrik',       col:'#2e2200', floor:'#3d2e00', accent:'#8f6e00'},
-  // Engine Kiri (mid-left)
-  {x:50,  y:370, w:170, h:240, room:'Engine Kiri',   col:'#1a0a0a', floor:'#2a1010', accent:'#8b2222'},
-  // Security (center)
-  {x:490, y:440, w:200, h:180, room:'Security',      col:'#0a1a2e', floor:'#0e243d', accent:'#1a5276'},
-  // Komunikasi (center-right)
-  {x:810, y:440, w:200, h:180, room:'Komuni',        col:'#1a0a2e', floor:'#24103d', accent:'#4a235a'},
-  // Engine Kanan (far-right)
-  {x:1150,y:370, w:170, h:240, room:'Engine Kanan',  col:'#1a0a0a', floor:'#2a1010', accent:'#8b2222'},
-  // Storage (bottom-left)
-  {x:90,  y:720, w:240, h:200, room:'Storage',       col:'#2e2800', floor:'#3d3500', accent:'#7a6800'},
-  // Navigasi (bottom-center)
-  {x:420, y:740, w:360, h:180, room:'Navigasi',      col:'#001a2e', floor:'#00243d', accent:'#00698f'},
-  // Reaktor (bottom-right)
-  {x:920, y:680, w:240, h:250, room:'Reaktor',       col:'#2e0000', floor:'#3d0000', accent:'#8f0000'},
+  {x:420, y:70,  w:360, h:250, room:'Kafetaria',    floor:'#243524', accent:'#4a7a4a'},
+  {x:920, y:70,  w:240, h:200, room:'Lab',          floor:'#22223d', accent:'#4545af'},
+  {x:90,  y:70,  w:240, h:200, room:'Listrik',      floor:'#3d2e00', accent:'#af8800'},
+  {x:50,  y:370, w:180, h:220, room:'Engine Kiri',  floor:'#2a1010', accent:'#ab2222'},
+  {x:490, y:440, w:200, h:180, room:'Security',     floor:'#0e243d', accent:'#1a6296'},
+  {x:810, y:440, w:200, h:180, room:'Komunikasi',   floor:'#24103d', accent:'#6a35aa'},
+  {x:1170,y:370, w:180, h:220, room:'Engine Kanan', floor:'#2a1010', accent:'#ab2222'},
+  {x:90,  y:720, w:240, h:200, room:'Storage',      floor:'#3d3500', accent:'#9a8800'},
+  {x:420, y:740, w:360, h:180, room:'Navigasi',     floor:'#00243d', accent:'#0089af'},
+  {x:920, y:680, w:240, h:240, room:'Reaktor',      floor:'#3d0000', accent:'#af0000'},
 
-  // ── CORRIDORS ──
-  // Kafetaria ↔ Listrik (top horizontal left)
-  {x:330, y:140, w:90,  h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Kafetaria ↔ Lab (top horizontal right)
-  {x:780, y:120, w:140, h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Kafetaria ↔ Security (vertical center-left)
-  {x:514, y:320, w:68,  h:120, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Kafetaria ↔ Komuni (vertical center-right)
-  {x:836, y:320, w:68,  h:120, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Listrik ↔ Engine Kiri (left vertical)
-  {x:100, y:270, w:68,  h:100, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Engine Kiri ↔ Storage (far-left vertical)
-  {x:100, y:610, w:68,  h:110, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Storage ↔ Navigasi (bottom horizontal left)
-  {x:330, y:762, w:90,  h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Navigasi ↔ Reaktor (bottom horizontal right)
-  {x:780, y:762, w:140, h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Reaktor ↔ Engine Kanan (right vertical)
-  {x:1200,y:610, w:68,  h:70,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Engine Kanan ↔ Lab (right top vertical)
-  {x:1200,y:270, w:68,  h:100, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Security ↔ Komuni (center horizontal)
-  {x:690, y:490, w:120, h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Komuni ↔ Engine Kanan (right horizontal)
-  {x:1010,y:490, w:140, h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Security ↔ Storage (lower-left vertical)
-  {x:180, y:490, w:68,  h:230, room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
-  // Reaktor ↔ Navigasi side connection
-  {x:920, y:760, w:68,  h:68,  room:null, col:'#161616', floor:'#1e1e1e', accent:'#2a2a2a'},
+  // ── CORRIDORS (verified to connect adjacent rooms) ──
+  // Listrik(90-330) ↔ Kafetaria(420-780): bridge x:310-422, y:140-208
+  {x:310, y:140, w:112, h:68, room:null, floor:'#1a1a1a', accent:'#333'},
+  // Kafetaria(420-780) ↔ Lab(920-1160): bridge x:778-922, y:110-178
+  {x:778, y:110, w:144, h:68, room:null, floor:'#1a1a1a', accent:'#333'},
+  // Kafetaria(420-780,70-320) ↔ Security(490-690,440-620): vertical x:514-582, y:318-442
+  {x:514, y:318, w:68,  h:124, room:null, floor:'#1a1a1a', accent:'#333'},
+  // Kafetaria(420-780,70-320) ↔ Komunikasi(810-1010,440-620): vertical x:836-904, y:318-442
+  {x:836, y:318, w:68,  h:124, room:null, floor:'#1a1a1a', accent:'#333'},
+  // Listrik(90-330,70-270) ↔ Engine Kiri(50-230,370-590): vertical x:100-168, y:268-372
+  {x:100, y:268, w:68,  h:104, room:null, floor:'#1a1a1a', accent:'#333'},
+  // Engine Kiri(50-230,370-590) ↔ Storage(90-330,720-920): vertical x:100-168, y:588-722
+  {x:100, y:588, w:68,  h:134, room:null, floor:'#1a1a1a', accent:'#333'},
+  // Storage(90-330,720-920) ↔ Navigasi(420-780,740-920): horizontal x:328-422, y:762-830
+  {x:328, y:762, w:94,  h:68,  room:null, floor:'#1a1a1a', accent:'#333'},
+  // Navigasi(420-780,740-920) ↔ Reaktor(920-1160,680-920): horizontal x:778-922, y:762-830
+  {x:778, y:762, w:144, h:68,  room:null, floor:'#1a1a1a', accent:'#333'},
+  // Security(490-690,440-620) ↔ Komunikasi(810-1010,440-620): horizontal x:688-812, y:490-558
+  {x:688, y:490, w:124, h:68,  room:null, floor:'#1a1a1a', accent:'#333'},
+  // Komunikasi(810-1010,440-620) ↔ Engine Kanan(1170-1350,370-590): horizontal x:1008-1172, y:490-558
+  {x:1008,y:490, w:164, h:68,  room:null, floor:'#1a1a1a', accent:'#333'},
+  // Lab(920-1160,70-270) ↔ Engine Kanan(1170-1350,370-590): vertical x:1158-1226, y:268-372
+  {x:1158,y:268, w:68,  h:104, room:null, floor:'#1a1a1a', accent:'#333'},
+  // Engine Kanan(1170-1350,370-590) ↔ Reaktor(920-1160,680-920): vertical x:1158-1226, y:588-682
+  {x:1158,y:588, w:68,  h:94,  room:null, floor:'#1a1a1a', accent:'#333'},
+  // Security(490-690,440-620) ↔ Storage(90-330,720-920): vertical x:180-248, y:488-722
+  {x:180, y:488, w:68,  h:234, room:null, floor:'#1a1a1a', accent:'#333'},
 ];
 
 // Rooms for label/style lookup (name, display info)
@@ -622,12 +610,18 @@ function handleMovement(){
 }
 
 function hitWall(x,y){
-  // Player is blocked unless center+radius fits inside at least one walkable zone
-  const r=PLAYER_R;
-  for(const z of WALKABLE){
-    if(x-r>=z.x&&x+r<=z.x+z.w&&y-r>=z.y&&y+r<=z.y+z.h) return false;
+  // Check if ALL 4 corners of the player are covered by ANY walkable zone
+  // (corners can be in different zones, allowing doorway transitions)
+  const r=PLAYER_R-3;
+  const corners=[[x-r,y-r],[x+r,y-r],[x-r,y+r],[x+r,y+r]];
+  for(const [cx,cy] of corners){
+    let covered=false;
+    for(const z of WALKABLE){
+      if(cx>=z.x&&cx<=z.x+z.w&&cy>=z.y&&cy<=z.y+z.h){covered=true;break;}
+    }
+    if(!covered) return true;
   }
-  return true;
+  return false;
 }
 
 function updateCamera(){
