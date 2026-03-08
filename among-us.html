@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Among Us — Angkatan XVI</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0d1b2a;font-family:'Nunito',sans-serif;color:#fff;overflow:hidden;width:100vw;height:100dvh;}
+canvas{display:block;position:fixed;inset:0;z-index:0;}
+
+/* ─── SCREENS ─── */
+.screen{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:1rem;}
+.screen.on{display:flex;}
+#sJoin,#sLobby,#sEnd{background:radial-gradient(ellipse at center,#1a0a2e 0%,#0d1117 100%);}
+#sMeeting{background:rgba(0,0,0,.85);backdrop-filter:blur(14px);}
+
+.card{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:2px solid rgba(255,255,255,.1);border-radius:26px;padding:2.2rem 1.8rem;max-width:460px;width:100%;text-align:center;}
+.big-emoji{font-size:3.8rem;margin-bottom:.5rem;display:block;}
+h1.gt{font-family:'Fredoka One',cursive;font-size:2.6rem;color:#c8f7ff;text-shadow:0 3px 0 rgba(0,0,0,.4);margin-bottom:.2rem;}
+.gsub{font-size:.84rem;color:rgba(255,255,255,.4);margin-bottom:1.5rem;line-height:1.55;}
+.inp{width:100%;padding:.8rem 1.2rem;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.14);border-radius:50px;color:#fff;font-family:'Nunito',sans-serif;font-size:.96rem;outline:none;text-align:center;margin-bottom:.8rem;}
+.inp::placeholder{color:rgba(255,255,255,.3);}
+.inp:focus{border-color:#c8f7ff;}
+.btn{width:100%;padding:.85rem;border:none;border-radius:50px;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.btn-cyan{background:linear-gradient(135deg,#00b4d8,#0077b6);color:#fff;}
+.btn-cyan:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,180,216,.4);}
+.btn-cyan:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.btn-red{background:linear-gradient(135deg,#e63946,#c1121f);color:#fff;}
+.btn-red:hover{transform:translateY(-2px);}
+.btn-grey{background:rgba(255,255,255,.08);color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.12);}
+.btn-grey:hover{background:rgba(255,255,255,.14);}
+
+/* ─── LOBBY ─── */
+.lob-head{font-family:'Fredoka One',cursive;font-size:1.9rem;color:#c8f7ff;margin-bottom:.2rem;}
+.lob-sub{font-size:.8rem;color:rgba(255,255,255,.38);margin-bottom:1.1rem;}
+.player-chips{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-bottom:1rem;}
+.pchip{display:flex;align-items:center;gap:.4rem;padding:.35rem .75rem;border-radius:50px;font-size:.82rem;font-weight:700;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);}
+.pdot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+
+/* ─── HUD ─── */
+#hud{position:fixed;inset:0;z-index:10;pointer-events:none;}
+.hud-tl{position:absolute;top:.7rem;left:.7rem;display:flex;flex-direction:column;gap:.4rem;}
+.hud-tr{position:absolute;top:.7rem;right:.7rem;display:flex;flex-direction:column;gap:.4rem;align-items:flex-end;}
+.hud-bl{position:absolute;bottom:.8rem;left:.8rem;}
+.hud-bc{position:absolute;bottom:.8rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;}
+.hud-br{position:absolute;bottom:.8rem;right:.8rem;display:flex;flex-direction:column;gap:.5rem;align-items:flex-end;}
+.hbadge{background:rgba(0,0,0,.62);backdrop-filter:blur(8px);border-radius:12px;padding:.45rem .85rem;border:1px solid rgba(255,255,255,.1);font-size:.78rem;font-weight:700;}
+.role-badge{font-family:'Fredoka One',cursive;font-size:.95rem;}
+.role-crew{color:#7adf9f;border-color:rgba(122,223,159,.25);}
+.role-imp{color:#ff6b6b;border-color:rgba(255,107,107,.25);}
+.task-bar-wrap{background:rgba(0,0,0,.55);border-radius:50px;padding:.35rem .75rem;display:flex;align-items:center;gap:.6rem;border:1px solid rgba(255,255,255,.08);}
+.task-label{font-size:.65rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.task-bar-bg{width:100px;height:8px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden;}
+.task-bar-fill{height:100%;background:linear-gradient(90deg,#7adf9f,#00b4d8);border-radius:4px;transition:width .4s;}
+.hud-btn{pointer-events:all;padding:.6rem 1.1rem;border:none;border-radius:50px;font-family:'Fredoka One',cursive;font-size:.9rem;cursor:pointer;transition:all .2s;}
+.kill-btn{background:linear-gradient(135deg,#e63946,#c1121f);color:#fff;}
+.kill-btn:disabled{opacity:.28;cursor:not-allowed;}
+.kill-btn:not(:disabled):hover{transform:scale(1.07);}
+.report-btn{background:linear-gradient(135deg,#f4a261,#e76f51);color:#fff;}
+.report-btn:disabled{opacity:.28;cursor:not-allowed;}
+.emerg-btn{background:linear-gradient(135deg,#e63946,#9d0208);color:#fff;font-size:.78rem;}
+.task-btn{background:linear-gradient(135deg,#7adf9f,#2dc653);color:#1a3a2a;font-size:.85rem;}
+.task-btn:disabled{opacity:.3;cursor:not-allowed;}
+.sabotage-btn{background:linear-gradient(135deg,#9d4edd,#7b2d8b);color:#fff;font-size:.78rem;}
+
+/* ─── JOYSTICK ─── */
+#joystick-area{position:fixed;bottom:1.4rem;left:1rem;z-index:20;pointer-events:all;display:none;}
+.jstick-outer{width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);position:relative;touch-action:none;}
+.jstick-inner{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.35);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+
+/* ─── MEETING ─── */
+#sMeeting .card{max-width:520px;}
+.meet-title{font-family:'Fredoka One',cursive;font-size:2rem;color:#ff6b6b;margin-bottom:.2rem;}
+.meet-sub{font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:1.2rem;}
+.vote-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.9rem;max-height:55vh;overflow-y:auto;}
+.vote-row{display:flex;align-items:center;gap:.65rem;padding:.6rem .85rem;border-radius:14px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);cursor:pointer;transition:all .18s;}
+.vote-row:hover:not(.dead-row):not(.voted-row){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);}
+.vote-row.voted-row{border-color:var(--voter-color,#c8f7ff);background:rgba(200,247,255,.08);}
+.vote-row.dead-row{opacity:.3;cursor:default;}
+.vote-row.eliminated{background:rgba(230,57,70,.15);border-color:rgba(230,57,70,.3);}
+.vr-color{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+.vr-name{font-size:.9rem;font-weight:700;flex:1;}
+.vr-you{font-size:.65rem;color:rgba(255,255,255,.4);margin-left:.2rem;}
+.vr-dead{font-size:.9rem;}
+.vr-votes{font-size:.78rem;color:rgba(255,255,255,.5);font-weight:700;margin-left:auto;}
+.vr-mymark{font-size:.75rem;color:#c8f7ff;font-weight:700;margin-left:.3rem;}
+.skip-row{background:rgba(255,255,255,.03);border-style:dashed;justify-content:center;color:rgba(255,255,255,.45);font-size:.85rem;font-weight:700;}
+.meet-timer{font-family:'Fredoka One',cursive;font-size:1.1rem;color:rgba(255,255,255,.5);margin-bottom:.5rem;}
+.meet-timer.urg{color:#ff6b6b;animation:urg .5s ease infinite;}
+@keyframes urg{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ─── TASK MINI-GAMES ─── */
+#sTask{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;}
+#sTask.on{display:flex;}
+.task-card{background:#111827;border-radius:22px;padding:1.8rem;max-width:340px;width:90%;text-align:center;border:2px solid rgba(122,223,159,.2);}
+.task-title{font-family:'Fredoka One',cursive;font-size:1.4rem;color:#7adf9f;margin-bottom:.3rem;}
+.task-desc{font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:1.2rem;}
+/* Wiring task */
+.wire-wrap{display:flex;justify-content:space-between;gap:1rem;margin-bottom:1rem;}
+.wire-col{display:flex;flex-direction:column;gap:.5rem;}
+.wire-node{width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;}
+.wire-node:hover{transform:scale(1.1);}
+.wire-node.sel{transform:scale(1.1);box-shadow:0 0 12px currentColor;}
+.wire-node.done{opacity:.4;cursor:default;}
+canvas#wireCanvas{position:absolute;top:0;left:0;pointer-events:none;}
+.wire-area{position:relative;}
+/* Button mash task */
+.mash-wrap{display:flex;flex-direction:column;align-items:center;gap:.8rem;}
+.mash-progress{width:100%;height:16px;background:rgba(255,255,255,.1);border-radius:8px;overflow:hidden;}
+.mash-fill{height:100%;background:linear-gradient(90deg,#7adf9f,#00b4d8);border-radius:8px;transition:width .1s;}
+.mash-btn{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#7adf9f,#2dc653);border:none;font-family:'Fredoka One',cursive;font-size:1rem;color:#1a3a2a;cursor:pointer;transition:all .1s;box-shadow:0 6px 0 #1a7a3a;}
+.mash-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #1a7a3a;}
+/* Simon says task */
+.simon-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:.8rem auto;max-width:200px;}
+.simon-btn{height:72px;border-radius:12px;border:none;cursor:pointer;transition:all .15s;opacity:.4;}
+.simon-btn.lit{opacity:1;filter:brightness(1.5);transform:scale(1.06);}
+.simon-btn.active{opacity:1;}
+/* Scan task */
+.scan-wrap{display:flex;flex-direction:column;align-items:center;gap:.7rem;}
+.scan-circle{width:110px;height:110px;border-radius:50%;border:4px solid rgba(122,223,159,.3);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.scan-line{position:absolute;width:100%;height:3px;background:linear-gradient(90deg,transparent,#7adf9f,transparent);top:50%;animation:scanAnim 1.2s ease-in-out infinite;}
+@keyframes scanAnim{0%,100%{top:5%;}50%{top:95%;}}
+.scan-icon{font-size:2.5rem;z-index:1;}
+.scan-progress-text{font-family:'Fredoka One',cursive;font-size:1.1rem;color:#7adf9f;}
+
+/* ─── NOTIFICATIONS ─── */
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);backdrop-filter:blur(8px);color:#fff;padding:.6rem 1.3rem;border-radius:50px;font-size:.83rem;font-weight:700;z-index:300;opacity:0;transition:opacity .25s;pointer-events:none;border:1px solid rgba(255,255,255,.15);max-width:92vw;white-space:nowrap;}
+.toast.on{opacity:1;}
+.announce{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Fredoka One',cursive;font-size:2.2rem;text-align:center;z-index:250;pointer-events:none;opacity:0;transition:opacity .3s;text-shadow:0 3px 0 rgba(0,0,0,.6);}
+.announce.on{opacity:1;animation:annAnim 1s ease;}
+@keyframes annAnim{0%{transform:translate(-50%,-50%) scale(.6);}30%{transform:translate(-50%,-55%) scale(1.1);}100%{transform:translate(-50%,-55%) scale(1);}}
+.kill-flash{position:fixed;inset:0;background:rgba(230,57,70,.4);pointer-events:none;z-index:200;opacity:0;transition:opacity .15s;}
+.kill-flash.on{opacity:1;}
+
+/* ─── END ─── */
+.end-result{font-family:'Fredoka One',cursive;font-size:2.2rem;margin:1rem 0 .3rem;}
+.crew-win{color:#7adf9f;} .imp-win{color:#ff6b6b;}
+.end-list{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin:.9rem 0;}
+.er-chip{padding:.3rem .8rem;border-radius:50px;font-size:.78rem;font-weight:700;}
+.er-crew{background:rgba(122,223,159,.18);color:#7adf9f;border:1px solid rgba(122,223,159,.3);}
+.er-imp{background:rgba(255,107,107,.18);color:#ff6b6b;border:1px solid rgba(255,107,107,.3);}
+
+@media(max-width:480px){
+  h1.gt{font-size:2rem;}
+  .card{padding:1.6rem 1.1rem;}
+  .hud-btn{font-size:.78rem;padding:.5rem .85rem;}
+  .task-card{padding:1.4rem 1rem;}
+  #joystick-area{bottom:1rem;left:.7rem;}
+}
+</style>
+</head>
+<body>
+<!-- JOIN -->
+<div id="sJoin" class="screen on">
+  <div class="card">
+    <span class="big-emoji">🚀</span>
+    <h1 class="gt">Among Us</h1>
+    <p class="gsub">Temukan siapa impostornya! Selesaikan tugas, laporkan mayat, dan jangan dibunuh. 4–10 pemain.</p>
+    <input class="inp" id="jName" placeholder="Nama kamu..." maxlength="16" autocomplete="off">
+    <div style="display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap;justify-content:center" id="colorPicker"></div>
+    <button class="btn btn-cyan" onclick="joinGame()">Masuk ke Kapal →</button>
+  </div>
+</div>
+
+<!-- LOBBY -->
+<div id="sLobby" class="screen">
+  <div class="card">
+    <div class="lob-head">🚀 Ruang Tunggu</div>
+    <div class="lob-sub">Tunggu semua bergabung, lalu host atur dan mulai game.</div>
+    <div class="player-chips" id="lobChips"></div>
+    <div id="hostConfig" style="display:none;margin-bottom:.9rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border-radius:12px;padding:.6rem .9rem;margin-bottom:.4rem;">
+        <span style="font-size:.82rem;color:rgba(255,255,255,.55)">Jumlah Impostor</span>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <button onclick="changeImp(-1)" style="width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:.9rem">−</button>
+          <span id="impCount" style="font-family:'Fredoka One',cursive;font-size:1.2rem;color:#ff6b6b">1</span>
+          <button onclick="changeImp(1)" style="width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:.9rem">+</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-cyan" id="startBtn" onclick="startGame()" disabled>🚀 Mulai Game!</button>
+    <p style="font-size:.72rem;color:rgba(255,255,255,.28);margin-top:.5rem" id="lobHint">Butuh min 2 pemain</p>
+    <button class="btn btn-grey" style="margin-top:.6rem;width:auto;padding:.4rem 1.2rem;font-size:.82rem" onclick="backToJoin()">← Kembali</button>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud" style="display:none">
+  <div class="hud-tl">
+    <div class="hbadge role-badge" id="roleBadge">👤 ?</div>
+    <div class="hbadge" id="aliveBadge">👥 —</div>
+  </div>
+  <div class="hud-tr">
+    <div class="task-bar-wrap" id="taskBarWrap">
+      <span class="task-label">Tugas</span>
+      <div class="task-bar-bg"><div class="task-bar-fill" id="taskBarFill" style="width:0%"></div></div>
+      <span style="font-size:.68rem;color:rgba(255,255,255,.5)" id="taskCount">0/0</span>
+    </div>
+  </div>
+  <div class="hud-br" id="actionBtns">
+    <button class="hud-btn kill-btn" id="killBtn" onclick="tryKill()" disabled style="display:none">🔪 Bunuh</button>
+    <button class="hud-btn report-btn" id="reportBtn" onclick="tryReport()" disabled>📢 Lapor</button>
+    <button class="hud-btn emerg-btn" id="emergBtn" onclick="callMeeting('emergency')">🚨 Meeting</button>
+    <button class="hud-btn task-btn" id="taskBtn" onclick="openTask()" disabled style="display:none">⚡ Tugas</button>
+    <button class="hud-btn sabotage-btn" id="sabBtn" onclick="doSabotage()" style="display:none">💥 Sabotase</button>
+  </div>
+</div>
+
+<!-- JOYSTICK -->
+<div id="joystick-area">
+  <div class="jstick-outer" id="jOuter">
+    <div class="jstick-inner" id="jInner"></div>
+  </div>
+</div>
+
+<!-- MEETING -->
+<div id="sMeeting" class="screen">
+  <div class="card">
+    <div class="meet-title" id="meetTitle">🚨 DARURAT!</div>
+    <div class="meet-sub" id="meetSub">Diskusikan siapa impostornya. Vote sekarang!</div>
+    <div class="meet-timer" id="meetTimer"></div>
+    <div class="vote-list" id="voteList"></div>
+    <button class="btn btn-grey" id="skipVoteBtn" onclick="castVote('skip')" style="padding:.6rem;font-size:.82rem">⏭ Lewati Voting</button>
+    <div style="font-size:.7rem;color:rgba(255,255,255,.25);margin-top:.5rem" id="voteStatus">Menunggu semua vote...</div>
+  </div>
+</div>
+
+<!-- TASK MINI-GAME -->
+<div id="sTask">
+  <div class="task-card" id="taskCard">
+    <!-- filled dynamically -->
+  </div>
+</div>
+
+<!-- END -->
+<div id="sEnd" class="screen">
+  <div class="card">
+    <span class="big-emoji" id="endEmoji">🚀</span>
+    <div class="end-result" id="endResult"></div>
+    <div style="font-size:.83rem;color:rgba(255,255,255,.45);margin-bottom:.5rem" id="endSub"></div>
+    <div class="end-list" id="endList"></div>
+    <button class="btn btn-cyan" onclick="playAgain()" style="margin-top:.5rem">🔄 Main Lagi</button>
+  </div>
+</div>
+
+<div class="kill-flash" id="killFlash"></div>
+<div class="toast" id="toastEl"></div>
+<div class="announce" id="announceEl"></div>
+<canvas id="canvas"></canvas>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+/* ══════════════════════════════════════════════
+   FIREBASE
+══════════════════════════════════════════════ */
+firebase.initializeApp({
+  apiKey:'AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg',
+  authDomain:'chat-angkatan-16.firebaseapp.com',
+  databaseURL:'https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId:'chat-angkatan-16',storageBucket:'chat-angkatan-16.appspot.com',
+  messagingSenderId:'47699501502',appId:'1:47699501502:web:0d09e69d0b3ff39a7359ef'
+});
+const db=firebase.database();
+const PR=db.ref('au/players');
+const GR=db.ref('au/game');
+const BR=db.ref('au/bodies');
+const TR=db.ref('au/tasks');
+const MR=db.ref('au/meeting');
+const VR=db.ref('au/votes');
+
+/* ══════════════════════════════════════════════
+   CONSTANTS
+══════════════════════════════════════════════ */
+const COLORS=['#e63946','#f4a261','#e9c46a','#2a9d8f','#457b9d','#a8dadc','#6a4c93','#c77dff','#ff9f1c','#2dc653'];
+const COLOR_NAMES=['Merah','Oranye','Kuning','Toska','Biru','Langit','Ungu','Lavender','Amber','Hijau'];
+const PLAYER_R=14;
+const INTERACT_DIST=52;
+const KILL_DIST=48;
+const SPEED=2.6;
+const TASKS_PER_PLAYER=3;
+const MEETING_SECS=40;
+
+// Map rooms
+const MAP_W=1200, MAP_H=800;
+const ROOMS=[
+  {name:'Kafe',         x:60,  y:60,  w:280, h:200, col:'#1a2e1a', light:'#2d4d2d'},
+  {name:'Lab',          x:460, y:60,  w:280, h:200, col:'#1a1a2e', light:'#2d2d4d'},
+  {name:'Mesin',        x:860, y:60,  w:280, h:200, col:'#2e1a1a', light:'#4d2d2d'},
+  {name:'Koridor Atas', x:340, y:80,  w:120, h:160, col:'#1e1e1e', light:'#2a2a2a'},
+  {name:'Koridor Kiri', x:80,  y:260, w:160, h:280, col:'#1e1e1e', light:'#2a2a2a'},
+  {name:'Pusat',        x:380, y:280, w:440, h:240, col:'#1e2a1e', light:'#2a3d2a'},
+  {name:'Mekanik',      x:860, y:260, w:280, h:200, col:'#2a1e2a', light:'#3d2a3d'},
+  {name:'Gudang',       x:60,  y:560, w:280, h:200, col:'#2a2a1e', light:'#3d3d2a'},
+  {name:'Reaktor',      x:460, y:540, w:280, h:220, col:'#2e1a1a', light:'#4d2d2d'},
+  {name:'Engine',       x:860, y:480, w:280, h:280, col:'#1a1e2a', light:'#2a2d3d'},
+  {name:'Vent Atas L',  x:340, y:60,  w:120, h:20,  col:'#111',    light:'#222'},
+  {name:'Vent Bawah',   x:460, y:760, w:280, h:20,  col:'#111',    light:'#222'},
+];
+
+const WALLS=[
+  // Outer walls
+  {x:40,y:40,w:1120,h:20},{x:40,y:740,w:1120,h:20},
+  {x:40,y:40,w:20,h:720},{x:1140,y:40,w:20,h:720},
+  // Inner dividers
+  {x:340,y:60,w:20,h:200},{x:460,y:60,w:20,h:200},
+  {x:740,y:60,w:20,h:200},{x:860,y:60,w:20,h:200},
+  {x:60,y:260,w:320,h:20},{x:500,y:260,w:600,h:20},
+  {x:340,y:200,w:140,h:80},
+  {x:60,y:520,w:320,h:20},{x:380,y:520,w:460,h:20},{x:860,y:460,w:280,h:20},
+  {x:380,y:260,w:20,h:260},{x:820,y:260,w:20,h:260},
+];
+
+// Task positions (roomName, x, y, id)
+const TASK_SPOTS=[
+  {id:'t0',room:'Kafe',       x:120, y:140, label:'Tuang Kopi ☕',    type:'mash'},
+  {id:'t1',room:'Kafe',       x:240, y:100, label:'Bersihkan Meja 🧹',type:'mash'},
+  {id:'t2',room:'Lab',        x:520, y:120, label:'Kalibrasi Mesin 🔧',type:'wire'},
+  {id:'t3',room:'Lab',        x:660, y:160, label:'Scan Sampel 🔬',    type:'scan'},
+  {id:'t4',room:'Mesin',      x:920, y:100, label:'Isi BBM ⛽',        type:'mash'},
+  {id:'t5',room:'Mesin',      x:1060,y:160, label:'Sambung Kabel 🔌',  type:'wire'},
+  {id:'t6',room:'Pusat',      x:500, y:360, label:'Perbaiki Panel 🗂', type:'wire'},
+  {id:'t7',room:'Pusat',      x:660, y:320, label:'Cek CCTV 📹',       type:'simon'},
+  {id:'t8',room:'Reaktor',    x:520, y:600, label:'Reaktor Nuklir ☢', type:'scan'},
+  {id:'t9',room:'Gudang',     x:140, y:620, label:'Sortir Kotak 📦',   type:'mash'},
+  {id:'t10',room:'Mekanik',   x:940, y:320, label:'Ganti Busi 🔩',     type:'wire'},
+  {id:'t11',room:'Engine',    x:980, y:540, label:'Engine Check 🚀',   type:'simon'},
+];
+
+const VENT_PAIRS=[
+  ['v0','v1'],['v0','v2'],['v1','v2'],['v3','v4']
+];
+const VENTS=[
+  {id:'v0',x:180,y:480,room:'Koridor Kiri'},
+  {id:'v1',x:600,y:400,room:'Pusat'},
+  {id:'v2',x:960,y:360,room:'Mekanik'},
+  {id:'v3',x:200,y:650,room:'Gudang'},
+  {id:'v4',x:600,y:650,room:'Reaktor'},
+];
+
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let myId   = localStorage.getItem('auUid')||('au'+Math.random().toString(36).substr(2,7));
+let myName = localStorage.getItem('auName')||'';
+let myColor= localStorage.getItem('auColor')||COLORS[0];
+localStorage.setItem('auUid',myId);
+
+let playersData={}, gameData={}, bodiesData={}, tasksData={}, meetingData={}, votesData={};
+let isHost=false;
+let myRole='crewmate'; // 'crewmate' | 'impostor'
+let myAlive=true;
+let myTasks=[]; // task ids assigned to me
+let gameStarted=false;
+let gameListeners=false;
+let impCount=1;
+
+// Canvas / render
+let canvas, ctx;
+let camX=0, camY=0;
+let isMobile=/Mobi|Android/i.test(navigator.userAgent);
+
+// Movement
+const keys={};
+let joy={x:0,y:0};
+let myX=600,myY=400;
+let nearTask=null, nearBody=null;
+let posThrottle=0;
+
+// Meeting state
+let meetingTimer=null;
+let myVote=null;
+let hasVoted=false;
+
+// Task mini-game
+let currentTaskId=null;
+let wireState={selected:null,matched:[]};
+let mashProgress=0;
+let simonSeq=[],simonInput=[],simonPhase='show',simonStep=0,simonTimer=null;
+let scanProgress=0, scanTimer=null;
+
+/* ══════════════════════════════════════════════
+   COLOR PICKER
+══════════════════════════════════════════════ */
+function buildColorPicker(){
+  const el=document.getElementById('colorPicker');
+  el.innerHTML=COLORS.map((c,i)=>`<div onclick="pickColor('${c}')"
+    style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;
+    border:3px solid ${c===myColor?'#fff':'transparent'};transition:all .15s;flex-shrink:0"
+    id="cp${i}" title="${COLOR_NAMES[i]}"></div>`).join('');
+}
+function pickColor(c){
+  myColor=c;
+  localStorage.setItem('auColor',c);
+  document.querySelectorAll('#colorPicker div').forEach((d,i)=>{
+    d.style.border=COLORS[i]===c?'3px solid #fff':'3px solid transparent';
+  });
+}
+buildColorPicker();
+
+/* ══════════════════════════════════════════════
+   JOIN / LOBBY
+══════════════════════════════════════════════ */
+document.getElementById('jName').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame();});
+document.getElementById('jName').value=myName||localStorage.getItem('lbName')||'';
+
+function joinGame(){
+  const n=document.getElementById('jName').value.trim();
+  if(!n){document.getElementById('jName').focus();return;}
+  myName=n; localStorage.setItem('auName',n);
+  PR.child(myId).set({name:n,color:myColor,x:600,y:400,alive:true,joinedAt:Date.now()});
+  PR.child(myId).onDisconnect().remove();
+  showScreen('sLobby');
+  startLobby();
+}
+
+function startLobby(){
+  PR.orderByChild('joinedAt').on('value',snap=>{
+    playersData={};
+    snap.forEach(s=>{playersData[s.key]=s.val();});
+    const ids=Object.keys(playersData);
+    isHost=ids.length>0&&ids[0]===myId;
+    document.getElementById('lobChips').innerHTML=ids.map(id=>{
+      const p=playersData[id];
+      return `<div class="pchip"><div class="pdot" style="background:${p.color}"></div>${esc(p.name)}${id===myId?' (kamu)':''}</div>`;
+    }).join('');
+    document.getElementById('startBtn').disabled=!isHost||ids.length<2;
+    document.getElementById('hostConfig').style.display=isHost?'block':'none';
+    document.getElementById('lobHint').textContent=isHost
+      ?`${ids.length} pemain — siap!`
+      :'Menunggu host mulai...';
+    if(gameData.phase==='playing') enterGame();
+  });
+  GR.on('value',snap=>{
+    gameData=snap.val()||{};
+    if(gameData.phase==='playing') enterGame();
+    if(gameData.phase==='meeting') enterMeeting();
+    if(gameData.phase==='end') showEndScreen();
+  });
+}
+
+function changeImp(d){
+  impCount=Math.max(1,Math.min(impCount+d,Math.floor(Object.keys(playersData).length/2)));
+  document.getElementById('impCount').textContent=impCount;
+}
+
+function startGame(){
+  const ids=Object.keys(playersData);
+  if(ids.length<2) return;
+  const shuffled=[...ids].sort(()=>Math.random()-.5);
+  const impostors=shuffled.slice(0,impCount);
+  const roles={};
+  ids.forEach(id=>{roles[id]=impostors.includes(id)?'impostor':'crewmate';});
+
+  // Assign tasks (crewmates only)
+  const taskAssign={};
+  ids.forEach(id=>{
+    if(roles[id]==='crewmate'){
+      const shuffleTasks=[...TASK_SPOTS].sort(()=>Math.random()-.5);
+      taskAssign[id]=shuffleTasks.slice(0,TASKS_PER_PLAYER).map(t=>t.id);
+    } else {
+      taskAssign[id]=[];
+    }
+  });
+
+  // Spawn positions
+  const spawnAngles=ids.map((_,i)=>i/ids.length*Math.PI*2);
+  const posUp={};
+  ids.forEach((id,i)=>{
+    const a=spawnAngles[i];
+    posUp[id+'/x']=600+Math.cos(a)*60;
+    posUp[id+'/y']=400+Math.sin(a)*60;
+    posUp[id+'/alive']=true;
+    posUp[id+'/role']=roles[id];
+    posUp[id+'/tasks']=JSON.stringify(taskAssign[id]);
+  });
+  PR.update(posUp);
+  BR.remove(); TR.remove(); MR.remove(); VR.remove();
+  GR.set({phase:'playing',roles,taskAssign,hostId:myId,impostors,totalTasks:ids.filter(id=>roles[id]==='crewmate').length*TASKS_PER_PLAYER,completedTasks:0,startedAt:Date.now()});
+}
+
+/* ══════════════════════════════════════════════
+   ENTER GAME
+══════════════════════════════════════════════ */
+function enterGame(){
+  if(gameStarted) return;
+  gameStarted=true;
+  showScreen(null);
+  document.getElementById('hud').style.display='block';
+  if(isMobile) document.getElementById('joystick-area').style.display='block';
+  initCanvas();
+  setupGameListeners();
+  setupControls();
+  // Set my role
+  myRole=gameData.roles?.[myId]||'crewmate';
+  myAlive=true;
+  myTasks=JSON.parse(playersData[myId]?.tasks||'[]');
+  myX=playersData[myId]?.x||600;
+  myY=playersData[myId]?.y||400;
+  updateRoleHUD();
+  requestAnimationFrame(gameLoop);
+}
+
+function setupGameListeners(){
+  if(gameListeners) return;
+  gameListeners=true;
+  PR.on('value',snap=>{
+    playersData={};
+    snap.forEach(s=>{playersData[s.key]=s.val();});
+    const me=playersData[myId];
+    if(me){myAlive=me.alive!==false;}
+    updateAliveBadge();
+  });
+  GR.on('value',snap=>{
+    gameData=snap.val()||{};
+    isHost=gameData.hostId===myId;
+    updateTaskBar();
+    if(gameData.phase==='meeting'&&!document.getElementById('sMeeting').classList.contains('on')) enterMeeting();
+    if(gameData.phase==='end') showEndScreen();
+    if(gameData.phase==='playing'&&document.getElementById('sMeeting').classList.contains('on')){
+      hideMeeting();
+    }
+  });
+  BR.on('value',snap=>{bodiesData=snap.val()||{};});
+  TR.on('value',snap=>{
+    tasksData=snap.val()||{};
+    updateTaskBar();
+    checkTaskWin();
+  });
+  VR.on('value',snap=>{
+    votesData=snap.val()||{};
+    renderVoteList();
+    updateVoteStatus();
+    if(isHost) checkAllVoted();
+  });
+}
+
+/* ══════════════════════════════════════════════
+   CANVAS + RENDER
+══════════════════════════════════════════════ */
+function initCanvas(){
+  canvas=document.getElementById('canvas');
+  ctx=canvas.getContext('2d');
+  resize();
+  window.addEventListener('resize',resize);
+}
+function resize(){
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+}
+
+function gameLoop(){
+  if(gameData.phase!=='playing'&&gameData.phase!=='meeting'){requestAnimationFrame(gameLoop);return;}
+  handleMovement();
+  updateCamera();
+  render();
+  checkProximity();
+  requestAnimationFrame(gameLoop);
+}
+
+function handleMovement(){
+  if(!myAlive) return;
+  if(gameData.phase==='meeting') return;
+  let dx=0,dy=0;
+  if(keys['ArrowLeft']||keys['a']||keys['A']) dx-=1;
+  if(keys['ArrowRight']||keys['d']||keys['D']) dx+=1;
+  if(keys['ArrowUp']||keys['w']||keys['W']) dy-=1;
+  if(keys['ArrowDown']||keys['s']||keys['S']) dy+=1;
+  dx+=joy.x; dy+=joy.y;
+  if(dx!==0&&dy!==0){dx*=0.707;dy*=0.707;}
+  if(dx!==0||dy!==0){
+    const nx=myX+dx*SPEED, ny=myY+dy*SPEED;
+    if(!hitWall(nx,myY)) myX=nx;
+    if(!hitWall(myX,ny)) myY=ny;
+    myX=Math.max(60,Math.min(MAP_W-60,myX));
+    myY=Math.max(60,Math.min(MAP_H-60,myY));
+    // Throttle Firebase writes
+    posThrottle++;
+    if(posThrottle%4===0){
+      PR.child(myId+'/x').set(myX);
+      PR.child(myId+'/y').set(myY);
+    }
+  }
+}
+
+function hitWall(x,y){
+  for(const w of WALLS){
+    if(x-PLAYER_R<w.x+w.w&&x+PLAYER_R>w.x&&y-PLAYER_R<w.y+w.h&&y+PLAYER_R>w.y) return true;
+  }
+  return false;
+}
+
+function updateCamera(){
+  const W=canvas.width,H=canvas.height;
+  camX=myX-W/2; camY=myY-H/2;
+  camX=Math.max(0,Math.min(MAP_W-W,camX));
+  camY=Math.max(0,Math.min(MAP_H-H,camY));
+}
+
+function render(){
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(-camX,-camY);
+
+  // Background
+  ctx.fillStyle='#0d1b2a';
+  ctx.fillRect(0,0,MAP_W,MAP_H);
+
+  // Stars
+  ctx.fillStyle='rgba(255,255,255,.4)';
+  for(let i=0;i<60;i++){
+    const sx=(i*137+13)%MAP_W, sy=(i*97+7)%MAP_H;
+    ctx.fillRect(sx,sy,1.5,1.5);
+  }
+
+  // Rooms
+  ROOMS.forEach(r=>{
+    ctx.fillStyle=r.light;
+    ctx.fillRect(r.x,r.y,r.w,r.h);
+    // Room border
+    ctx.strokeStyle='rgba(255,255,255,.06)';
+    ctx.lineWidth=2;
+    ctx.strokeRect(r.x,r.y,r.w,r.h);
+    // Room label
+    ctx.fillStyle='rgba(255,255,255,.2)';
+    ctx.font='bold 11px Nunito';
+    ctx.textAlign='center';
+    ctx.fillText(r.name,r.x+r.w/2,r.y+18);
+  });
+
+  // Walls
+  ctx.fillStyle='#1a1a2e';
+  WALLS.forEach(w=>ctx.fillRect(w.x,w.y,w.w,w.h));
+
+  // Task spots
+  const myDoneTasks=tasksData[myId]||{};
+  TASK_SPOTS.forEach(t=>{
+    const done=myDoneTasks[t.id];
+    const isMine=myTasks.includes(t.id);
+    if(!isMine&&myRole!=='impostor') return;
+    ctx.beginPath();
+    ctx.arc(t.x,t.y,10,0,Math.PI*2);
+    ctx.fillStyle=done?'rgba(122,223,159,.3)':isMine?'rgba(233,196,106,.7)':'rgba(255,255,255,.1)';
+    ctx.fill();
+    ctx.strokeStyle=done?'#7adf9f':'#e9c46a';
+    ctx.lineWidth=2;
+    ctx.stroke();
+    if(!done&&isMine){
+      ctx.fillStyle='#e9c46a';
+      ctx.font='bold 9px Nunito';
+      ctx.textAlign='center';
+      ctx.fillText('!',t.x,t.y+3);
+    }
+  });
+
+  // Vents (impostor only)
+  if(myRole==='impostor'){
+    VENTS.forEach(v=>{
+      ctx.beginPath();
+      ctx.ellipse(v.x,v.y,18,10,0,0,Math.PI*2);
+      ctx.fillStyle='rgba(155,89,182,.35)';
+      ctx.fill();
+      ctx.strokeStyle='rgba(155,89,182,.7)';
+      ctx.lineWidth=2;
+      ctx.stroke();
+    });
+  }
+
+  // Bodies
+  Object.entries(bodiesData).forEach(([uid,b])=>{
+    const p=playersData[uid];
+    const c=p?.color||'#888';
+    ctx.save();
+    ctx.globalAlpha=0.7;
+    // Bone/cross shape
+    ctx.strokeStyle=c;
+    ctx.lineWidth=3;
+    ctx.beginPath();
+    ctx.moveTo(b.x-12,b.y);ctx.lineTo(b.x+12,b.y);
+    ctx.moveTo(b.x,b.y-12);ctx.lineTo(b.x,b.y+12);
+    ctx.stroke();
+    ctx.fillStyle='#111';
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,7,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle=c;
+    ctx.lineWidth=2;
+    ctx.stroke();
+    ctx.fillStyle='rgba(255,0,0,.6)';
+    ctx.font='11px Arial';
+    ctx.textAlign='center';
+    ctx.fillText('☠',b.x,b.y+4);
+    ctx.restore();
+  });
+
+  // Other players
+  Object.entries(playersData).forEach(([uid,p])=>{
+    if(uid===myId) return;
+    if(!p.alive&&myRole==='crewmate'&&myAlive) return; // ghosts invisible to living crew
+    const alpha=p.alive?1:0.35;
+    drawPlayer(ctx,p.x||600,p.y||400,p.color||'#888',p.name||'?',alpha,p.role==='impostor'&&(!p.alive||myRole==='impostor'||!myAlive));
+  });
+
+  // My player
+  drawPlayer(ctx,myX,myY,myColor,myName,myAlive?1:.4,false,true);
+
+  // Proximity indicators
+  if(nearTask){
+    const t=TASK_SPOTS.find(t=>t.id===nearTask);
+    if(t){
+      ctx.beginPath();ctx.arc(t.x,t.y,18,0,Math.PI*2);
+      ctx.strokeStyle='rgba(233,196,106,.8)';ctx.lineWidth=2.5;
+      ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+    }
+  }
+  if(nearBody){
+    const b=bodiesData[nearBody];
+    if(b){
+      ctx.beginPath();ctx.arc(b.x,b.y,20,0,Math.PI*2);
+      ctx.strokeStyle='rgba(230,57,70,.8)';ctx.lineWidth=2.5;
+      ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+    }
+  }
+
+  ctx.restore();
+}
+
+function drawPlayer(ctx,x,y,color,name,alpha,showImp,isMe){
+  ctx.save();
+  ctx.globalAlpha=alpha;
+  // Shadow
+  ctx.fillStyle='rgba(0,0,0,.3)';
+  ctx.beginPath();ctx.ellipse(x,y+PLAYER_R+2,PLAYER_R*.7,4,0,0,Math.PI*2);ctx.fill();
+  // Body (among-us bean shape)
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.ellipse(x,y+2,PLAYER_R,PLAYER_R*1.15,0,0,Math.PI*2);
+  ctx.fill();
+  // Visor
+  ctx.fillStyle='rgba(100,200,255,.85)';
+  ctx.beginPath();
+  ctx.ellipse(x+PLAYER_R*.3,y-PLAYER_R*.2,PLAYER_R*.55,PLAYER_R*.42,Math.PI/6,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.4)';
+  ctx.beginPath();
+  ctx.ellipse(x+PLAYER_R*.2,y-PLAYER_R*.3,PLAYER_R*.2,PLAYER_R*.15,Math.PI/6,0,Math.PI*2);
+  ctx.fill();
+  // Backpack
+  ctx.fillStyle=shadeColor(color,-30);
+  ctx.beginPath();
+  ctx.roundRect(x-PLAYER_R-.5,y-4,8,12,3);
+  ctx.fill();
+  // Impostor indicator (only visible to impostors or dead)
+  if(showImp){
+    ctx.fillStyle='rgba(230,57,70,.9)';
+    ctx.beginPath();ctx.arc(x+PLAYER_R,y-PLAYER_R,5,0,Math.PI*2);ctx.fill();
+  }
+  // Name
+  ctx.fillStyle='#fff';
+  ctx.font=`bold 11px Nunito`;
+  ctx.textAlign='center';
+  ctx.fillText(name+(isMe?' ★':''),x,y-PLAYER_R-8);
+  ctx.restore();
+}
+
+function shadeColor(col,amt){
+  const n=parseInt(col.slice(1),16);
+  const r=Math.max(0,Math.min(255,(n>>16)+amt));
+  const g=Math.max(0,Math.min(255,((n>>8)&0xff)+amt));
+  const b=Math.max(0,Math.min(255,(n&0xff)+amt));
+  return '#'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');
+}
+
+/* ══════════════════════════════════════════════
+   PROXIMITY + ACTIONS
+══════════════════════════════════════════════ */
+function dist(x1,y1,x2,y2){return Math.sqrt((x1-x2)**2+(y1-y2)**2);}
+
+function checkProximity(){
+  if(!myAlive) return;
+  nearTask=null; nearBody=null;
+  let nearestKill=null,nearestKillDist=Infinity;
+
+  // Tasks
+  TASK_SPOTS.forEach(t=>{
+    if(!myTasks.includes(t.id)) return;
+    if(tasksData[myId]?.[t.id]) return;
+    if(dist(myX,myY,t.x,t.y)<INTERACT_DIST) nearTask=t.id;
+  });
+
+  // Bodies
+  Object.entries(bodiesData).forEach(([uid,b])=>{
+    if(dist(myX,myY,b.x,b.y)<INTERACT_DIST) nearBody=uid;
+  });
+
+  // Kill target (impostor)
+  if(myRole==='impostor'){
+    Object.entries(playersData).forEach(([uid,p])=>{
+      if(uid===myId||!p.alive||p.role==='impostor') return;
+      const d=dist(myX,myY,p.x||0,p.y||0);
+      if(d<KILL_DIST&&d<nearestKillDist){nearestKillDist=d;nearestKill=uid;}
+    });
+  }
+
+  // Update buttons
+  const taskBtn=document.getElementById('taskBtn');
+  const reportBtn=document.getElementById('reportBtn');
+  const killBtn=document.getElementById('killBtn');
+  taskBtn.style.display=myTasks.length>0&&myRole==='crewmate'?'inline-flex':'none';
+  taskBtn.disabled=!nearTask;
+  reportBtn.disabled=!nearBody;
+  killBtn.style.display=myRole==='impostor'?'inline-flex':'none';
+  killBtn.disabled=!nearestKill;
+  killBtn.dataset.target=nearestKill||'';
+}
+
+/* ══════════════════════════════════════════════
+   KILL + REPORT + MEETING
+══════════════════════════════════════════════ */
+function tryKill(){
+  const target=document.getElementById('killBtn').dataset.target;
+  if(!target||myRole!=='impostor') return;
+  const tp=playersData[target];
+  if(!tp||!tp.alive) return;
+  PR.child(target).update({alive:false});
+  BR.child(target).set({x:tp.x,y:tp.y,killedBy:myId,ts:Date.now()});
+  flash(); toast(`💀 Kamu membunuh ${tp.name}!`);
+  checkImpostorWin();
+}
+
+function tryReport(){
+  if(!nearBody) return;
+  const uid=nearBody;
+  const b=bodiesData[uid];
+  if(!b) return;
+  const name=playersData[uid]?.name||'?';
+  callMeeting('report',`${myName} melaporkan mayat ${name}!`);
+}
+
+function callMeeting(type,reason){
+  const msg=reason||(type==='emergency'?`${myName} memanggil darurat!`:'Meeting!');
+  announce(`🚨 ${msg}`);
+  MR.set({caller:myId,type,reason:msg,ts:Date.now(),phase:'voting'});
+  VR.remove();
+  GR.update({phase:'meeting',meetingCaller:myId,meetingReason:msg});
+}
+
+/* ══════════════════════════════════════════════
+   MEETING + VOTING
+══════════════════════════════════════════════ */
+function enterMeeting(){
+  hasVoted=false; myVote=null;
+  showScreen('sMeeting');
+  document.getElementById('meetTitle').textContent=gameData.meetingReason||'🚨 Meeting!';
+  document.getElementById('meetSub').textContent='Diskusikan siapa impostornya dan vote!';
+  renderVoteList();
+  startMeetingTimer();
+}
+
+function hideMeeting(){
+  document.getElementById('sMeeting').classList.remove('on');
+  document.getElementById('sMeeting').style.display='none';
+}
+
+function startMeetingTimer(){
+  let t=MEETING_SECS;
+  const el=document.getElementById('meetTimer');
+  if(meetingTimer) clearInterval(meetingTimer);
+  meetingTimer=setInterval(()=>{
+    t--;
+    el.textContent=`⏳ ${t}s`;
+    el.className='meet-timer'+(t<=8?' urg':'');
+    if(t<=0){
+      clearInterval(meetingTimer);
+      if(isHost) resolveVoting();
+    }
+  },1000);
+}
+
+function renderVoteList(){
+  const alive=Object.entries(playersData).filter(([,p])=>p.alive!==false);
+  const list=document.getElementById('voteList');
+  const voteCounts={};
+  Object.values(votesData).forEach(v=>{voteCounts[v]=(voteCounts[v]||0)+1;});
+  list.innerHTML=alive.map(([uid,p])=>{
+    const myMark=votesData[myId]===uid;
+    const vc=voteCounts[uid]||0;
+    const isMe=uid===myId;
+    return `<div class="vote-row${hasVoted?' voted-row':''}" 
+      onclick="${!hasVoted&&!isMe?`castVote('${uid}')`:''}"
+      style="cursor:${hasVoted||isMe?'default':'pointer'}">
+      <div class="vr-color" style="background:${p.color||'#888'}"></div>
+      <div class="vr-name">${esc(p.name)}${isMe?'<span class="vr-you">(kamu)</span>':''}</div>
+      ${vc>0?`<div class="vr-votes">🗳 ${vc}</div>`:''}
+      ${myMark?`<div class="vr-mymark">✓ vote kamu</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function castVote(targetId){
+  if(hasVoted||!myAlive) return;
+  hasVoted=true;
+  myVote=targetId;
+  VR.child(myId).set(targetId);
+  document.getElementById('skipVoteBtn').disabled=true;
+  renderVoteList();
+  toast(targetId==='skip'?'⏭ Kamu skip vote':`🗳 Kamu vote ${playersData[targetId]?.name||'?'}`);
+}
+
+function updateVoteStatus(){
+  const alive=Object.entries(playersData).filter(([,p])=>p.alive!==false).length;
+  const voted=Object.keys(votesData).length;
+  document.getElementById('voteStatus').textContent=`${voted}/${alive} sudah vote`;
+}
+
+function checkAllVoted(){
+  const alive=Object.entries(playersData).filter(([,p])=>p.alive!==false);
+  if(Object.keys(votesData).length>=alive.length){
+    clearInterval(meetingTimer);
+    setTimeout(resolveVoting,600);
+  }
+}
+
+function resolveVoting(){
+  if(!isHost) return;
+  const counts={};
+  Object.values(votesData).forEach(v=>{ counts[v]=(counts[v]||0)+1; });
+  const sorted=Object.entries(counts).filter(([k])=>k!=='skip').sort((a,b)=>b[1]-a[1]);
+  let ejected=null;
+  if(sorted.length>0&&(sorted.length===1||sorted[0][1]>sorted[1][1])){
+    ejected=sorted[0][0];
+  }
+  if(ejected){
+    const name=playersData[ejected]?.name||'?';
+    const role=gameData.roles?.[ejected]||'crewmate';
+    PR.child(ejected).update({alive:false});
+    BR.child(ejected).remove(); // clear body if it existed
+    GR.update({phase:'playing',lastEjected:ejected,lastEjectedRole:role});
+    announce(`⚖️ ${name} dieliminasi!\nDia adalah ${role==='impostor'?'IMPOSTOR 😱':'warga biasa 😢'}`);
+    setTimeout(()=>checkImpostorWin()||checkTaskWin(),800);
+  } else {
+    announce('⚖️ Tidak ada yang dieliminasi!');
+    GR.update({phase:'playing',lastEjected:null});
+  }
+  VR.remove(); MR.remove();
+}
+
+/* ══════════════════════════════════════════════
+   WIN CONDITIONS
+══════════════════════════════════════════════ */
+function checkImpostorWin(){
+  const alive=Object.entries(playersData).filter(([,p])=>p.alive!==false);
+  const imps=alive.filter(([id])=>gameData.impostors?.includes(id));
+  const crew=alive.filter(([id])=>!gameData.impostors?.includes(id));
+  if(imps.length>=crew.length){
+    if(isHost) GR.update({phase:'end',winner:'impostor'});
+    return true;
+  }
+  if(imps.length===0){
+    if(isHost) GR.update({phase:'end',winner:'crew'});
+    return true;
+  }
+  return false;
+}
+
+function checkTaskWin(){
+  if(!isHost) return;
+  const crew=Object.entries(playersData).filter(([id])=>gameData.roles?.[id]==='crewmate');
+  let total=0,done=0;
+  crew.forEach(([id])=>{
+    const t=JSON.parse(playersData[id]?.tasks||'[]');
+    total+=t.length;
+    done+=Object.keys(tasksData[id]||{}).length;
+  });
+  if(total>0&&done>=total){
+    GR.update({phase:'end',winner:'crew_tasks'});
+  }
+}
+
+/* ══════════════════════════════════════════════
+   SABOTAGE
+══════════════════════════════════════════════ */
+function doSabotage(){
+  toast('💥 Sabotase belum ada efek saat ini — coming soon!');
+}
+
+/* ══════════════════════════════════════════════
+   TASK MINI-GAMES
+══════════════════════════════════════════════ */
+function openTask(){
+  if(!nearTask) return;
+  const t=TASK_SPOTS.find(t=>t.id===nearTask);
+  if(!t||tasksData[myId]?.[t.id]) return;
+  currentTaskId=t.id;
+  showTaskUI(t);
+}
+
+function showTaskUI(t){
+  const card=document.getElementById('taskCard');
+  document.getElementById('sTask').classList.add('on');
+  if(t.type==='mash') buildMashTask(card,t);
+  else if(t.type==='wire') buildWireTask(card,t);
+  else if(t.type==='simon') buildSimonTask(card,t);
+  else if(t.type==='scan') buildScanTask(card,t);
+}
+
+function closeTask(){
+  document.getElementById('sTask').classList.remove('on');
+  if(simonTimer){clearTimeout(simonTimer);simonTimer=null;}
+  if(scanTimer){clearInterval(scanTimer);scanTimer=null;}
+  currentTaskId=null;
+}
+
+function completeTask(){
+  if(!currentTaskId) return;
+  TR.child(myId+'/'+currentTaskId).set(true);
+  closeTask();
+  toast('✅ Tugas selesai! +1');
+}
+
+// ── MASH ──
+function buildMashTask(card,t){
+  mashProgress=0;
+  card.innerHTML=`<div class="task-title">${t.label}</div>
+    <div class="task-desc">Ketuk/klik tombol sebanyak mungkin untuk mengisinya!</div>
+    <div class="mash-wrap">
+      <div class="mash-progress"><div class="mash-fill" id="mashFill" style="width:0%"></div></div>
+      <div style="font-size:.8rem;color:rgba(255,255,255,.4)" id="mashTxt">0%</div>
+      <button class="mash-btn" onmousedown="doMash()" ontouchstart="doMash(event)">TAP!</button>
+    </div>
+    <br><button class="btn btn-grey" style="width:auto;padding:.5rem 1.2rem;font-size:.8rem" onclick="closeTask()">Batal</button>`;
+}
+function doMash(e){
+  if(e) e.preventDefault();
+  mashProgress=Math.min(100,mashProgress+7);
+  document.getElementById('mashFill').style.width=mashProgress+'%';
+  document.getElementById('mashTxt').textContent=Math.round(mashProgress)+'%';
+  if(mashProgress>=100) completeTask();
+}
+
+// ── WIRE ──
+const WIRE_COLORS=['#e63946','#f4a261','#7adf9f','#457b9d'];
+function buildWireTask(card,t){
+  wireState={selected:null,matched:[]};
+  const order=[0,1,2,3].sort(()=>Math.random()-.5);
+  card.innerHTML=`<div class="task-title">${t.label}</div>
+    <div class="task-desc">Sambungkan kabel kiri ke kanan yang warnanya sama!</div>
+    <div class="wire-area" style="position:relative">
+      <canvas id="wireCanvas" width="280" height="220" style="position:absolute;top:0;left:0;pointer-events:none"></canvas>
+      <div class="wire-wrap" style="padding:.5rem 1rem;min-height:220px">
+        <div class="wire-col" id="wireLeft">
+          ${WIRE_COLORS.map((c,i)=>`<div class="wire-node" id="wl${i}" style="background:${c};color:#fff" onclick="selectWire('left',${i})">${i+1}</div>`).join('')}
+        </div>
+        <div style="flex:1"></div>
+        <div class="wire-col" id="wireRight">
+          ${order.map((i)=>`<div class="wire-node" id="wr${i}" style="background:${WIRE_COLORS[i]};color:#fff" onclick="selectWire('right',${i})">${i+1}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-grey" style="width:auto;padding:.5rem 1.2rem;font-size:.8rem;margin-top:.5rem" onclick="closeTask()">Batal</button>`;
+  window._wireOrder=order;
+}
+function selectWire(side,idx){
+  if(wireState.matched.includes(idx)) return;
+  if(side==='left'){
+    wireState.selected=idx;
+    document.querySelectorAll('.wire-node').forEach(n=>n.classList.remove('sel'));
+    document.getElementById('wl'+idx)?.classList.add('sel');
+  } else if(side==='right'&&wireState.selected!==null){
+    if(wireState.selected===idx){
+      wireState.matched.push(idx);
+      document.getElementById('wl'+idx)?.classList.add('done');
+      document.getElementById('wr'+idx)?.classList.add('done');
+      wireState.selected=null;
+      drawWires();
+      if(wireState.matched.length>=4) completeTask();
+    } else {
+      toast('❌ Warna tidak cocok!');
+      wireState.selected=null;
+      document.querySelectorAll('.wire-node').forEach(n=>n.classList.remove('sel'));
+    }
+  }
+}
+function drawWires(){
+  const c=document.getElementById('wireCanvas');
+  if(!c) return;
+  const ctx2=c.getContext('2d');
+  ctx2.clearRect(0,0,c.width,c.height);
+  wireState.matched.forEach(i=>{
+    const lEl=document.getElementById('wl'+i);
+    const rEl=document.getElementById('wr'+i);
+    if(!lEl||!rEl) return;
+    const lRect=lEl.getBoundingClientRect();
+    const rRect=rEl.getBoundingClientRect();
+    const cRect=c.getBoundingClientRect();
+    const lx=lRect.right-cRect.left, ly=lRect.top+lRect.height/2-cRect.top;
+    const rx=rRect.left-cRect.left, ry=rRect.top+rRect.height/2-cRect.top;
+    ctx2.beginPath();
+    ctx2.moveTo(lx,ly);
+    ctx2.bezierCurveTo(lx+40,ly,rx-40,ry,rx,ry);
+    ctx2.strokeStyle=WIRE_COLORS[i];
+    ctx2.lineWidth=3;
+    ctx2.stroke();
+  });
+}
+
+// ── SIMON SAYS ──
+function buildSimonTask(card,t){
+  simonSeq=[Math.floor(Math.random()*4)];
+  simonInput=[]; simonPhase='show'; simonStep=0;
+  const simonColors=['#e63946','#7adf9f','#f4a261','#457b9d'];
+  card.innerHTML=`<div class="task-title">${t.label}</div>
+    <div class="task-desc" id="simonDesc">Perhatikan urutan warnanya, lalu ulangi!</div>
+    <div class="simon-grid">
+      ${simonColors.map((c,i)=>`<button class="simon-btn" id="sb${i}" style="background:${c}" onclick="simonPress(${i})"></button>`).join('')}
+    </div>
+    <div style="font-size:.78rem;color:rgba(255,255,255,.4)" id="simonStatus">Menampilkan urutan...</div>
+    <br><button class="btn btn-grey" style="width:auto;padding:.5rem 1.2rem;font-size:.8rem" onclick="closeTask()">Batal</button>`;
+  setTimeout(playSimonSeq,600);
+}
+function playSimonSeq(){
+  simonPhase='show'; simonStep=0;
+  document.getElementById('simonDesc').textContent='Perhatikan!';
+  document.getElementById('simonStatus').textContent='Menampilkan urutan...';
+  function showNext(){
+    if(simonStep>=simonSeq.length){
+      simonPhase='input'; simonInput=[];
+      document.getElementById('simonDesc').textContent='Sekarang ulangi!';
+      document.getElementById('simonStatus').textContent='Giliranmu!';
+      return;
+    }
+    const i=simonSeq[simonStep];
+    const btn=document.getElementById('sb'+i);
+    if(btn) btn.classList.add('lit');
+    simonTimer=setTimeout(()=>{
+      if(btn) btn.classList.remove('lit');
+      simonStep++;
+      simonTimer=setTimeout(showNext,300);
+    },600);
+  }
+  showNext();
+}
+function simonPress(i){
+  if(simonPhase!=='input') return;
+  const btn=document.getElementById('sb'+i);
+  if(btn){btn.classList.add('lit');setTimeout(()=>btn.classList.remove('lit'),200);}
+  simonInput.push(i);
+  const expected=simonSeq[simonInput.length-1];
+  if(i!==expected){
+    toast('❌ Salah! Mulai ulang...');
+    simonSeq=[Math.floor(Math.random()*4)];
+    simonInput=[];
+    simonTimer=setTimeout(playSimonSeq,800);
+    return;
+  }
+  if(simonInput.length===simonSeq.length){
+    if(simonSeq.length>=3){
+      completeTask(); return;
+    }
+    simonSeq.push(Math.floor(Math.random()*4));
+    document.getElementById('simonStatus').textContent=`Level ${simonSeq.length}/3 — lanjut!`;
+    simonTimer=setTimeout(playSimonSeq,700);
+  }
+}
+
+// ── SCAN ──
+function buildScanTask(card,t){
+  scanProgress=0;
+  card.innerHTML=`<div class="task-title">${t.label}</div>
+    <div class="task-desc">Tahan tombol sampai scan selesai!</div>
+    <div class="scan-wrap">
+      <div class="scan-circle" id="scanCircle">
+        <div class="scan-line" id="scanLine"></div>
+        <div class="scan-icon">🔬</div>
+      </div>
+      <div class="mash-progress" style="width:160px"><div class="mash-fill" id="scanFill" style="width:0%"></div></div>
+      <div class="scan-progress-text" id="scanTxt">0%</div>
+      <button class="mash-btn" id="scanBtn"
+        onmousedown="startScan()" onmouseup="stopScan()" onmouseleave="stopScan()"
+        ontouchstart="startScan(event)" ontouchend="stopScan()">TAHAN</button>
+    </div>
+    <br><button class="btn btn-grey" style="width:auto;padding:.5rem 1.2rem;font-size:.8rem" onclick="closeTask()">Batal</button>`;
+}
+let _scanning=false;
+function startScan(e){if(e)e.preventDefault();_scanning=true;if(!scanTimer)scanTimer=setInterval(doScan,80);}
+function stopScan(){_scanning=false;if(scanTimer){clearInterval(scanTimer);scanTimer=null;}}
+function doScan(){
+  if(!_scanning){stopScan();return;}
+  scanProgress=Math.min(100,scanProgress+2.2);
+  const fill=document.getElementById('scanFill');
+  const txt=document.getElementById('scanTxt');
+  if(fill) fill.style.width=scanProgress+'%';
+  if(txt) txt.textContent=Math.round(scanProgress)+'%';
+  if(scanProgress>=100){stopScan();completeTask();}
+}
+
+/* ══════════════════════════════════════════════
+   HUD UPDATES
+══════════════════════════════════════════════ */
+function updateRoleHUD(){
+  const rb=document.getElementById('roleBadge');
+  const killBtn=document.getElementById('killBtn');
+  const sabBtn=document.getElementById('sabBtn');
+  const taskBtn=document.getElementById('taskBtn');
+  const taskBarWrap=document.getElementById('taskBarWrap');
+  if(myRole==='impostor'){
+    rb.textContent='🔪 Impostor';
+    rb.className='hbadge role-badge role-imp';
+    killBtn.style.display='inline-flex';
+    sabBtn.style.display='inline-flex';
+    taskBarWrap.style.display='none';
+    taskBtn.style.display='none';
+  } else {
+    rb.textContent='👤 Kru';
+    rb.className='hbadge role-badge role-crew';
+    taskBtn.style.display='inline-flex';
+    taskBarWrap.style.display='flex';
+  }
+}
+
+function updateAliveBadge(){
+  const alive=Object.values(playersData).filter(p=>p.alive!==false).length;
+  const total=Object.keys(playersData).length;
+  document.getElementById('aliveBadge').textContent=`👥 ${alive}/${total}`;
+}
+
+function updateTaskBar(){
+  if(myRole!=='crewmate') return;
+  const crew=Object.entries(playersData).filter(([id])=>gameData.roles?.[id]==='crewmate');
+  let total=0,done=0;
+  crew.forEach(([id])=>{
+    const t=JSON.parse(playersData[id]?.tasks||'[]');
+    total+=t.length;
+    done+=Object.keys(tasksData[id]||{}).length;
+  });
+  const pct=total>0?(done/total*100):0;
+  document.getElementById('taskBarFill').style.width=pct+'%';
+  document.getElementById('taskCount').textContent=`${done}/${total}`;
+}
+
+/* ══════════════════════════════════════════════
+   END SCREEN
+══════════════════════════════════════════════ */
+function showEndScreen(){
+  clearInterval(meetingTimer);
+  showScreen('sEnd');
+  document.getElementById('hud').style.display='none';
+  const w=gameData.winner;
+  const crewWin=w==='crew'||w==='crew_tasks';
+  document.getElementById('endEmoji').textContent=crewWin?'🌍':'💀';
+  document.getElementById('endResult').textContent=crewWin?'Kru Menang! 🎉':'Impostor Menang! 😈';
+  document.getElementById('endResult').className='end-result '+(crewWin?'crew-win':'imp-win');
+  document.getElementById('endSub').textContent=
+    w==='crew_tasks'?'Semua tugas berhasil diselesaikan!':
+    w==='crew'?'Semua impostor berhasil dieliminasi!':
+    'Impostor menguasai kapal!';
+  const ids=Object.keys(playersData);
+  document.getElementById('endList').innerHTML=ids.map(id=>{
+    const p=playersData[id]; const r=gameData.roles?.[id]||'crewmate';
+    return `<div class="er-chip ${r==='impostor'?'er-imp':'er-crew'}">${r==='impostor'?'🔪':'👤'} ${esc(p.name||'?')}</div>`;
+  }).join('');
+  // Leaderboard
+  if(window.LB_addPoints){
+    ids.forEach(id=>{
+      const r=gameData.roles?.[id]||'crewmate';
+      const won=(crewWin&&r==='crewmate')||(!crewWin&&r==='impostor');
+      window.LB_addPoints(playersData[id]?.name,id,won?150:30);
+      if(won&&window.LB_addWin) window.LB_addWin(playersData[id]?.name,id);
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════
+   CONTROLS
+══════════════════════════════════════════════ */
+function setupControls(){
+  document.addEventListener('keydown',e=>{keys[e.key]=true;});
+  document.addEventListener('keyup',e=>{keys[e.key]=false;});
+  if(isMobile) setupJoystick();
+}
+
+function setupJoystick(){
+  const outer=document.getElementById('jOuter');
+  const inner=document.getElementById('jInner');
+  const R=55-22;
+  function onStart(e){e.preventDefault();onMove(e);}
+  function onMove(e){
+    e.preventDefault();
+    const t=e.touches?e.touches[0]:e;
+    const rect=outer.getBoundingClientRect();
+    const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+    let dx=t.clientX-cx, dy=t.clientY-cy;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if(d>R){dx=dx/d*R;dy=dy/d*R;}
+    inner.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    joy.x=dx/R; joy.y=dy/R;
+  }
+  function onEnd(e){
+    e.preventDefault();
+    inner.style.transform='translate(-50%,-50%)';
+    joy.x=0; joy.y=0;
+  }
+  outer.addEventListener('touchstart',onStart,{passive:false});
+  outer.addEventListener('touchmove',onMove,{passive:false});
+  outer.addEventListener('touchend',onEnd,{passive:false});
+}
+
+/* ══════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════ */
+function showScreen(id){
+  ['sJoin','sLobby','sMeeting','sEnd'].forEach(s=>{
+    const el=document.getElementById(s);
+    el.classList.remove('on'); el.style.display='none';
+  });
+  if(id){
+    const el=document.getElementById(id);
+    el.style.display='flex'; el.classList.add('on');
+  }
+}
+function flash(){
+  const f=document.getElementById('killFlash');
+  f.classList.add('on'); setTimeout(()=>f.classList.remove('on'),200);
+}
+function toast(msg){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg; t.classList.add('on');
+  clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove('on'),2800);
+}
+function announce(msg){
+  const a=document.getElementById('announceEl');
+  a.textContent=msg; a.classList.add('on');
+  clearTimeout(window._at); window._at=setTimeout(()=>a.classList.remove('on'),2200);
+}
+function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function backToJoin(){PR.child(myId).remove();showScreen('sJoin');}
+function leaveGame(){PR.child(myId).remove();location.reload();}
+function playAgain(){db.ref('au').remove();location.reload();}
+
+document.getElementById('jName').value=myName||localStorage.getItem('lbName')||'';
+</script>
+<script src="shared.js"></script>
+</body>
+</html>
