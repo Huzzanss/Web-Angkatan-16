@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Profil — Angkatan XVI</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Nunito',sans-serif;background:#0d1117;color:#fff;min-height:100dvh;}
+
+/* ─── Nav ─── */
+.pnav{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.2rem;background:rgba(13,17,23,.9);border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);}
+.pnav-title{font-family:'Fredoka One',cursive;font-size:1.2rem;color:#7adf9f;}
+.pnav-back{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:50px;color:rgba(255,255,255,.6);padding:.4rem 1rem;font-size:.82rem;cursor:pointer;text-decoration:none;transition:all .18s;}
+.pnav-back:hover{background:rgba(255,255,255,.12);}
+
+/* ─── Layout ─── */
+.profil-wrap{max-width:860px;margin:0 auto;padding:1.5rem 1rem 4rem;}
+.profil-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:600px){.profil-grid{grid-template-columns:1fr;}}
+
+/* ─── Cards ─── */
+.pcard{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:20px;padding:1.3rem 1.4rem;transition:border-color .2s;}
+.pcard:hover{border-color:rgba(255,255,255,.14);}
+.pcard-title{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.35);font-weight:700;margin-bottom:1rem;}
+.pcard.span2{grid-column:span 2;}
+@media(max-width:600px){.pcard.span2{grid-column:span 1;}}
+
+/* ─── Identity card ─── */
+.identity-card{background:linear-gradient(135deg,#1a2f1a,#1a1a2f,#2f1a1a);border-radius:20px;padding:1.6rem;position:relative;overflow:hidden;}
+.identity-card::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='28' fill='none' stroke='rgba(255,255,255,.03)' stroke-width='1'/%3E%3C/svg%3E") repeat;opacity:.5;}
+.id-top{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem;position:relative;}
+.id-avatar-big{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:2.6rem;border:3px solid rgba(255,255,255,.15);flex-shrink:0;cursor:pointer;transition:all .2s;position:relative;}
+.id-avatar-big:hover{border-color:#7adf9f;transform:scale(1.05);}
+.id-avatar-edit{position:absolute;bottom:-4px;right:-4px;background:#7adf9f;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#1a3a2a;font-weight:800;}
+.id-info{flex:1;}
+.id-name{font-family:'Fredoka One',cursive;font-size:1.5rem;line-height:1.1;margin-bottom:.2rem;}
+.id-class{font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:.5rem;}
+.id-mood-display{display:inline-flex;align-items:center;gap:.35rem;background:rgba(255,255,255,.08);border-radius:50px;padding:.3rem .7rem;font-size:.82rem;cursor:pointer;transition:all .2s;}
+.id-mood-display:hover{background:rgba(255,255,255,.14);}
+.id-stats{display:flex;gap:.7rem;position:relative;}
+.id-stat{text-align:center;flex:1;background:rgba(0,0,0,.2);border-radius:12px;padding:.5rem;}
+.id-stat-num{font-family:'Fredoka One',cursive;font-size:1.2rem;color:#7adf9f;}
+.id-stat-label{font-size:.62rem;color:rgba(255,255,255,.4);margin-top:.1rem;}
+.id-school-badge{position:absolute;top:.8rem;right:.8rem;background:rgba(122,223,159,.15);border:1px solid rgba(122,223,159,.3);border-radius:8px;padding:.3rem .6rem;font-size:.65rem;color:#7adf9f;font-weight:700;letter-spacing:.5px;}
+
+/* ─── Avatar picker ─── */
+.avatar-grid{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;padding:.5rem 0;}
+.av-opt{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;transition:all .18s;}
+.av-opt:hover{border-color:#7adf9f;transform:scale(1.1);}
+.av-opt.sel{border-color:#7adf9f;background:rgba(122,223,159,.15);}
+
+/* ─── Name/class editor ─── */
+.edit-row{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.7rem;}
+.edit-label{font-size:.75rem;color:rgba(255,255,255,.45);font-weight:700;}
+.edit-inp{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:10px;padding:.55rem .9rem;color:#fff;font-size:.9rem;outline:none;font-family:'Nunito',sans-serif;width:100%;}
+.edit-inp:focus{border-color:#7adf9f;}
+select.edit-inp option{background:#1a1f2e;}
+.save-btn{width:100%;padding:.65rem;background:linear-gradient(135deg,#7adf9f,#2dc653);border:none;border-radius:50px;color:#1a3a2a;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;transition:all .2s;margin-top:.3rem;}
+.save-btn:hover{transform:scale(1.03);}
+
+/* ─── Mood picker ─── */
+.mood-grid{display:flex;flex-wrap:wrap;gap:.4rem;}
+.mood-opt{padding:.3rem .7rem;border-radius:50px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);cursor:pointer;font-size:.88rem;transition:all .18s;}
+.mood-opt:hover{background:rgba(255,255,255,.1);}
+.mood-opt.sel{background:rgba(122,223,159,.15);border-color:#7adf9f;}
+.mood-custom{display:flex;gap:.4rem;margin-top:.6rem;}
+.mood-txt{flex:1;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:50px;padding:.4rem .9rem;color:#fff;font-size:.82rem;outline:none;}
+.mood-txt:focus{border-color:#7adf9f;}
+.mood-save{padding:.4rem 1rem;background:rgba(122,223,159,.2);border:1px solid rgba(122,223,159,.4);border-radius:50px;color:#7adf9f;font-weight:800;font-size:.82rem;cursor:pointer;}
+
+/* ─── Student card ─── */
+.student-id-card{background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);border-radius:18px;padding:1.4rem;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.1);}
+.student-id-card::after{content:'ANGKATAN XVI';position:absolute;bottom:1rem;right:1rem;font-family:'Fredoka One',cursive;font-size:1.8rem;color:rgba(255,255,255,.04);letter-spacing:2px;}
+.sic-top{display:flex;gap:1rem;align-items:center;margin-bottom:1rem;}
+.sic-photo{width:72px;height:88px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:2.5rem;border:2px solid rgba(255,255,255,.12);flex-shrink:0;}
+.sic-info{}
+.sic-school{font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.4);margin-bottom:.2rem;}
+.sic-name{font-family:'Fredoka One',cursive;font-size:1.2rem;line-height:1.1;margin-bottom:.3rem;}
+.sic-nis{font-size:.75rem;color:rgba(255,255,255,.5);}
+.sic-divider{border:none;border-top:1px solid rgba(255,255,255,.1);margin:.7rem 0;}
+.sic-fields{display:grid;grid-template-columns:1fr 1fr;gap:.4rem .8rem;}
+.sic-field{font-size:.72rem;color:rgba(255,255,255,.45);}
+.sic-value{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.85);}
+.sic-barcode{margin-top:.8rem;display:flex;justify-content:center;}
+.sic-barcode-inner{font-family:monospace;font-size:.55rem;letter-spacing:3px;color:rgba(255,255,255,.2);background:rgba(0,0,0,.2);padding:.3rem .8rem;border-radius:4px;}
+
+/* ─── Achievements ─── */
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:.7rem;}
+.badge-item{display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.6rem .4rem;border-radius:12px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);transition:all .18s;cursor:default;}
+.badge-item.earned{border-color:rgba(122,223,159,.3);background:rgba(122,223,159,.07);}
+.badge-item.earned:hover{transform:scale(1.08);}
+.badge-item.locked{opacity:.3;filter:grayscale(1);}
+.badge-icon{font-size:1.6rem;}
+.badge-name{font-size:.6rem;font-weight:700;text-align:center;color:rgba(255,255,255,.6);line-height:1.2;}
+.badge-item.earned .badge-name{color:#7adf9f;}
+
+/* ─── Stats ─── */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.stat-row:last-child{border-bottom:none;}
+.stat-key{font-size:.82rem;color:rgba(255,255,255,.5);}
+.stat-val{font-size:.88rem;font-weight:800;color:#7adf9f;}
+
+/* ─── Toast ─── */
+.toast2{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:rgba(13,17,23,.95);backdrop-filter:blur(8px);border:1px solid rgba(122,223,159,.3);color:#7adf9f;padding:.6rem 1.4rem;border-radius:50px;font-size:.85rem;font-weight:700;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none;}
+.toast2.on{opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="pnav">
+  <a class="pnav-back" href="index.html">← Kembali</a>
+  <span class="pnav-title">⭐ Profilku</span>
+  <div style="width:80px"></div>
+</div>
+
+<div class="profil-wrap">
+
+  <!-- ── Identity Card (preview) ── -->
+  <div class="identity-card pcard" style="margin-bottom:1rem">
+    <div class="id-school-badge">🎓 ANGKATAN XVI</div>
+    <div class="id-top">
+      <div class="id-avatar-big" id="avatarBig" onclick="document.getElementById('avatarSection').scrollIntoView({behavior:'smooth'})">
+        👤
+        <div class="id-avatar-edit">✏️</div>
+      </div>
+      <div class="id-info">
+        <div class="id-name" id="dispName">Loading...</div>
+        <div class="id-class" id="dispClass">— Kelas —</div>
+        <div class="id-mood-display" id="dispMood" onclick="document.getElementById('moodSection').scrollIntoView({behavior:'smooth'})">
+          😊 <span id="dispMoodText">Klik untuk set mood</span>
+        </div>
+      </div>
+    </div>
+    <div class="id-stats">
+      <div class="id-stat"><div class="id-stat-num" id="statPts">0</div><div class="id-stat-label">Poin</div></div>
+      <div class="id-stat"><div class="id-stat-num" id="statWins">0</div><div class="id-stat-label">Menang</div></div>
+      <div class="id-stat"><div class="id-stat-num" id="statGames">0</div><div class="id-stat-label">Game</div></div>
+      <div class="id-stat"><div class="id-stat-num" id="statOnline">0j</div><div class="id-stat-label">Online</div></div>
+    </div>
+  </div>
+
+  <div class="profil-grid">
+
+    <!-- ── Edit Info ── -->
+    <div class="pcard">
+      <div class="pcard-title">✏️ Edit Informasi</div>
+      <div class="edit-row">
+        <label class="edit-label">Nama Lengkap</label>
+        <input class="edit-inp" id="editName" placeholder="Nama kamu...">
+      </div>
+      <div class="edit-row">
+        <label class="edit-label">Kelas</label>
+        <select class="edit-inp" id="editClass">
+          <option value="">Pilih Kelas</option>
+          <option value="VI Kahayan">VI Kahayan</option>
+          <option value="VI Kapuas">VI Kapuas</option>
+          <option value="VI Mahakam">VI Mahakam</option>
+        </select>
+      </div>
+      <div class="edit-row">
+        <label class="edit-label">Bio</label>
+        <input class="edit-inp" id="editBio" placeholder="Kata-kata favoritmu..." maxlength="60">
+      </div>
+      <button class="save-btn" onclick="saveProfile()">💾 Simpan Profil</button>
+    </div>
+
+    <!-- ── Avatar Picker ── -->
+    <div class="pcard" id="avatarSection">
+      <div class="pcard-title">🎭 Pilih Avatar</div>
+      <div class="avatar-grid" id="avatarGrid"></div>
+      <div style="margin-top:.8rem;display:flex;gap:.5rem;align-items:center">
+        <input id="customEmoji" class="edit-inp" placeholder="Atau ketik emoji kustom..." maxlength="2" style="text-align:center;font-size:1.4rem;">
+        <button onclick="setCustomEmoji()" style="padding:.5rem 1rem;background:rgba(122,223,159,.2);border:1px solid rgba(122,223,159,.4);border-radius:50px;color:#7adf9f;cursor:pointer;font-weight:800;white-space:nowrap">Set</button>
+      </div>
+    </div>
+
+    <!-- ── Mood ── -->
+    <div class="pcard" id="moodSection">
+      <div class="pcard-title">💬 Status & Mood</div>
+      <div class="mood-grid" id="moodGrid"></div>
+      <div class="mood-custom">
+        <input class="mood-txt" id="moodCustom" placeholder="Tulis status custom..." maxlength="40">
+        <button class="mood-save" onclick="saveCustomMood()">Set</button>
+      </div>
+    </div>
+
+    <!-- ── Student Card ── -->
+    <div class="pcard">
+      <div class="pcard-title">🪪 Kartu Pelajar</div>
+      <div class="student-id-card" id="studentCard">
+        <div class="sic-top">
+          <div class="sic-photo" id="sicPhoto">👤</div>
+          <div class="sic-info">
+            <div class="sic-school">SDI BUNGA BANGSA BALIKPAPAN</div>
+            <div class="sic-name" id="sicName">—</div>
+
+          </div>
+        </div>
+        <hr class="sic-divider">
+        <div class="sic-fields">
+          <div><div class="sic-field">Kelas</div><div class="sic-value" id="sicClass">—</div></div>
+          <div><div class="sic-field">Angkatan</div><div class="sic-value">XVI</div></div>
+          <div><div class="sic-field">T.A.</div><div class="sic-value">2025/2026</div></div>
+          <div><div class="sic-field">Status</div><div class="sic-value" style="color:#7adf9f">Aktif ✓</div></div>
+        </div>
+        <div class="sic-barcode">
+          <div class="sic-barcode-inner" id="sicBarcode">|||  | |||| ||  | ||| ||  ||||</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Achievements ── -->
+    <div class="pcard span2">
+      <div class="pcard-title">🏅 Achievement & Badge</div>
+      <div class="badge-grid" id="badgeGrid"></div>
+    </div>
+
+    <!-- ── Stats ── -->
+    <div class="pcard">
+      <div class="pcard-title">📊 Statistik Game</div>
+      <div id="statsDetail">
+        <div class="stat-row"><span class="stat-key">Total Poin</span><span class="stat-val" id="st-pts">—</span></div>
+        <div class="stat-row"><span class="stat-key">Kemenangan</span><span class="stat-val" id="st-wins">—</span></div>
+        <div class="stat-row"><span class="stat-key">Total Game</span><span class="stat-val" id="st-games">—</span></div>
+        <div class="stat-row"><span class="stat-key">Waktu Online</span><span class="stat-val" id="st-online">—</span></div>
+        <div class="stat-row"><span class="stat-key">Rank #</span><span class="stat-val" id="st-rank">—</span></div>
+      </div>
+    </div>
+
+    <!-- ── Leaderboard mini ── -->
+    <div class="pcard">
+      <div class="pcard-title">🏆 Top Pemain Hari Ini</div>
+      <div id="miniLeaderboard" style="display:flex;flex-direction:column;gap:.4rem"></div>
+      <a href="leaderboard.html" style="display:block;text-align:center;margin-top:.8rem;font-size:.78rem;color:rgba(122,223,159,.7);text-decoration:none">Lihat semua →</a>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast2" id="toast2El"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:'AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg',
+  authDomain:'chat-angkatan-16.firebaseapp.com',
+  databaseURL:'https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId:'chat-angkatan-16',storageBucket:'chat-angkatan-16.appspot.com',
+  messagingSenderId:'47699501502',appId:'1:47699501502:web:0d09e69d0b3ff39a7359ef'
+});
+const db=firebase.database();
+
+/* ── Identity ── */
+let myUid=localStorage.getItem('auUid')||localStorage.getItem('mgUid');
+if(!myUid){myUid='u'+Math.random().toString(36).substr(2,7);localStorage.setItem('auUid',myUid);}
+let profileData={};
+
+const AVATARS=['👤','😎','🤩','🥳','🤓','😈','👻','🐶','🐱','🦊','🐸','🦁','🐯','🐼','🦋','🌟','🔥','💎','🚀','🎮','🎸','🏆','💀','🤖','👾','🎭','🌈','⚡','🍀','🌙'];
+
+const MOODS=[
+  {emoji:'😊',label:'Happy'},
+  {emoji:'😴',label:'Ngantuk'},
+  {emoji:'📚',label:'Belajar'},
+  {emoji:'🎮',label:'Gaming'},
+  {emoji:'🎵',label:'Dengerin Musik'},
+  {emoji:'😅',label:'Panik'},
+  {emoji:'🍔',label:'Lapar'},
+  {emoji:'💪',label:'Semangat'},
+  {emoji:'🥱',label:'Bosen'},
+  {emoji:'🤔',label:'Mikir'},
+  {emoji:'😴',label:'Mau Tidur'},
+  {emoji:'🎉',label:'Senang'},
+];
+
+const BADGES=[
+  {id:'first_login',icon:'🚀',name:'Pertama Login',req:'Login pertama kali'},
+  {id:'game5',icon:'🎮',name:'Gamer',req:'Main 5 game'},
+  {id:'win3',icon:'🏆',name:'Juara',req:'Menang 3 kali'},
+  {id:'pts500',icon:'⭐',name:'500 Poin',req:'Kumpulkan 500 poin'},
+  {id:'pts1000',icon:'💎',name:'1000 Poin',req:'Kumpulkan 1000 poin'},
+  {id:'online1h',icon:'⏰',name:'1 Jam Online',req:'Online 1 jam total'},
+  {id:'mading',icon:'📝',name:'Kontributor',req:'Post di mading'},
+  {id:'wolf',icon:'🐺',name:'Werewolf',req:'Main werewolf'},
+  {id:'golf',icon:'⛳',name:'Pegolf',req:'Main mini golf'},
+  {id:'impostor',icon:'🔪',name:'Impostor',req:'Main Among Us'},
+  {id:'chat10',icon:'💬',name:'Penyapa',req:'Kirim 10 chat'},
+  {id:'social',icon:'👥',name:'Sosial',req:'Lihat profil 3 teman'},
+];
+
+function toast2(msg){
+  const t=document.getElementById('toast2El');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(window._t2);window._t2=setTimeout(()=>t.classList.remove('on'),2600);
+}
+
+function fmtMs(ms){
+  if(!ms||ms<0) return '0j';
+  const h=Math.floor(ms/3600000);
+  if(h<1){const m=Math.floor(ms/60000);return m+'m';}
+  return h+'j '+(Math.floor((ms%3600000)/60000))+'m';
+}
+
+/* ── Build avatar grid ── */
+function buildAvatarGrid(){
+  const current=localStorage.getItem('profileAvatar')||'👤';
+  document.getElementById('avatarGrid').innerHTML=AVATARS.map(a=>
+    `<div class="av-opt${a===current?' sel':''}" onclick="selectAvatar('${a}')">${a}</div>`
+  ).join('');
+}
+
+function selectAvatar(av){
+  localStorage.setItem('profileAvatar',av);
+  document.querySelectorAll('.av-opt').forEach(el=>el.classList.toggle('sel',el.textContent===av));
+  document.getElementById('avatarBig').innerHTML=av+'<div class="id-avatar-edit">✏️</div>';
+  document.getElementById('sicPhoto').textContent=av;
+  saveToFirebase();
+  toast2('Avatar diubah! '+av);
+}
+
+function setCustomEmoji(){
+  const v=document.getElementById('customEmoji').value.trim();
+  if(!v) return;
+  selectAvatar(v);
+}
+
+/* ── Build mood grid ── */
+function buildMoodGrid(){
+  const current=localStorage.getItem('profileMood')||'';
+  document.getElementById('moodGrid').innerHTML=MOODS.map(m=>
+    `<div class="mood-opt${m.emoji+' '+m.label===current?' sel':''}" onclick="selectMood('${m.emoji}','${m.label}')">${m.emoji} ${m.label}</div>`
+  ).join('');
+}
+
+function selectMood(emoji,label){
+  const full=emoji+' '+label;
+  localStorage.setItem('profileMood',full);
+  document.querySelectorAll('.mood-opt').forEach(el=>el.classList.toggle('sel',el.textContent===emoji+' '+label));
+  updateMoodDisplay(full);
+  saveToFirebase();
+  toast2('Mood diset: '+full);
+}
+
+function saveCustomMood(){
+  const v=document.getElementById('moodCustom').value.trim();
+  if(!v) return;
+  localStorage.setItem('profileMood',v);
+  updateMoodDisplay(v);
+  saveToFirebase();
+  toast2('Status diset!');
+}
+
+function updateMoodDisplay(mood){
+  const parts=mood.split(' ');
+  document.getElementById('dispMood').innerHTML=`${parts[0]||'😊'} <span id="dispMoodText">${mood}</span>`;
+}
+
+/* ── Save / Load profile ── */
+function saveProfile(){
+  const name=document.getElementById('editName').value.trim()||localStorage.getItem('lbName')||'Anonim';
+  const kelas=document.getElementById('editClass').value;
+
+  const bio=document.getElementById('editBio').value.trim();
+  localStorage.setItem('lbName',name);
+  localStorage.setItem('auName',name);
+  localStorage.setItem('profileClass',kelas);
+
+  localStorage.setItem('profileBio',bio);
+  updateDisplayCard();
+  saveToFirebase();
+  toast2('✅ Profil disimpan!');
+}
+
+function saveToFirebase(){
+  const name=localStorage.getItem('lbName')||'Anonim';
+  const avatar=localStorage.getItem('profileAvatar')||'👤';
+  const mood=localStorage.getItem('profileMood')||'';
+  const kelas=localStorage.getItem('profileClass')||'';
+  const bio=localStorage.getItem('profileBio')||'';
+  db.ref('shared/profiles/'+myUid).set({name,avatar,mood,kelas,bio,uid:myUid,ts:Date.now()});
+  db.ref('shared/online/'+myUid).update({name,mood,avatar,kelas});
+}
+
+function updateDisplayCard(){
+  const name=localStorage.getItem('lbName')||'Anonim';
+  const kelas=localStorage.getItem('profileClass')||'—';
+  const avatar=localStorage.getItem('profileAvatar')||'👤';
+  const mood=localStorage.getItem('profileMood')||'Klik untuk set mood';
+  document.getElementById('dispName').textContent=name;
+  document.getElementById('dispClass').textContent=kelas;
+  document.getElementById('avatarBig').innerHTML=avatar+'<div class="id-avatar-edit">✏️</div>';
+  updateMoodDisplay(mood);
+  // Student card
+  document.getElementById('sicName').textContent=name;
+  document.getElementById('sicClass').textContent=kelas;
+
+  document.getElementById('sicPhoto').textContent=avatar;
+  document.getElementById('sicBarcode').textContent='|'+myUid.split('').map(c=>'|'.repeat(c.charCodeAt(0)%3+1)).join(' ')+'|';
+}
+
+function loadLocalProfile(){
+  document.getElementById('editName').value=localStorage.getItem('lbName')||'';
+  document.getElementById('editClass').value=localStorage.getItem('profileClass')||'';
+  document.getElementById('editBio').value=localStorage.getItem('profileBio')||'';
+  updateDisplayCard();
+  buildAvatarGrid();
+  buildMoodGrid();
+  const savedMood=localStorage.getItem('profileMood');
+  if(savedMood) updateMoodDisplay(savedMood);
+}
+
+/* ── Firebase stats ── */
+db.ref('shared/lb2').on('value',snap=>{
+  const data=snap.val()||{};
+  // Find my entry by name
+  const myName=localStorage.getItem('lbName')||'';
+  const mySanitized=myName.replace(/[.#$\[\]]/g,'_');
+  const me=data[mySanitized]||{};
+  document.getElementById('statPts').textContent=me.points||0;
+  document.getElementById('statWins').textContent=me.wins||0;
+  document.getElementById('statGames').textContent=me.games||0;
+  document.getElementById('statOnline').textContent=fmtMs(me.onlineMs||0);
+  document.getElementById('st-pts').textContent=me.points||0;
+  document.getElementById('st-wins').textContent=me.wins||0;
+  document.getElementById('st-games').textContent=me.games||0;
+  document.getElementById('st-online').textContent=fmtMs(me.onlineMs||0);
+  // Rank
+  const sorted=Object.values(data).sort((a,b)=>(b.points||0)-(a.points||0));
+  const rank=sorted.findIndex(e=>e.name===myName)+1;
+  document.getElementById('st-rank').textContent=rank>0?'#'+rank:'—';
+  // Badges
+  checkBadges(me);
+  // Mini leaderboard
+  const top5=sorted.slice(0,5);
+  document.getElementById('miniLeaderboard').innerHTML=top5.map((e,i)=>`
+    <div style="display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="font-size:.78rem;color:rgba(255,255,255,.3);width:18px">${i+1}</span>
+      <span style="font-size:.88rem;font-weight:700;flex:1">${e.name||'?'}</span>
+      <span style="font-size:.78rem;color:#7adf9f;font-weight:800">${e.points||0}⭐</span>
+    </div>`).join('');
+});
+
+/* ── Badge checker ── */
+function checkBadges(me){
+  const pts=me.points||0, wins=me.wins||0, games=me.games||0, ms=me.onlineMs||0;
+  const earned=new Set(JSON.parse(localStorage.getItem('earnedBadges')||'[]'));
+  earned.add('first_login');
+  if(games>=5) earned.add('game5');
+  if(wins>=3) earned.add('win3');
+  if(pts>=500) earned.add('pts500');
+  if(pts>=1000) earned.add('pts1000');
+  if(ms>=3600000) earned.add('online1h');
+  if(localStorage.getItem('playedWerewolf')) earned.add('wolf');
+  if(localStorage.getItem('playedMinigolf')) earned.add('golf');
+  if(localStorage.getItem('playedAmongUs')) earned.add('impostor');
+  if(localStorage.getItem('madingPosted')) earned.add('mading');
+  localStorage.setItem('earnedBadges',JSON.stringify([...earned]));
+  renderBadges(earned);
+}
+
+function renderBadges(earned){
+  document.getElementById('badgeGrid').innerHTML=BADGES.map(b=>`
+    <div class="badge-item${earned.has(b.id)?' earned':' locked'}" title="${b.req}">
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+    </div>`).join('');
+}
+
+/* ── Init: load from Firebase first, then local ── */
+loadLocalProfile();
+renderBadges(new Set(JSON.parse(localStorage.getItem('earnedBadges')||'["first_login"]')));
+
+// Try to load profile from Firebase (catches fresh logins)
+db.ref('shared/profiles/'+myUid).once('value',snap=>{
+  const d=snap.val();
+  if(!d) return;
+  // Only overwrite if Firebase has a name and local doesn't
+  if(d.name&&!localStorage.getItem('lbName')){
+    ['lbName','auName','mgName','wwName','unoName','spyName','gbPlayerName','wwPlayerName'].forEach(k=>localStorage.setItem(k,d.name));
+    if(d.avatar) localStorage.setItem('profileAvatar',d.avatar);
+    if(d.mood)   localStorage.setItem('profileMood',d.mood);
+    if(d.kelas)  localStorage.setItem('profileClass',d.kelas);
+    if(d.bio)    localStorage.setItem('profileBio',d.bio);
+    loadLocalProfile();
+  }
+});
+</script>
+<script src="shared.js"></script>
+</body>
+</html>
