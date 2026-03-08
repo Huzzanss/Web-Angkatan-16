@@ -214,8 +214,6 @@ const _BASE_BAD_WORDS = [
   'dildo','fag','faggot','fuck','fucker','fucking','goddamn','horny',
   'jackass','jerk','motherfucker','nigga','nigger','penis','piss',
   'porn','prick','pussy','rape','retard','shit','slut','twat','wank','whore',
-  // custom
-  'puji','arthur','artur','arhtur','fuji','tanto','anwar','edi','edy','ade','yudi','doni','rudy','rudi','rohansyah',
 ];
 
 // Gabungkan base + custom, buat regex sekali saja
@@ -423,15 +421,9 @@ window.addEventListener('beforeunload', stopTyping);
 (function() {
   // ─── PLAYLIST — ganti sesuai nama file di ./music/ ───
   const PLAYLIST = [
-    { file: 'Tujuh Belas.mp3',  title: 'Tujuh Belas' },
-    { file: 'Kenangan Manis.mp3',  title: 'Kenangan Manis' },
-    { file: 'Kita Ke Sana.mp3',  title: 'Kita Ke Sana' },
-    { file: 'Monolog.mp3',  title: 'Monolog' },
-    { file: 'Monokrom.mp3',  title: 'Monokrom' },
-    { file: 'Lantas.mp3',  title: 'Lantas' },
-    { file: 'Terbuang Dalam Waktu.mp3',  title: 'Terbuang Dalam Waktu' },
-    { file: 'Ribuan Memori.mp3',  title: 'Ribuan Memori' },
-    { file: 'Secukupnya.mp3',  title: 'Secukupnya' },
+    { file: 'lagu1.mp3',  title: 'Lagu 1' },
+    { file: 'lagu2.mp3',  title: 'Lagu 2' },
+    { file: 'lagu3.mp3',  title: 'Lagu 3' },
   ];
 
   const BASE_PATH = './music/'; // folder musik di repo
@@ -531,3 +523,327 @@ window.addEventListener('beforeunload', stopTyping);
     }
   }, { once: true });
 })();
+
+
+/* ─── New Features: Mading, Song Request, Notif, Game Tags, Online ─── */
+
+/* ══════════════════════════
+   SHARED FIREBASE REF (already init'd in script.js)
+══════════════════════════ */
+const madingRef  = firebase.database().ref('mading/posts');
+const songReqRef = firebase.database().ref('songReq');
+const notifRef   = firebase.database().ref('notif');
+const onlineRef  = firebase.database().ref('shared/online');
+const moodRef    = firebase.database().ref('shared/mood');
+const gamePlayRef= firebase.database().ref('shared/gamePlays');
+
+function myUid(){return localStorage.getItem('auUid')||localStorage.getItem('mgUid')||('u'+Math.random().toString(36).substr(2,7));}
+function myNameStr(){return localStorage.getItem('lbName')||localStorage.getItem('auName')||localStorage.getItem('mgName')||'Anonim';}
+function myAvatarStr(){return localStorage.getItem('profileAvatar')||'👤';}
+function esc2(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtAgo2(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return 'barusan';if(s<3600)return Math.floor(s/60)+'m lalu';if(s<86400)return Math.floor(s/3600)+'j lalu';return Math.floor(s/86400)+'h lalu';}
+
+/* ═══ ONLINE STRIP ═══ */
+onlineRef.on('value',snap=>{
+  const data=snap.val()||{};
+  const me=myUid();
+  const chips=document.getElementById('onlineChips');
+  if(!chips) return;
+  let html='';
+  let count=0;
+  Object.entries(data).forEach(([uid,v])=>{
+    if(!v) return;
+    count++;
+    const mood=v.mood||'';
+    const name=(v.name||'?').split(' ')[0];
+    const isMe=uid===me;
+    const av=v.avatar||'👤';
+    html+=`<div class="online-chip" onclick="window.location='profil.html'" title="${esc2(v.name||'?')}">
+      <div class="online-dot-sm"></div>
+      <span style="font-size:.85rem">${av}</span>
+      ${mood?`<span class="online-mood" style="font-size:.75rem">${mood.split(' ')[0]}</span>`:''}
+      <span>${esc2(name)}${isMe?' ★':''}</span>
+    </div>`;
+  });
+  chips.innerHTML=html||'<span style="font-size:.75rem;color:rgba(255,255,255,.3)">Tidak ada yang online</span>';
+});
+
+/* ═══ NOTIFICATIONS ═══ */
+let notifData={};
+let unreadCount=0;
+notifRef.orderByChild('ts').limitToLast(20).on('value',snap=>{
+  notifData={};
+  snap.forEach(s=>{notifData[s.key]=s.val();});
+  renderNotifs();
+});
+
+function renderNotifs(){
+  const list=document.getElementById('notifList');
+  if(!list) return;
+  const items=Object.values(notifData).reverse();
+  if(!items.length){list.innerHTML='<div class="notif-empty">Belum ada notifikasi</div>';return;}
+  const readSet=JSON.parse(localStorage.getItem('readNotifs')||'[]');
+  unreadCount=items.filter(n=>!readSet.includes(n.id)).length;
+  const dot=document.getElementById('notifDot');
+  if(dot) dot.style.display=unreadCount>0?'block':'none';
+  list.innerHTML=items.map(n=>{
+    const unread=!readSet.includes(n.id);
+    return `<div class="notif-item${unread?' unread':''}">
+      ${esc2(n.msg||'')}
+      <div class="notif-time">${fmtAgo2(n.ts||0)}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleNotifPanel(){
+  const p=document.getElementById('notifPanel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')){
+    // Mark all read
+    const ids=Object.keys(notifData);
+    localStorage.setItem('readNotifs',JSON.stringify(ids));
+    unreadCount=0;
+    const dot=document.getElementById('notifDot');
+    if(dot) dot.style.display='none';
+    renderNotifs();
+  }
+}
+function clearNotifs(){document.getElementById('notifList').innerHTML='<div class="notif-empty">Belum ada notifikasi</div>';}
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('notifPanel');
+  const bell=document.getElementById('notifBell');
+  if(panel&&bell&&!panel.contains(e.target)&&!bell.contains(e.target)){
+    panel.classList.remove('open');
+  }
+});
+
+/* ═══ MADING ═══ */
+let madingType='post';
+let pollOptCount=2;
+let madingPosts={};
+
+function setMadingType(t){
+  madingType=t;
+  document.querySelectorAll('.mading-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`[data-type="${t}"]`).classList.add('active');
+  document.getElementById('pollInputs').style.display=t==='poll'?'flex':'none';
+}
+
+function addPollOpt(){
+  pollOptCount++;
+  const div=document.createElement('input');
+  div.className='poll-opt-input'; div.placeholder=`Pilihan ${pollOptCount}...`;
+  div.id='pollOpt'+pollOptCount;
+  document.getElementById('pollExtraOpts').appendChild(div);
+}
+
+function submitMading(){
+  const txt=document.getElementById('madingInput').value.trim();
+  if(!txt) return;
+  const post={
+    uid:myUid(), name:myNameStr(), avatar:myAvatarStr(),
+    type:madingType, text:txt, ts:Date.now(), likes:{}, comments:{}
+  };
+  if(madingType==='poll'){
+    const opts=[];
+    for(let i=1;i<=pollOptCount;i++){
+      const v=document.getElementById('pollOpt'+i)?.value.trim();
+      if(v) opts.push(v);
+    }
+    if(opts.length<2){alert('Poll butuh minimal 2 pilihan!');return;}
+    post.pollOpts=opts; post.pollVotes={};
+  }
+  madingRef.push(post);
+  document.getElementById('madingInput').value='';
+  // Send notification
+  notifRef.push({msg:`📝 ${myNameStr()} membuat ${madingType==='pengumuman'?'pengumuman':madingType==='poll'?'poll':'postingan'} baru!`,ts:Date.now(),id:Date.now().toString()});
+}
+
+madingRef.orderByChild('ts').limitToLast(30).on('value',snap=>{
+  madingPosts={};
+  snap.forEach(s=>{madingPosts[s.key]=s.val();});
+  renderMading();
+});
+
+function renderMading(){
+  const feed=document.getElementById('madingFeed');
+  if(!feed) return;
+  const posts=Object.entries(madingPosts).reverse();
+  if(!posts.length){
+    feed.innerHTML='<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem">Belum ada postingan. Jadilah yang pertama! ✨</div>';
+    return;
+  }
+  feed.innerHTML=posts.map(([id,p])=>buildMadingCard(id,p)).join('');
+}
+
+function buildMadingCard(id,p){
+  const me=myUid();
+  const likeCount=Object.keys(p.likes||{}).length;
+  const liked=(p.likes||{})[me];
+  const commentCount=Object.keys(p.comments||{}).length;
+  const typeTag={post:'tag-post',pengumuman:'tag-pengumuman',poll:'tag-poll'}[p.type]||'tag-post';
+  const typeLabel={post:'Post',pengumuman:'📢 Pengumuman',poll:'📊 Poll'}[p.type]||'Post';
+
+  let bodyHtml=`<div class="mc-body">${esc2(p.text)}</div>`;
+
+  if(p.type==='poll'&&p.pollOpts){
+    const totalVotes=Object.values(p.pollVotes||{}).length;
+    const myVote=(p.pollVotes||{})[me];
+    bodyHtml+=`<div class="mc-body" style="margin-bottom:.3rem">${esc2(p.text)}</div><div class="poll-results">`;
+    p.pollOpts.forEach((opt,i)=>{
+      const voteCount=Object.values(p.pollVotes||{}).filter(v=>v===i).length;
+      const pct=totalVotes>0?Math.round(voteCount/totalVotes*100):0;
+      const isVoted=myVote===i;
+      bodyHtml+=`<div class="poll-opt-result" onclick="votePoll('${id}',${i})">
+        <div class="poll-opt-label"><span>${esc2(opt)}</span><span>${pct}% (${voteCount})</span></div>
+        <div class="poll-bar-bg"><div class="poll-bar-fill${isVoted?' voted':''}" style="width:${pct}%"></div></div>
+      </div>`;
+    });
+    bodyHtml+=`<div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:.3rem">${totalVotes} suara</div></div>`;
+  }
+
+  const comments=Object.values(p.comments||{}).slice(-3);
+  const commHtml=comments.map(c=>`<div class="mc-comment"><b>${esc2(c.name)}</b> ${esc2(c.text)}</div>`).join('');
+
+  return `<div class="mading-card type-${p.type}">
+    <div class="mc-head">
+      <div class="mc-avatar">${p.avatar||'👤'}</div>
+      <div class="mc-meta">
+        <div class="mc-name">${esc2(p.name||'?')}</div>
+        <div class="mc-time">${fmtAgo2(p.ts||0)}</div>
+      </div>
+      <span class="mc-type-tag ${typeTag}">${typeLabel}</span>
+    </div>
+    ${bodyHtml}
+    <div class="mc-actions">
+      <button class="mc-action-btn${liked?' liked':''}" onclick="likeMading('${id}')">❤️ ${likeCount}</button>
+      <button class="mc-action-btn" onclick="toggleComments('${id}')">💬 ${commentCount}</button>
+      ${p.uid===me?`<button class="mc-action-btn" onclick="deleteMading('${id}')" style="margin-left:auto;color:rgba(255,100,100,.5)">🗑</button>`:''}
+    </div>
+    <div class="mc-comments" id="mc-comm-${id}" style="display:none">
+      ${commHtml}
+      <div class="mc-comment-input-row">
+        <input class="mc-comment-input" id="ci-${id}" placeholder="Tulis komentar...">
+        <button class="mc-comment-send" onclick="sendComment('${id}')">➤</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function likeMading(id){
+  const me=myUid();
+  const ref=madingRef.child(id+'/likes/'+me);
+  ref.once('value',s=>{s.val()?ref.remove():ref.set(true);});
+}
+function toggleComments(id){
+  const el=document.getElementById('mc-comm-'+id);
+  if(el) el.style.display=el.style.display==='none'?'flex':'none';
+  if(el) el.style.flexDirection='column';
+}
+function sendComment(id){
+  const input=document.getElementById('ci-'+id);
+  if(!input||!input.value.trim()) return;
+  madingRef.child(id+'/comments').push({name:myNameStr(),text:input.value.trim(),ts:Date.now()});
+  input.value='';
+}
+function deleteMading(id){madingRef.child(id).remove();}
+function votePoll(id,optIdx){
+  const me=myUid();
+  madingRef.child(id+'/pollVotes/'+me).set(optIdx);
+}
+
+/* ═══ SONG REQUEST ═══ */
+let songData={};
+let myVotedSongs=JSON.parse(localStorage.getItem('srVotes')||'[]');
+
+songReqRef.orderByChild('votes').limitToLast(20).on('value',snap=>{
+  songData={};
+  snap.forEach(s=>{songData[s.key]=s.val();});
+  renderSongReq();
+});
+
+function requestSong(){
+  const inp=document.getElementById('srSongInput');
+  const song=inp.value.trim();
+  if(!song) return;
+  songReqRef.push({song,reqBy:myNameStr(),votes:1,voters:{[myUid()]:true},ts:Date.now()});
+  inp.value='';
+  notifRef.push({msg:`🎵 ${myNameStr()} request lagu: ${song}`,ts:Date.now(),id:Date.now().toString()});
+}
+
+function voteForSong(id){
+  const me=myUid();
+  if(myVotedSongs.includes(id)){
+    songReqRef.child(id+'/voters/'+me).remove();
+    songReqRef.child(id+'/votes').transaction(v=>(v||1)-1);
+    myVotedSongs=myVotedSongs.filter(x=>x!==id);
+  } else {
+    songReqRef.child(id+'/voters/'+me).set(true);
+    songReqRef.child(id+'/votes').transaction(v=>(v||0)+1);
+    myVotedSongs.push(id);
+  }
+  localStorage.setItem('srVotes',JSON.stringify(myVotedSongs));
+  renderSongReq();
+}
+
+function renderSongReq(){
+  const list=document.getElementById('srList');
+  if(!list) return;
+  const sorted=Object.entries(songData).sort((a,b)=>(b[1].votes||0)-(a[1].votes||0));
+  if(!sorted.length){
+    list.innerHTML='<div style="text-align:center;padding:1rem;color:rgba(255,255,255,.3);font-size:.82rem">Belum ada request. Mulai request lagu!</div>';
+    return;
+  }
+  list.innerHTML=sorted.map(([id,s],i)=>{
+    const voted=(s.voters||{})[myUid()]||myVotedSongs.includes(id);
+    return `<div class="sr-item">
+      <span class="sr-rank">${i+1}</span>
+      <div style="flex:1"><div class="sr-song">${esc2(s.song)}</div><div class="sr-req">req. ${esc2(s.reqBy||'?')}</div></div>
+      <button class="sr-vote-btn${voted?' voted':''}" onclick="voteForSong('${id}')">▲</button>
+      <span class="sr-votes">${s.votes||0}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ═══ GAME PLAY TRACKING + TAGS ═══ */
+gamePlayRef.on('value',snap=>{
+  const data=snap.val()||{};
+  const games=Object.entries(data).sort((a,b)=>b[1]-a[1]);
+  // Most played = Recommended
+  if(games.length>0){
+    const topId=games[0][0].replace(/_/g,'-');
+    const topEl=document.getElementById('tag-'+topId);
+    if(topEl) topEl.innerHTML='<span class="game-tag game-tag-rec">⭐ RECOMMENDED</span>';
+    // Second most = Hot
+    if(games.length>1){
+      const secId=games[1][0].replace(/_/g,'-');
+      const secEl=document.getElementById('tag-'+secId);
+      if(secEl&&!secEl.innerHTML.includes('NEW')) secEl.innerHTML='<span class="game-tag game-tag-hot">🔥 HOT</span>';
+    }
+  }
+});
+
+// Track when leaving to a game (clicks on game cards)
+document.querySelectorAll('.game-card[data-game]').forEach(card=>{
+  card.addEventListener('click',()=>{
+    const game=card.dataset.game.replace(/-/g,'_');
+    gamePlayRef.child(game).transaction(v=>(v||0)+1);
+  });
+});
+
+/* ═══ PROFILE AVATAR UPDATE ═══ */
+const navProfil=document.getElementById('navProfil');
+if(navProfil){
+  const av=localStorage.getItem('profileAvatar');
+  if(av) navProfil.textContent=av+' Profil';
+}
+const madAv=document.getElementById('madingAvatarSm');
+if(madAv) madAv.textContent=localStorage.getItem('profileAvatar')||'👤';
+
+// Update nav profil link with avatar
+const navP=document.getElementById('navProfil');
+if(navP){
+  const av=localStorage.getItem('profileAvatar')||'';
+  const nm=localStorage.getItem('lbName')||'Profil';
+  navP.textContent=(av?av+' ':'')+nm;
+}
