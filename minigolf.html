@@ -491,9 +491,52 @@ function removeBallMesh(uid) {
 /* ═══════════════════════════════════════
    PHYSICS
 ═══════════════════════════════════════ */
-const FRICTION = 0.975; // per frame at 60fps
+const FRICTION = 0.991; // less friction = rolls longer and smoother
 const MAX_SPEED = 18;
-const MIN_SPEED = 0.04;
+const MIN_SPEED = 0.012; // lower = crawls to natural stop
+
+function physicsStep(dt) {
+  if (!ballMoving) return;
+  const steps = 6;
+  const sdt = dt / steps;
+  const subFriction = Math.pow(FRICTION, 1 / steps);
+  for(let s=0;s<steps;s++){
+    ball.x += ball.vx * sdt;
+    ball.z += ball.vz * sdt;
+    checkWallCollisions();
+    checkBumperCollisions();
+    checkWindmillCollision();
+    ball.vx *= subFriction;
+    ball.vz *= subFriction;
+  }
+
+  const spd = Math.sqrt(ball.vx**2 + ball.vz**2);
+
+  // Rolling rotation
+  if (ballMeshes[myId] && spd > 0.01) {
+    const dist = spd * dt;
+    const rollAxis = new THREE.Vector3(-ball.vz, 0, ball.vx).normalize();
+    ballMeshes[myId].rotateOnWorldAxis(rollAxis, dist / BALL_R);
+    ballMeshes[myId].position.set(ball.x, BALL_R, ball.z);
+  }
+
+  const h = HOLES[currentHoleIdx];
+  const cupDx = ball.x - h.cup[0], cupDz = ball.z - h.cup[1];
+  const cupDist = Math.sqrt(cupDx**2+cupDz**2);
+  if (cupDist < CUP_R && spd < 5) {
+    ballInHole();
+    return;
+  }
+  if (spd < MIN_SPEED) {
+    ball.vx = ball.vz = 0;
+    ballMoving = false;
+    writeBallPos();
+    checkTurnAdvance();
+  }
+  if (ballMeshes[myId]) {
+    ballMeshes[myId].position.set(ball.x, BALL_R, ball.z);
+  }
+}
 
 function resetBallToTee() {
   const h = HOLES[currentHoleIdx];
@@ -520,39 +563,6 @@ function shootBall(dx, dz, power) {
   f.classList.add('pop'); setTimeout(()=>f.classList.remove('pop'),150);
   // Write shot to firebase
   db.ref('mg/shots/'+myId).set({dx,dz,power,ts:Date.now()});
-}
-
-function physicsStep(dt) {
-  if (!ballMoving) return;
-  const steps = 4;
-  const sdt = dt / steps;
-  for(let s=0;s<steps;s++){
-    ball.x += ball.vx * sdt;
-    ball.z += ball.vz * sdt;
-    checkWallCollisions();
-    checkBumperCollisions();
-    checkWindmillCollision();
-    ball.vx *= FRICTION;
-    ball.vz *= FRICTION;
-  }
-
-  const spd = Math.sqrt(ball.vx**2 + ball.vz**2);
-  const h = HOLES[currentHoleIdx];
-  const cupDx = ball.x - h.cup[0], cupDz = ball.z - h.cup[1];
-  const cupDist = Math.sqrt(cupDx**2+cupDz**2);
-  if (cupDist < CUP_R && spd < 4) {
-    ballInHole();
-    return;
-  }
-  if (spd < MIN_SPEED) {
-    ball.vx = ball.vz = 0;
-    ballMoving = false;
-    writeBallPos();
-    checkTurnAdvance();
-  }
-  if (ballMeshes[myId]) {
-    ballMeshes[myId].position.set(ball.x, BALL_R, ball.z);
-  }
 }
 
 function checkWallCollisions() {
