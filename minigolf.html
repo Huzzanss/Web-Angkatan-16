@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Mini Golf 3D — Angkatan XVI</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--green:#2d6a4f;--lime:#74c69d;--yellow:#f9c74f;--sky:#87ceeb;--white:#fff;--dark:#1b2a1f;}
+body{font-family:'Nunito',sans-serif;background:#1b2a1f;color:#fff;overflow:hidden;height:100dvh;width:100vw;}
+#canvas{position:fixed;inset:0;z-index:0;display:block;width:100%!important;height:100%!important;}
+
+/* ─ Screens ─ */
+.screen{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:1rem;}
+.screen.on{display:flex;}
+#sJoin{background:radial-gradient(ellipse at center,#1a3d2a 0%,#0d1f14 100%);}
+#sLobby{background:radial-gradient(ellipse at center,#1a3d2a 0%,#0d1f14 100%);}
+#sEnd{background:radial-gradient(ellipse at center,#1a3d2a 0%,#0d1f14 100%);}
+
+.card{background:rgba(255,255,255,.07);backdrop-filter:blur(20px);border:2px solid rgba(255,255,255,.12);border-radius:28px;padding:2.2rem 1.8rem;max-width:440px;width:100%;text-align:center;}
+.big-icon{font-size:3.5rem;margin-bottom:.5rem;filter:drop-shadow(0 4px 16px rgba(0,0,0,.4));}
+h1.title{font-family:'Fredoka One',cursive;font-size:2.8rem;color:var(--yellow);text-shadow:0 3px 0 rgba(0,0,0,.3);margin-bottom:.2rem;}
+.subtitle{font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:1.6rem;line-height:1.5;}
+.inp{width:100%;padding:.8rem 1.2rem;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:50px;color:#fff;font-family:'Nunito',sans-serif;font-size:1rem;outline:none;text-align:center;margin-bottom:.85rem;}
+.inp::placeholder{color:rgba(255,255,255,.3);}
+.inp:focus{border-color:var(--yellow);}
+.btn{width:100%;padding:.85rem;border:none;border-radius:50px;font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;}
+.btn-gold{background:linear-gradient(135deg,#f9c74f,#f3a712);color:#1b2a1f;}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(249,199,79,.45);}
+.btn-gold:disabled{opacity:.38;transform:none;cursor:not-allowed;}
+.btn-green{background:linear-gradient(135deg,#2d6a4f,#40916c);color:#fff;margin-top:.5rem;}
+.btn-green:hover{transform:translateY(-2px);}
+
+/* Lobby */
+.lob-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--yellow);margin-bottom:.2rem;}
+.lob-sub{font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:1.2rem;}
+.player-row{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1rem;}
+.pchip{display:flex;align-items:center;gap:.4rem;padding:.38rem .75rem;border-radius:50px;font-size:.82rem;font-weight:700;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.12);}
+.pchip-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.hint{font-size:.72rem;color:rgba(255,255,255,.3);margin-top:.4rem;}
+
+/* HUD */
+#hud{position:fixed;inset:0;z-index:10;pointer-events:none;}
+.hud-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:flex-start;justify-content:space-between;padding:.7rem 1rem;gap:.5rem;}
+.hole-badge{background:rgba(0,0,0,.55);backdrop-filter:blur(10px);border-radius:14px;padding:.55rem .95rem;border:1.5px solid rgba(255,255,255,.12);}
+.hole-num{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--yellow);line-height:1;}
+.hole-name{font-size:.7rem;color:rgba(255,255,255,.55);margin-top:.1rem;}
+.hole-par{font-size:.68rem;color:var(--lime);font-weight:700;}
+.scores-hud{background:rgba(0,0,0,.55);backdrop-filter:blur(10px);border-radius:14px;padding:.55rem .85rem;border:1.5px solid rgba(255,255,255,.12);min-width:140px;}
+.scores-title{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.4rem;}
+.score-row{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.2rem;}
+.score-row:last-child{margin-bottom:0;}
+.score-name{font-size:.77rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px;}
+.score-pts{font-size:.77rem;font-weight:800;color:var(--yellow);}
+.score-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.hud-bot{position:absolute;bottom:.8rem;left:0;right:0;display:flex;align-items:flex-end;justify-content:space-between;padding:0 1rem;}
+.turn-indicator{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border-radius:14px;padding:.6rem 1rem;border:2px solid rgba(255,255,255,.1);transition:all .3s;}
+.turn-indicator.myturn{border-color:var(--yellow);background:rgba(249,199,79,.15);}
+.turn-name{font-family:'Fredoka One',cursive;font-size:1rem;line-height:1;}
+.turn-strokes{font-size:.68rem;color:rgba(255,255,255,.5);margin-top:.15rem;}
+.aim-hint{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:.2rem;}
+.power-wrap{position:absolute;bottom:.8rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);border-radius:50px;padding:.4rem .8rem;display:none;align-items:center;gap:.5rem;backdrop-filter:blur(10px);}
+.power-wrap.show{display:flex;}
+.power-label{font-size:.7rem;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.power-bar-bg{width:110px;height:10px;background:rgba(255,255,255,.15);border-radius:5px;overflow:hidden;}
+.power-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#74c69d,#f9c74f,#e74c3c);transition:width .05s;}
+.back-btn{pointer-events:all;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.15);border-radius:50px;color:rgba(255,255,255,.6);padding:.4rem .9rem;font-family:'Nunito',sans-serif;font-size:.75rem;cursor:pointer;}
+
+/* Hole transition */
+#sHoleCard{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;}
+#sHoleCard.on{display:flex;}
+.hole-card-inner{text-align:center;animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+.hc-num{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--lime);letter-spacing:3px;text-transform:uppercase;}
+.hc-name{font-family:'Fredoka One',cursive;font-size:3.5rem;color:var(--yellow);text-shadow:0 4px 0 rgba(0,0,0,.4);margin:.3rem 0;}
+.hc-par{font-size:1rem;color:rgba(255,255,255,.6);}
+.hc-scores{margin-top:1.2rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;}
+.hcs{background:rgba(255,255,255,.08);border-radius:14px;padding:.7rem 1.2rem;text-align:center;}
+.hcs-name{font-size:.8rem;color:rgba(255,255,255,.6);}
+.hcs-val{font-family:'Fredoka One',cursive;font-size:1.8rem;}
+.hcs-plus{color:#e74c3c;}.hcs-even{color:var(--yellow);}.hcs-under{color:var(--lime);}
+
+/* Hit flash */
+.hit-flash{position:fixed;inset:0;background:rgba(249,199,79,.2);pointer-events:none;z-index:30;opacity:0;transition:opacity .15s;}
+.hit-flash.pop{opacity:1;}
+
+/* End screen */
+.end-podium{display:flex;align-items:flex-end;justify-content:center;gap:.8rem;margin:1.2rem 0;}
+.podium-slot{text-align:center;}
+.podium-bar{border-radius:10px 10px 0 0;width:60px;margin:0 auto;}
+.p1-bar{height:80px;background:linear-gradient(to top,#b7950b,#f9c74f);}
+.p2-bar{height:55px;background:linear-gradient(to top,#707070,#c0c0c0);}
+.p3-bar{height:36px;background:linear-gradient(to top,#6d3a1f,#cd7f32);}
+.podium-name{font-size:.78rem;font-weight:800;margin-top:.3rem;}
+.podium-score{font-size:.7rem;color:rgba(255,255,255,.5);}
+
+/* Toast */
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);backdrop-filter:blur(8px);color:#fff;padding:.55rem 1.3rem;border-radius:50px;font-size:.82rem;font-weight:700;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none;border:1px solid rgba(255,255,255,.15);white-space:nowrap;max-width:92vw;}
+.toast.on{opacity:1;}
+
+/* In-hole celebrate */
+.celebrate{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Fredoka One',cursive;font-size:3rem;color:var(--yellow);text-shadow:0 3px 0 rgba(0,0,0,.5);pointer-events:none;z-index:200;opacity:0;transition:opacity .2s;}
+.celebrate.on{opacity:1;animation:celebAnim .8s ease forwards;}
+@keyframes celebAnim{0%{transform:translate(-50%,-50%) scale(.5);opacity:0;}40%{transform:translate(-50%,-55%) scale(1.2);opacity:1;}70%{transform:translate(-50%,-60%) scale(1);}100%{transform:translate(-50%,-70%) scale(.9);opacity:0;}}
+
+@media(max-width:480px){
+  h1.title{font-size:2.2rem;}
+  .card{padding:1.8rem 1.2rem;}
+  .hud-top{padding:.5rem .6rem;}
+  .hole-badge,.scores-hud{padding:.45rem .7rem;}
+  .hole-num{font-size:1.1rem;}
+  .hc-name{font-size:2.8rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- JOIN -->
+<div id="sJoin" class="screen on">
+  <div class="card">
+    <div class="big-icon">⛳</div>
+    <h1 class="title">Mini Golf 3D</h1>
+    <p class="subtitle">Game golf 3D multiplayer! Masukkan bola ke lubang dengan pukulan sesedikit mungkin. 1–6 pemain, 5 lubang seru.</p>
+    <input class="inp" id="jName" placeholder="Nama kamu..." maxlength="16" autocomplete="off">
+    <button class="btn btn-gold" onclick="joinGame()">Masuk ke Lapangan →</button>
+  </div>
+</div>
+
+<!-- LOBBY -->
+<div id="sLobby" class="screen">
+  <div class="card">
+    <div class="lob-title">🏌️ Ruang Tunggu</div>
+    <div class="lob-sub">Tunggu semua bergabung, lalu host klik Mulai.</div>
+    <div class="player-row" id="lobPlayers"></div>
+    <button class="btn btn-gold" id="startBtn" onclick="startGame()" disabled>⛳ Mulai Game!</button>
+    <div class="hint" id="startHint">Butuh minimal 1 pemain</div>
+    <button class="btn btn-green" onclick="backToMenu()" style="width:auto;padding:.5rem 1.2rem;font-size:.82rem;margin-top:.6rem">← Kembali</button>
+  </div>
+</div>
+
+<!-- HUD (over 3D canvas) -->
+<div id="hud" style="display:none">
+  <div class="hud-top">
+    <div class="hole-badge">
+      <div class="hole-num" id="hudHoleNum">Lubang 1</div>
+      <div class="hole-name" id="hudHoleName">Santai</div>
+      <div class="hole-par" id="hudHolePar">Par 2</div>
+    </div>
+    <div class="scores-hud">
+      <div class="scores-title">Skor Total</div>
+      <div id="hudScores"></div>
+    </div>
+  </div>
+  <div class="hud-bot">
+    <div class="turn-indicator" id="turnInd">
+      <div class="turn-name" id="turnName">—</div>
+      <div class="turn-strokes" id="turnStrokes">0 pukulan</div>
+      <div class="aim-hint" id="aimHint"></div>
+    </div>
+    <div class="power-wrap" id="powerWrap">
+      <span class="power-label">Kekuatan</span>
+      <div class="power-bar-bg"><div class="power-bar-fill" id="powerFill" style="width:0%"></div></div>
+    </div>
+    <button class="back-btn" onclick="leaveGame()">✕ Keluar</button>
+  </div>
+</div>
+
+<!-- Hole Card Transition -->
+<div id="sHoleCard">
+  <div class="hole-card-inner">
+    <div class="hc-num" id="hcNum">Lubang 1</div>
+    <div class="hc-name" id="hcName">Santai</div>
+    <div class="hc-par" id="hcPar">Par 2</div>
+    <div class="hc-scores" id="hcScores"></div>
+  </div>
+</div>
+
+<!-- END -->
+<div id="sEnd" class="screen">
+  <div class="card">
+    <div class="big-icon">🏆</div>
+    <h1 class="title" style="font-size:2rem">Game Selesai!</h1>
+    <div class="end-podium" id="endPodium"></div>
+    <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:1.2rem" id="endSub"></div>
+    <button class="btn btn-gold" onclick="playAgain()">🔄 Main Lagi</button>
+  </div>
+</div>
+
+<div class="hit-flash" id="hitFlash"></div>
+<div class="celebrate" id="celebrate">⛳ Masuk!</div>
+<div class="toast" id="toastEl"></div>
+<canvas id="canvas"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+/* ═══════════════════════════════════════
+   FIREBASE
+═══════════════════════════════════════ */
+firebase.initializeApp({
+  apiKey:'AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg',
+  authDomain:'chat-angkatan-16.firebaseapp.com',
+  databaseURL:'https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId:'chat-angkatan-16',storageBucket:'chat-angkatan-16.appspot.com',
+  messagingSenderId:'47699501502',appId:'1:47699501502:web:0d09e69d0b3ff39a7359ef'
+});
+const db = firebase.database();
+const pRef = db.ref('mg/players');
+const gRef = db.ref('mg/game');
+const bRef = db.ref('mg/balls');
+const sRef = db.ref('mg/scores');
+
+/* ═══════════════════════════════════════
+   HOLE DEFINITIONS
+   tee/cup: [x, z]
+   walls: [cx, cz, w, d]  (AABB obstacles)
+   bumpers: [cx, cz, r]   (circle obstacles)
+═══════════════════════════════════════ */
+const HOLES = [
+  { name:'Santai', par:2,
+    size:[18,5.5], tee:[-7,0], cup:[7,0],
+    walls:[], bumpers:[] },
+  { name:'Tikungan', par:3,
+    size:[18,9], tee:[-7,3], cup:[6,-3],
+    walls:[ [0,0,2.5,5] ],
+    bumpers:[] },
+  { name:'Lorong Sempit', par:3,
+    size:[22,4], tee:[-9,0], cup:[9,0],
+    walls:[],
+    bumpers:[ [-3,0,.9], [1.5,0,.9], [5,.5,.9] ] },
+  { name:'Baling-baling', par:4,
+    size:[20,6], tee:[-8,0], cup:[8,0],
+    walls:[], bumpers:[],
+    windmill:{ x:0, z:0, r:2.2, speed:1.2 } },
+  { name:'Labirin', par:4,
+    size:[20,9], tee:[-8,3.5], cup:[8,-3.5],
+    walls:[
+      [-3.5, 0.5, 1.5, 5.5],
+      [1, -1.5, 1.5, 5.5],
+      [5, 1, 1.5, 5]
+    ], bumpers:[] }
+];
+
+const COLORS = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c'];
+const BALL_R = 0.22;
+const WALL_H = 0.75;
+const CUP_R  = 0.42;
+
+/* ═══════════════════════════════════════
+   IDENTITY + STATE
+═══════════════════════════════════════ */
+let myId   = localStorage.getItem('mgUid') || ('p'+Math.random().toString(36).substr(2,7));
+let myName = localStorage.getItem('mgName')|| '';
+localStorage.setItem('mgUid', myId);
+
+let playersData = {}, gameData = {}, scoresData = {};
+let myColor = COLORS[0];
+let isHost  = false;
+let gameListeners = false;
+let currentHoleIdx = 0;
+let myStrokes = 0;
+
+/* ═══════════════════════════════════════
+   THREE.JS STATE
+═══════════════════════════════════════ */
+let scene, camera, renderer, raycaster;
+let holeMeshGroup = null;
+let ballMeshes = {};   // uid -> mesh
+let aimLine = null, aimDots = [];
+let windmillBlades = null;
+let groundPlane;
+
+// Ball physics (my ball only)
+let ball = { x:0, z:0, vx:0, vz:0 };
+let ballMoving = false;
+let ballInHoleFlag = false;
+let holeComplete = false;
+
+// Aiming
+let aiming = false;
+let aimStart = null; // {x, z} world
+let aimPower = 0;
+let aimDir   = {x:0, z:0};
+let clock;
+
+/* ═══════════════════════════════════════
+   INIT THREE.JS
+═══════════════════════════════════════ */
+function initThree() {
+  const canvas = document.getElementById('canvas');
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.setClearColor(0x87ceeb);
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x87ceeb, 30, 60);
+
+  // Camera: orthographic-ish perspective from above
+  const W = window.innerWidth, H = window.innerHeight;
+  camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 100);
+  camera.position.set(0, 14, 10);
+  camera.lookAt(0, 0, 0);
+
+  // Lights
+  const amb = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(amb);
+  const dir = new THREE.DirectionalLight(0xfff5e0, 1.2);
+  dir.position.set(5, 12, 8);
+  dir.castShadow = true;
+  dir.shadow.mapSize.set(1024, 1024);
+  dir.shadow.camera.near = 1;
+  dir.shadow.camera.far = 40;
+  dir.shadow.camera.left = -15;
+  dir.shadow.camera.right = 15;
+  dir.shadow.camera.top = 12;
+  dir.shadow.camera.bottom = -12;
+  scene.add(dir);
+
+  // Ground plane for raycasting
+  groundPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(200, 200),
+    new THREE.MeshBasicMaterial({ visible:false, side:THREE.DoubleSide })
+  );
+  groundPlane.rotation.x = -Math.PI/2;
+  scene.add(groundPlane);
+
+  raycaster = new THREE.Raycaster();
+  clock = new THREE.Clock();
+
+  // Resize
+  window.addEventListener('resize', () => {
+    const W=window.innerWidth, H=window.innerHeight;
+    renderer.setSize(W, H);
+    camera.aspect = W/H;
+    camera.updateProjectionMatrix();
+  });
+  renderer.setSize(W, H);
+  requestAnimationFrame(gameLoop);
+}
+
+/* ═══════════════════════════════════════
+   BUILD HOLE
+═══════════════════════════════════════ */
+function buildHole(idx) {
+  if (holeMeshGroup) scene.remove(holeMeshGroup);
+  holeMeshGroup = new THREE.Group();
+  scene.add(holeMeshGroup);
+  windmillBlades = null;
+
+  const h = HOLES[idx];
+  const [W, D] = h.size;
+  const GY = -0.1;
+
+  // Fairway green
+  const gMat = new THREE.MeshLambertMaterial({color:0x3d8c5e});
+  const gGeo = new THREE.BoxGeometry(W+.4, 0.25, D+.4);
+  const ground = new THREE.Mesh(gGeo, gMat);
+  ground.position.set(0, GY, 0);
+  ground.receiveShadow = true;
+  holeMeshGroup.add(ground);
+
+  // Rough border strip
+  const roughMat = new THREE.MeshLambertMaterial({color:0x2a6640});
+  const rB = [[0, -(D/2+.7), W+2, .9, .15], [0,(D/2+.7),W+2,.9,.15],
+              [-(W/2+.7),0,.9,D,.15], [(W/2+.7),0,.9,D,.15]];
+  rB.forEach(([x,z,w,d,t])=>{
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,t,d),roughMat);
+    m.position.set(x,GY+.04,z); holeMeshGroup.add(m);
+  });
+
+  // Walls (white)
+  const wMat = new THREE.MeshLambertMaterial({color:0xf5f0e8});
+  // Border walls
+  const borders = [
+    [0, -(D/2+.35), W+1.5, .7],
+    [0,  (D/2+.35), W+1.5, .7],
+    [-(W/2+.35), 0, .7, D+1.5],
+    [ (W/2+.35), 0, .7, D+1.5]
+  ];
+  borders.forEach(([x,z,w,d])=>addWallMesh(x,z,w,d,WALL_H,wMat));
+
+  // Internal walls
+  const iwMat = new THREE.MeshLambertMaterial({color:0xd4c9b2});
+  h.walls.forEach(([x,z,w,d])=>addWallMesh(x,z,w,d,WALL_H,iwMat));
+
+  // Bumpers (pink cylinders)
+  const bMat = new THREE.MeshLambertMaterial({color:0xff6b9d});
+  h.bumpers.forEach(([x,z,r])=>{
+    const m = new THREE.Mesh(
+      new THREE.CylinderGeometry(r, r, WALL_H*1.2, 12),
+      bMat
+    );
+    m.position.set(x, WALL_H*.6, z);
+    m.castShadow = true;
+    holeMeshGroup.add(m);
+  });
+
+  // Windmill
+  if (h.windmill) buildWindmill(h.windmill);
+
+  // Tee marker (white circle)
+  const teeMat = new THREE.MeshLambertMaterial({color:0xffffff});
+  const teeM = new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,.05,16), teeMat);
+  teeM.position.set(h.tee[0], .03, h.tee[1]);
+  holeMeshGroup.add(teeM);
+
+  // Cup
+  const cupMat = new THREE.MeshLambertMaterial({color:0x1a1a1a});
+  const cupM = new THREE.Mesh(new THREE.CylinderGeometry(CUP_R,CUP_R,.2,20), cupMat);
+  cupM.position.set(h.cup[0], GY+.05, h.cup[1]);
+  holeMeshGroup.add(cupM);
+
+  // Flag pole
+  const poleMat = new THREE.MeshLambertMaterial({color:0xffffff});
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,1.4,6), poleMat);
+  pole.position.set(h.cup[0], .7, h.cup[1]);
+  holeMeshGroup.add(pole);
+  const flagMat = new THREE.MeshLambertMaterial({color:0xe74c3c, side:THREE.DoubleSide});
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(.5,.3), flagMat);
+  flag.position.set(h.cup[0]+.28, 1.3, h.cup[1]);
+  holeMeshGroup.add(flag);
+
+  // Aim line (hidden initially)
+  const lineMat = new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity:.55});
+  const lineGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0,0.05,0), new THREE.Vector3(0,0.05,0)
+  ]);
+  aimLine = new THREE.Line(lineGeo, lineMat);
+  aimLine.visible = false;
+  scene.add(aimLine);
+
+  // Aim dots
+  aimDots.forEach(d=>scene.remove(d));
+  aimDots = [];
+  const dotMat = new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6});
+  for(let i=0;i<8;i++){
+    const d = new THREE.Mesh(new THREE.SphereGeometry(.06,6,6), dotMat);
+    d.visible = false;
+    scene.add(d);
+    aimDots.push(d);
+  }
+
+  // Position camera over hole center
+  camera.position.set(0, 14, 9);
+  camera.lookAt(0, 0, 0);
+}
+
+function addWallMesh(x,z,w,d,h,mat){
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+  m.position.set(x,h/2,z);
+  m.castShadow=true;
+  m.receiveShadow=true;
+  holeMeshGroup.add(m);
+}
+
+function buildWindmill({x,z,r,speed}){
+  const bladeGrp = new THREE.Group();
+  bladeGrp.position.set(x, WALL_H*.6, z);
+  const bMat = new THREE.MeshLambertMaterial({color:0xf39c12});
+  const blade1 = new THREE.Mesh(new THREE.BoxGeometry(r*2, .3, .3), bMat);
+  const blade2 = new THREE.Mesh(new THREE.BoxGeometry(.3, .3, r*2), bMat);
+  bladeGrp.add(blade1); bladeGrp.add(blade2);
+  const hubMat = new THREE.MeshLambertMaterial({color:0xecf0f1});
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,.35,10),hubMat);
+  bladeGrp.add(hub);
+  holeMeshGroup.add(bladeGrp);
+  windmillBlades = {group:bladeGrp, speed, x, z, r};
+}
+
+/* ═══════════════════════════════════════
+   BALL MESHES
+═══════════════════════════════════════ */
+function ensureBallMesh(uid, color) {
+  if (ballMeshes[uid]) return;
+  const mat = new THREE.MeshLambertMaterial({color: parseInt(color.replace('#','0x'))});
+  const geo = new THREE.SphereGeometry(BALL_R, 12, 12);
+  const m = new THREE.Mesh(geo, mat);
+  m.castShadow = true;
+  m.position.set(0, BALL_R, 0);
+  scene.add(m);
+  ballMeshes[uid] = m;
+}
+
+function removeBallMesh(uid) {
+  if (ballMeshes[uid]) { scene.remove(ballMeshes[uid]); delete ballMeshes[uid]; }
+}
+
+/* ═══════════════════════════════════════
+   PHYSICS
+═══════════════════════════════════════ */
+const FRICTION = 0.975; // per frame at 60fps
+const MAX_SPEED = 18;
+const MIN_SPEED = 0.04;
+
+function resetBallToTee() {
+  const h = HOLES[currentHoleIdx];
+  ball.x = h.tee[0]; ball.z = h.tee[1];
+  ball.vx = 0; ball.vz = 0;
+  ballMoving = false; ballInHoleFlag = false; holeComplete = false;
+  myStrokes = 0;
+  if (ballMeshes[myId]) {
+    ballMeshes[myId].position.set(ball.x, BALL_R, ball.z);
+  }
+  // Write initial ball position
+  writeBallPos();
+}
+
+function shootBall(dx, dz, power) {
+  if (ballMoving || ballInHoleFlag) return;
+  const spd = power * MAX_SPEED;
+  ball.vx = dx * spd; ball.vz = dz * spd;
+  ballMoving = true;
+  myStrokes++;
+  updateStrokeHUD();
+  // Flash
+  const f = document.getElementById('hitFlash');
+  f.classList.add('pop'); setTimeout(()=>f.classList.remove('pop'),150);
+  // Write shot to firebase
+  db.ref('mg/shots/'+myId).set({dx,dz,power,ts:Date.now()});
+}
+
+function physicsStep(dt) {
+  if (!ballMoving) return;
+  const steps = 4;
+  const sdt = dt / steps;
+  for(let s=0;s<steps;s++){
+    ball.x += ball.vx * sdt;
+    ball.z += ball.vz * sdt;
+    checkWallCollisions();
+    checkBumperCollisions();
+    checkWindmillCollision();
+    ball.vx *= FRICTION;
+    ball.vz *= FRICTION;
+  }
+
+  const spd = Math.sqrt(ball.vx**2 + ball.vz**2);
+  const h = HOLES[currentHoleIdx];
+  const cupDx = ball.x - h.cup[0], cupDz = ball.z - h.cup[1];
+  const cupDist = Math.sqrt(cupDx**2+cupDz**2);
+  if (cupDist < CUP_R && spd < 4) {
+    ballInHole();
+    return;
+  }
+  if (spd < MIN_SPEED) {
+    ball.vx = ball.vz = 0;
+    ballMoving = false;
+    writeBallPos();
+    checkTurnAdvance();
+  }
+  if (ballMeshes[myId]) {
+    ballMeshes[myId].position.set(ball.x, BALL_R, ball.z);
+  }
+}
+
+function checkWallCollisions() {
+  const h = HOLES[currentHoleIdx];
+  const [W, D] = h.size;
+  const allWalls = [
+    [0, -(D/2+.35), W+1.5, .7],
+    [0,  (D/2+.35), W+1.5, .7],
+    [-(W/2+.35), 0, .7, D+1.5],
+    [ (W/2+.35), 0, .7, D+1.5],
+    ...h.walls
+  ];
+  for(const [wx,wz,ww,wd] of allWalls) {
+    const l=wx-ww/2-BALL_R, r=wx+ww/2+BALL_R;
+    const t=wz-wd/2-BALL_R, b=wz+wd/2+BALL_R;
+    if(ball.x>l&&ball.x<r&&ball.z>t&&ball.z<b){
+      const ol=r-ball.x, or2=ball.x-l, ot=b-ball.z, ob=ball.z-t;
+      const min=Math.min(ol,or2,ot,ob);
+      if(min===ol){ball.x=r; ball.vx=Math.abs(ball.vx)*.65;}
+      else if(min===or2){ball.x=l; ball.vx=-Math.abs(ball.vx)*.65;}
+      else if(min===ot){ball.z=b; ball.vz=Math.abs(ball.vz)*.65;}
+      else{ball.z=t; ball.vz=-Math.abs(ball.vz)*.65;}
+    }
+  }
+}
+
+function checkBumperCollisions() {
+  const bumpers = HOLES[currentHoleIdx].bumpers;
+  for(const [bx,bz,br] of bumpers){
+    const dx=ball.x-bx, dz=ball.z-bz;
+    const dist=Math.sqrt(dx*dx+dz*dz);
+    const minD=br+BALL_R;
+    if(dist<minD&&dist>0.001){
+      const nx=dx/dist, nz=dz/dist;
+      const dot=ball.vx*nx+ball.vz*nz;
+      ball.vx-=2*dot*nx; ball.vz-=2*dot*nz;
+      ball.vx*=0.75; ball.vz*=0.75;
+      ball.x=bx+nx*minD; ball.z=bz+nz*minD;
+    }
+  }
+}
+
+function checkWindmillCollision() {
+  if (!windmillBlades) return;
+  const {x,z,r,group} = windmillBlades;
+  const angle = group.rotation.y;
+  // Blades: 4 endpoints at angle and angle+PI, and angle+PI/2 and angle+3PI/2
+  // Simplified: check if ball is within windmill influence zone
+  const dx=ball.x-x, dz=ball.z-z;
+  const dist=Math.sqrt(dx*dx+dz*dz);
+  if(dist>r+BALL_R*2) return;
+  // Check if ball overlaps either blade
+  for(let i=0;i<2;i++){
+    const bAngle = angle + i*Math.PI/2;
+    // Blade segment from (x,z) rotating
+    const bx1=x+Math.cos(bAngle)*r, bz1=z+Math.sin(bAngle)*r;
+    const bx2=x-Math.cos(bAngle)*r, bz2=z-Math.sin(bAngle)*r;
+    // Check proximity to line segment
+    const segLen=r*2;
+    const t=Math.max(0,Math.min(1,((ball.x-bx2)*(bx1-bx2)+(ball.z-bz2)*(bz1-bz2))/(segLen*segLen)));
+    const px=bx2+(bx1-bx2)*t, pz=bz2+(bz1-bz2)*t;
+    const d=Math.sqrt((ball.x-px)**2+(ball.z-pz)**2);
+    if(d<.25){
+      // Deflect along blade perpendicular
+      const perpX=-(bz1-bz2)/segLen, perpZ=(bx1-bx2)/segLen;
+      const dot=ball.vx*perpX+ball.vz*perpZ;
+      ball.vx-=2*dot*perpX*.8; ball.vz-=2*dot*perpZ*.8;
+    }
+  }
+}
+
+function ballInHole() {
+  ball.x=HOLES[currentHoleIdx].cup[0]; ball.z=HOLES[currentHoleIdx].cup[1];
+  ball.vx=0; ball.vz=0; ballMoving=false; ballInHoleFlag=true;
+  if(ballMeshes[myId]) ballMeshes[myId].position.set(ball.x,BALL_R*.3,ball.z);
+  showCelebrate();
+  writeBallPos();
+  // Save score
+  sRef.child(myId+'/h'+currentHoleIdx).set(myStrokes);
+  db.ref('mg/holed/'+myId+'/h'+currentHoleIdx).set(true);
+  toast(`⛳ Masuk! ${myStrokes} pukulan (Par ${HOLES[currentHoleIdx].par})`);
+  checkAllHoled();
+}
+
+function writeBallPos() {
+  bRef.child(myId).set({x:ball.x, z:ball.z, moving:ballMoving, ts:Date.now()});
+}
+
+/* ═══════════════════════════════════════
+   TURN MANAGEMENT
+═══════════════════════════════════════ */
+function isMyTurn() {
+  if (!gameData.turnOrder) return false;
+  return gameData.turnOrder[gameData.turnIdx % gameData.turnOrder.length] === myId;
+}
+
+function checkTurnAdvance() {
+  if (!isHost) return;
+  // Advance turn to next non-holed player
+  advanceTurn();
+}
+
+function advanceTurn() {
+  if (!gameData.turnOrder) return;
+  const order = gameData.turnOrder;
+  const holeIdx = gameData.hole || 0;
+  let idx = (gameData.turnIdx + 1) % order.length;
+  let checked = 0;
+  while (checked < order.length) {
+    db.ref('mg/holed/'+order[idx]+'/h'+holeIdx).once('value', snap => {
+      if (!snap.val()) {
+        gRef.update({turnIdx: idx});
+      } else {
+        // This player already holed, check next
+        idx = (idx + 1) % order.length;
+        checked++;
+        if (checked < order.length) advanceTurn();
+      }
+    });
+    break;
+  }
+}
+
+function checkAllHoled() {
+  if (!isHost) return;
+  const order = gameData.turnOrder || [];
+  const holeIdx = currentHoleIdx;
+  db.ref('mg/holed').once('value', snap => {
+    const holed = snap.val() || {};
+    const allDone = order.every(uid => holed[uid] && holed[uid]['h'+holeIdx]);
+    if (allDone) {
+      if (holeIdx >= HOLES.length - 1) {
+        setTimeout(()=>gRef.update({phase:'end'}), 1800);
+      } else {
+        setTimeout(()=>gRef.update({phase:'holecard', hole: holeIdx+1, turnIdx:0}), 1800);
+      }
+    } else {
+      advanceTurn();
+    }
+  });
+}
+
+/* ═══════════════════════════════════════
+   AIMING CONTROLS
+═══════════════════════════════════════ */
+function getGroundPoint(px, py) {
+  const W=window.innerWidth, H=window.innerHeight;
+  const nx=(px/W)*2-1, ny=-(py/H)*2+1;
+  raycaster.setFromCamera({x:nx,y:ny}, camera);
+  const plane = new THREE.Plane(new THREE.Vector3(0,1,0),0);
+  const target = new THREE.Vector3();
+  raycaster.ray.intersectPlane(plane, target);
+  return target;
+}
+
+function onPointerDown(e) {
+  if (!isMyTurn() || ballMoving || ballInHoleFlag) return;
+  const px=e.touches?e.touches[0].clientX:e.clientX;
+  const py=e.touches?e.touches[0].clientY:e.clientY;
+  const pt = getGroundPoint(px, py);
+  if (!pt) return;
+  aiming = true;
+  aimStart = {x:pt.x, z:pt.z};
+  updateAimVisual(pt.x, pt.z);
+}
+
+function onPointerMove(e) {
+  if (!aiming) return;
+  const px=e.touches?e.touches[0].clientX:e.clientX;
+  const py=e.touches?e.touches[0].clientY:e.clientY;
+  const pt = getGroundPoint(px, py);
+  if (!pt) return;
+  updateAimVisual(pt.x, pt.z);
+}
+
+function onPointerUp(e) {
+  if (!aiming) return;
+  aiming = false;
+  if (aimLine) aimLine.visible = false;
+  aimDots.forEach(d=>d.visible=false);
+  document.getElementById('powerWrap').classList.remove('show');
+  if (aimPower > 0.04) {
+    shootBall(aimDir.x, aimDir.z, aimPower);
+  }
+}
+
+function updateAimVisual(mx, mz) {
+  if (!aimStart || !isMyTurn() || ballInHoleFlag) return;
+  // Direction from mouse to ball (pull-back mechanic)
+  const dx = ball.x - mx;
+  const dz = ball.z - mz;
+  const len = Math.sqrt(dx*dx+dz*dz);
+  const maxPull = 5.5;
+  const power = Math.min(len/maxPull, 1.0);
+  aimPower = power;
+  if (len < 0.05) { aimDir={x:0,z:0}; return; }
+  aimDir = {x:dx/len, z:dz/len};
+
+  // Show aim line from ball in shot direction
+  if (aimLine) {
+    const pts = [
+      new THREE.Vector3(ball.x, .08, ball.z),
+      new THREE.Vector3(ball.x + aimDir.x*power*4, .08, ball.z + aimDir.z*power*4)
+    ];
+    aimLine.geometry.setFromPoints(pts);
+    aimLine.visible = true;
+  }
+
+  // Show trajectory dots
+  let px=ball.x, pz=ball.z;
+  let pvx=aimDir.x*power*MAX_SPEED, pvz=aimDir.z*power*MAX_SPEED;
+  for(let i=0;i<aimDots.length;i++){
+    for(let s=0;s<4;s++){
+      px+=pvx*.016; pz+=pvz*.016; pvx*=FRICTION; pvz*=FRICTION;
+    }
+    aimDots[i].position.set(px,.12,pz);
+    aimDots[i].visible=true;
+    aimDots[i].material.opacity = 0.6*(1-i/aimDots.length);
+  }
+
+  // Power bar
+  document.getElementById('powerFill').style.width=(power*100)+'%';
+  document.getElementById('powerWrap').classList.add('show');
+}
+
+/* ═══════════════════════════════════════
+   GAME LOOP
+═══════════════════════════════════════ */
+function gameLoop() {
+  requestAnimationFrame(gameLoop);
+  const dt = Math.min(clock.getDelta(), .05);
+  // Windmill rotation
+  if (windmillBlades) {
+    windmillBlades.group.rotation.y += windmillBlades.speed * dt;
+  }
+  if (gameData.phase==='playing' && isMyTurn()) {
+    physicsStep(dt);
+  }
+  renderer.render(scene, camera);
+}
+
+/* ═══════════════════════════════════════
+   JOIN / LOBBY
+═══════════════════════════════════════ */
+document.getElementById('jName').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame();});
+function joinGame(){
+  const n=document.getElementById('jName').value.trim();
+  if(!n){document.getElementById('jName').focus();return;}
+  myName=n; localStorage.setItem('mgName',n);
+  const idx=Object.keys(playersData).length%COLORS.length;
+  myColor=COLORS[idx];
+  pRef.child(myId).set({name:n,joinedAt:Date.now(),color:myColor});
+  pRef.child(myId).onDisconnect().remove();
+  showScreen('sLobby');
+  startLobbyListeners();
+}
+
+function startLobbyListeners(){
+  pRef.orderByChild('joinedAt').on('value',snap=>{
+    playersData={};
+    snap.forEach(s=>{playersData[s.key]=s.val();});
+    const ids=Object.keys(playersData);
+    isHost=ids.length>0&&ids[0]===myId;
+    myColor=playersData[myId]?.color||COLORS[0];
+    document.getElementById('lobPlayers').innerHTML=ids.map(id=>{
+      const p=playersData[id];
+      return `<div class="pchip">
+        <div class="pchip-dot" style="background:${p.color||'#fff'}"></div>
+        ${esc(p.name)}${id===myId?' (kamu)':''}
+      </div>`;
+    }).join('');
+    document.getElementById('startBtn').disabled=!isHost||ids.length<1;
+    document.getElementById('startBtn').style.display=isHost?'block':'none';
+    document.getElementById('startHint').textContent=isHost
+      ?`${ids.length} pemain — klik Mulai!`
+      :'Menunggu host memulai...';
+    if(playersData[myId]?.ready) enterGame();
+  });
+  gRef.on('value',snap=>{
+    gameData=snap.val()||{};
+    if(gameData.phase&&gameData.phase!=='lobby') enterGame();
+  });
+}
+
+function startGame(){
+  const ids=Object.keys(playersData);
+  const shuffled=[...ids].sort(()=>Math.random()-.5);
+  // Mark players ready
+  ids.forEach(id=>pRef.child(id+'/ready').set(true));
+  db.ref('mg/holed').remove();
+  sRef.remove();
+  gRef.set({phase:'holecard',hole:0,turnOrder:shuffled,turnIdx:0,hostId:myId,startedAt:Date.now()});
+}
+
+/* ═══════════════════════════════════════
+   ENTER GAME
+═══════════════════════════════════════ */
+function enterGame(){
+  if(document.getElementById('sGame')?.style.display==='block') return;
+  showScreen(null); // hide all overlay screens
+  document.getElementById('hud').style.display='block';
+
+  if(!gameListeners){
+    gameListeners=true;
+    initThree();
+    setupGameListeners();
+    setupInputListeners();
+  }
+}
+
+function setupGameListeners(){
+  pRef.on('value',snap=>{
+    playersData={}; snap.forEach(s=>{playersData[s.key]=s.val();});
+    myColor=playersData[myId]?.color||COLORS[0];
+    isHost=gameData.hostId===myId;
+    // Ensure ball meshes
+    Object.entries(playersData).forEach(([uid,p])=>{
+      ensureBallMesh(uid,p.color||COLORS[0]);
+    });
+    renderHudScores();
+  });
+
+  gRef.on('value',snap=>{
+    gameData=snap.val()||{};
+    isHost=gameData.hostId===myId;
+    const h=gameData.hole||0;
+    if(h!==currentHoleIdx||gameData.phase==='holecard'){
+      handleHoleChange(h);
+    }
+    updateTurnHUD();
+    if(gameData.phase==='end') renderEndScreen();
+  });
+
+  bRef.on('value',snap=>{
+    snap.forEach(s=>{
+      const uid=s.key, d=s.val();
+      if(!d||uid===myId) return;
+      if(ballMeshes[uid]) ballMeshes[uid].position.set(d.x, BALL_R, d.z);
+    });
+  });
+
+  sRef.on('value',snap=>{
+    scoresData=snap.val()||{};
+    renderHudScores();
+  });
+}
+
+function handleHoleChange(newIdx){
+  if(gameData.phase==='holecard'){
+    currentHoleIdx=newIdx;
+    showHoleCard(newIdx);
+    setTimeout(()=>{
+      hideHoleCard();
+      buildHole(newIdx);
+      resetBallToTee();
+      updateHoleHUD(newIdx);
+      if(gameData.phase==='holecard'&&isHost){
+        gRef.update({phase:'playing'});
+      }
+    },2500);
+  } else if(gameData.phase==='playing'){
+    currentHoleIdx=newIdx;
+    buildHole(newIdx);
+    resetBallToTee();
+    updateHoleHUD(newIdx);
+  }
+}
+
+function setupInputListeners(){
+  const c=document.getElementById('canvas');
+  c.addEventListener('mousedown',onPointerDown);
+  c.addEventListener('mousemove',onPointerMove);
+  c.addEventListener('mouseup',onPointerUp);
+  c.addEventListener('touchstart',e=>{e.preventDefault();onPointerDown(e);},{passive:false});
+  c.addEventListener('touchmove',e=>{e.preventDefault();onPointerMove(e);},{passive:false});
+  c.addEventListener('touchend',e=>{e.preventDefault();onPointerUp(e);},{passive:false});
+}
+
+/* ═══════════════════════════════════════
+   HUD
+═══════════════════════════════════════ */
+function updateHoleHUD(idx){
+  const h=HOLES[idx];
+  document.getElementById('hudHoleNum').textContent='Lubang '+(idx+1);
+  document.getElementById('hudHoleName').textContent=h.name;
+  document.getElementById('hudHolePar').textContent='Par '+h.par;
+}
+
+function updateTurnHUD(){
+  if(!gameData.turnOrder) return;
+  const curId=gameData.turnOrder[gameData.turnIdx%gameData.turnOrder.length];
+  const me=curId===myId;
+  const ind=document.getElementById('turnInd');
+  ind.className='turn-indicator'+(me?' myturn':'');
+  document.getElementById('turnName').textContent=me?'🎯 Giliran Kamu!':(playersData[curId]?.name||'?')+' bermain...';
+  updateStrokeHUD();
+  document.getElementById('aimHint').textContent=me&&!ballMoving&&!ballInHoleFlag?'Drag untuk bidik & tembak':'';
+}
+
+function updateStrokeHUD(){
+  document.getElementById('turnStrokes').textContent=myStrokes+' pukulan';
+}
+
+function renderHudScores(){
+  const ids=gameData.turnOrder||Object.keys(playersData);
+  const html=ids.map(uid=>{
+    const p=playersData[uid];
+    if(!p) return '';
+    const total=Object.values(scoresData[uid]||{}).reduce((a,b)=>a+b,0);
+    return `<div class="score-row">
+      <div class="score-dot" style="background:${p.color||'#fff'}"></div>
+      <div class="score-name">${esc(p.name)}${uid===myId?' ★':''}</div>
+      <div class="score-pts">${total}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('hudScores').innerHTML=html;
+}
+
+/* ═══════════════════════════════════════
+   HOLE CARD
+═══════════════════════════════════════ */
+function showHoleCard(idx){
+  const h=HOLES[idx];
+  document.getElementById('hcNum').textContent='Lubang '+(idx+1)+' dari '+HOLES.length;
+  document.getElementById('hcName').textContent=h.name;
+  document.getElementById('hcPar').textContent='Par '+h.par+(h.windmill?' • Ada Baling-baling!':h.bumpers?.length?' • Ada Bumper!':'');
+  // Show previous hole scores if not first
+  let scHtml='';
+  if(idx>0){
+    const prevIdx=idx-1;
+    const ids=gameData.turnOrder||[];
+    scHtml=ids.map(uid=>{
+      const p=playersData[uid]||{};
+      const s=scoresData[uid]?.['h'+prevIdx]||0;
+      const par=HOLES[prevIdx].par;
+      const diff=s-par;
+      const cls=diff<0?'hcs-under':diff===0?'hcs-even':'hcs-plus';
+      const sym=diff<0?'🦅':diff===0?'✅':'💀';
+      return `<div class="hcs">
+        <div class="hcs-name">${esc(p.name||'?')}</div>
+        <div class="hcs-val ${cls}">${s} ${sym}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('hcScores').innerHTML=scHtml;
+  document.getElementById('sHoleCard').classList.add('on');
+}
+function hideHoleCard(){ document.getElementById('sHoleCard').classList.remove('on'); }
+
+/* ═══════════════════════════════════════
+   END SCREEN
+═══════════════════════════════════════ */
+function renderEndScreen(){
+  document.getElementById('hud').style.display='none';
+  showScreen('sEnd');
+  const ids=gameData.turnOrder||Object.keys(playersData);
+  const totals=ids.map(uid=>{
+    const tot=Object.values(scoresData[uid]||{}).reduce((a,b)=>a+b,0);
+    const parTot=HOLES.reduce((a,h)=>a+h.par,0);
+    return {uid, name:playersData[uid]?.name||'?', color:playersData[uid]?.color||'#fff', total, parTot};
+  }).sort((a,b)=>a.total-b.total); // lowest score wins in golf!
+
+  const barH=['p1-bar','p2-bar','p3-bar'];
+  const pos=totals.slice(0,3);
+  let podHtml='';
+  pos.forEach((p,i)=>{
+    const diff=p.total-p.parTot;
+    podHtml+=`<div class="podium-slot">
+      <div class="podium-bar ${barH[i]||'p3-bar'}"></div>
+      <div class="podium-name">${i===0?'🥇':i===1?'🥈':'🥉'} ${esc(p.name)}</div>
+      <div class="podium-score">${p.total} pukulan (${diff>=0?'+':''}${diff})</div>
+    </div>`;
+  });
+  document.getElementById('endPodium').innerHTML=podHtml;
+  const winner=totals[0];
+  document.getElementById('endSub').textContent=`${winner.name} menang dengan ${winner.total} pukulan! 🎉`;
+  if(window.LB_addWin&&winner.uid===myId) window.LB_addWin(myName,myId);
+  ids.forEach(uid=>{
+    const t=Object.values(scoresData[uid]||{}).reduce((a,b)=>a+b,0);
+    if(window.LB_addPoints) window.LB_addPoints(playersData[uid]?.name,uid, Math.max(0,200-t*5));
+  });
+}
+
+/* ═══════════════════════════════════════
+   UTILS
+═══════════════════════════════════════ */
+function showScreen(id){
+  ['sJoin','sLobby','sEnd'].forEach(s=>{
+    document.getElementById(s).classList.remove('on');
+    document.getElementById(s).style.display='none';
+  });
+  if(id){
+    const el=document.getElementById(id);
+    el.style.display='flex'; el.classList.add('on');
+  }
+}
+
+function showCelebrate(){
+  const c=document.getElementById('celebrate');
+  c.classList.add('on'); setTimeout(()=>c.classList.remove('on'),1000);
+}
+
+function toast(msg){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg; t.classList.add('on');
+  clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove('on'),2600);
+}
+
+function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function backToMenu(){ db.ref('mg').remove(); pRef.child(myId).remove(); location.reload(); }
+function leaveGame(){ pRef.child(myId).remove(); location.reload(); }
+function playAgain(){ db.ref('mg').remove(); location.reload(); }
+
+// Pre-fill name
+document.getElementById('jName').value = myName || localStorage.getItem('lbName') || '';
+showScreen('sJoin');
+</script>
+<script src="shared.js"></script>
+</body>
+</html>
