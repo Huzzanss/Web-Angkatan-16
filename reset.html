@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Reset Data Firebase</title>
+<style>
+body{font-family:sans-serif;background:#0d1117;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:1rem;text-align:center;padding:1rem;}
+button{padding:.8rem 2rem;border:none;border-radius:50px;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-red{background:linear-gradient(135deg,#e63946,#c1121f);color:#fff;}
+.btn-green{background:linear-gradient(135deg,#7adf9f,#2dc653);color:#1a3a2a;}
+.log{background:rgba(255,255,255,.05);border-radius:12px;padding:1rem;font-size:.82rem;max-width:400px;width:100%;text-align:left;max-height:300px;overflow-y:auto;color:rgba(255,255,255,.7);}
+</style>
+</head>
+<body>
+<h2>🗑️ Reset Database Firebase</h2>
+<p style="color:rgba(255,255,255,.5);font-size:.85rem">Hapus semua data: leaderboard, mading, chat, game, profil, dll.<br>⚠️ Tidak bisa dikembalikan!</p>
+<button class="btn-red" onclick="doReset()">🗑 Reset Semua Data</button>
+<a href="index.html"><button class="btn-green" style="margin-top:.5rem">← Kembali</button></a>
+<div class="log" id="logEl">Tekan tombol untuk mulai reset...</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg",
+  authDomain:"chat-angkatan-16.firebaseapp.com",
+  databaseURL:"https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"chat-angkatan-16",storageBucket:"chat-angkatan-16.appspot.com",
+  messagingSenderId:"47699501502",appId:"1:47699501502:web:0d09e69d0b3ff39a7359ef"
+});
+const db = firebase.database();
+
+function log(msg){
+  const el=document.getElementById('logEl');
+  el.innerHTML+=`<div>• ${msg}</div>`;
+  el.scrollTop=el.scrollHeight;
+}
+
+async function doReset(){
+  if(!confirm("Yakin mau hapus SEMUA data Firebase?")) return;
+  const paths=[
+    'shared','mading','songReq','notif',
+    'au','mg','ww','uno','spy','sambungKata','gambarBareng',
+    'messages','gallery','chat'
+  ];
+  for(const p of paths){
+    try{
+      await db.ref(p).remove();
+      log(`✅ Hapus: /${p}`);
+    } catch(e){
+      log(`❌ Gagal hapus /${p}: ${e.message}`);
+    }
+  }
+  log("🎉 Semua data berhasil direset!");
+  // Also clear localStorage
+  localStorage.clear();
+  log("🧹 localStorage dibersihkan");
+}
+</script>
+</body>
+</html>
