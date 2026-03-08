@@ -57,6 +57,9 @@
   function boot() {
     injectStyles();
     injectHTML();
+    // If name was set via profil.html, pick it up
+    const savedName = localStorage.getItem('lbName');
+    if (savedName) myName = savedName;
     if (!myName) showNameModal();
     else afterName();
   }
@@ -82,7 +85,7 @@
     myName = v;
     localStorage.setItem('lbName', v);
     // Sync to all game name keys
-    ['lbName','wwName','unoName','spyName','gbPlayerName','wwPlayerName'].forEach(k => localStorage.setItem(k, v));
+    ['lbName','wwName','unoName','spyName','gbPlayerName','wwPlayerName','auName','mgName'].forEach(k => localStorage.setItem(k, v));
     document.getElementById('_sh_nm').style.display = 'none';
     afterName();
   }
@@ -102,7 +105,9 @@
     const db = getDB();
     if (!db) { setTimeout(startOnlineTracking, 600); return; }
     const ref = db.ref('shared/online/' + myId);
-    ref.set({ name: myName, since: Date.now() });
+    ref.set({ name: myName, since: Date.now(),
+      avatar: localStorage.getItem('profileAvatar')||'👤',
+      mood: localStorage.getItem('profileMood')||'' });
     ref.onDisconnect().remove();
     // Ensure LB entry exists with correct name
     db.ref('shared/lb2/' + lbKey(myName)).transaction(cur => {
@@ -114,7 +119,7 @@
       ref.remove();
     });
     // Heartbeat every 60s
-    setInterval(() => ref.update({ name: myName, beat: Date.now() }), 60000);
+    setInterval(() => ref.update({ name: myName, beat: Date.now(), avatar: localStorage.getItem('profileAvatar')||'👤', mood: localStorage.getItem('profileMood')||'' }), 60000);
     // Save time every 5 min
     setInterval(saveOnlineTime, 300000);
   }
