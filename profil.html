@@ -147,17 +147,76 @@ select.edit-inp option{background:#1a1f2e;}
     <div class="pcard">
       <div class="pcard-title">✏️ Edit Informasi</div>
       <div class="edit-row">
-        <label class="edit-label">Nama Lengkap</label>
-        <input class="edit-inp" id="editName" placeholder="Nama kamu...">
+        <label class="edit-label">Nama Kamu (A–Z)</label>
+        <select class="edit-inp" id="editName" onchange="onNameSelect()">
+          <option value="">Pilih namamu...</option>
+          <option value="Abdullah Raziq Hanan">Abdullah Raziq Hanan</option>
+          <option value="Adelia Felicia">Adelia Felicia</option>
+          <option value="Aditya Narendra Pambudi">Aditya Narendra Pambudi</option>
+          <option value="Afiqah Humayra Arresky">Afiqah Humayra Arresky</option>
+          <option value="Ahmad Abdullah Hafi Munaji">Ahmad Abdullah Hafi Munaji</option>
+          <option value="Ahmad Faezya Rafa">Ahmad Faezya Rafa</option>
+          <option value="Ahmad Hamdan Nurzati">Ahmad Hamdan Nurzati</option>
+          <option value="Alesha Zevanna Annayla Alfian">Alesha Zevanna Annayla Alfian</option>
+          <option value="Alexandra Shavira Kaysa">Alexandra Shavira Kaysa</option>
+          <option value="Alisha Nur Afiyah">Alisha Nur Afiyah</option>
+          <option value="Alisya Zella Naura Saputro">Alisya Zella Naura Saputro</option>
+          <option value="Alita Admiral">Alita Admiral</option>
+          <option value="Alkhalifi Hasyimi">Alkhalifi Hasyimi</option>
+          <option value="Andra Alghifari">Andra Alghifari</option>
+          <option value="Angelina Natalia Tennes">Angelina Natalia Tennes</option>
+          <option value="Aqillah Khayyirah">Aqillah Khayyirah</option>
+          <option value="Arsenio Al Fattan Wibowo">Arsenio Al Fattan Wibowo</option>
+          <option value="Azim Evano Rahman">Azim Evano Rahman</option>
+          <option value="Azima Zafeera Khairiya">Azima Zafeera Khairiya</option>
+          <option value="Azka Aisy Muhammad Firdaus">Azka Aisy Muhammad Firdaus</option>
+          <option value="Chaerul Risyad Ferdansyah">Chaerul Risyad Ferdansyah</option>
+          <option value="Deeandra Mikhailla Hariyadi">Deeandra Mikhailla Hariyadi</option>
+          <option value="Devan Rafandra Pratama">Devan Rafandra Pratama</option>
+          <option value="Faqih Hamizan Rahman">Faqih Hamizan Rahman</option>
+          <option value="Farrel Azka Firlana">Farrel Azka Firlana</option>
+          <option value="Fattah Altaf Qusyairi">Fattah Altaf Qusyairi</option>
+          <option value="Gavin Ahmad Farisakha Sahilin">Gavin Ahmad Farisakha Sahilin</option>
+          <option value="Ghaisan Adib Mubasyir">Ghaisan Adib Mubasyir</option>
+          <option value="Giovanny Syahputra">Giovanny Syahputra</option>
+          <option value="Gusti Muhammad An-Nafis">Gusti Muhammad An-Nafis</option>
+          <option value="Hana Aish Sumayyah">Hana Aish Sumayyah</option>
+          <option value="Hilmi Muhammad Nidho Mudhin">Hilmi Muhammad Nidho Mudhin</option>
+          <option value="Javier Al Majid">Javier Al Majid</option>
+          <option value="Kanaya Lubna Janitra Hafizah">Kanaya Lubna Janitra Hafizah</option>
+          <option value="Keisha Pratiwi Syahrizal">Keisha Pratiwi Syahrizal</option>
+          <option value="Khalika Ismatullah Assahla">Khalika Ismatullah Assahla</option>
+          <option value="Muhammad Abdurrahman Dzaki">Muhammad Abdurrahman Dzaki</option>
+          <option value="Muhammad Ahza Farezell">Muhammad Ahza Farezell</option>
+          <option value="Muhammad Alfindra Auvar Rahardja">Muhammad Alfindra Auvar Rahardja</option>
+          <option value="Muhammad Asyraf Al Farisi">Muhammad Asyraf Al Farisi</option>
+          <option value="Muhammad El Junot Razqal">Muhammad El Junot Razqal</option>
+          <option value="Muhammad Fahri Ardani">Muhammad Fahri Ardani</option>
+          <option value="Muhammad Hafidz Setiadi">Muhammad Hafidz Setiadi</option>
+          <option value="Muhammad Hafiz Faad Abqory">Muhammad Hafiz Faad Abqory</option>
+          <option value="Muhammad Juna Defa Alfarizie">Muhammad Juna Defa Alfarizie</option>
+          <option value="Muhammad Mezameru Arsyada">Muhammad Mezameru Arsyada</option>
+          <option value="Muhammad Zaki Raditya">Muhammad Zaki Raditya</option>
+          <option value="Muhammad Zamzam Zidna Fahn">Muhammad Zamzam Zidna Fahn</option>
+          <option value="Muhammad Zharif Syatir">Muhammad Zharif Syatir</option>
+          <option value="Nada Fajriah Salsabilla">Nada Fajriah Salsabilla</option>
+          <option value="Nayhan Abqari">Nayhan Abqari</option>
+          <option value="Nuhammad Rezky Tri Ramadhan">Nuhammad Rezky Tri Ramadhan</option>
+          <option value="Nur Aisyah">Nur Aisyah</option>
+          <option value="Nurul Farhana Aqilah Chandra">Nurul Farhana Aqilah Chandra</option>
+          <option value="Samytha Larisa Azzalea">Samytha Larisa Azzalea</option>
+          <option value="Shazia Amira Zhafirah">Shazia Amira Zhafirah</option>
+          <option value="Shidqia Nabila Azzahra">Shidqia Nabila Azzahra</option>
+          <option value="Super Novel Hardian">Super Novel Hardian</option>
+          <option value="Syaqila Marwa Putri Deandra">Syaqila Marwa Putri Deandra</option>
+          <option value="Syifa Fathiyah Zahra">Syifa Fathiyah Zahra</option>
+          <option value="Syrenia Carrisa Althafunnisa">Syrenia Carrisa Althafunnisa</option>
+          <option value="Zahratu Syifa">Zahratu Syifa</option>
+        </select>
       </div>
       <div class="edit-row">
         <label class="edit-label">Kelas</label>
-        <select class="edit-inp" id="editClass">
-          <option value="">Pilih Kelas</option>
-          <option value="VI Kahayan">VI Kahayan</option>
-          <option value="VI Kapuas">VI Kapuas</option>
-          <option value="VI Mahakam">VI Mahakam</option>
-        </select>
+        <input class="edit-inp" id="editClass" readonly style="opacity:.6;cursor:not-allowed" placeholder="Otomatis terisi...">
       </div>
       <div class="edit-row">
         <label class="edit-label">Bio</label>
@@ -358,9 +417,85 @@ function updateMoodDisplay(mood){
 }
 
 /* ── Save / Load profile ── */
+const STUDENT_CLASSES = {
+  "Abdullah Raziq Hanan":"VI Kahayan",
+  "Aditya Narendra Pambudi":"VI Kahayan",
+  "Ahmad Abdullah Hafi Munaji":"VI Kahayan",
+  "Alesha Zevanna Annayla Alfian":"VI Kahayan",
+  "Alisha Nur Afiyah":"VI Kahayan",
+  "Azim Evano Rahman":"VI Kahayan",
+  "Deeandra Mikhailla Hariyadi":"VI Kahayan",
+  "Faqih Hamizan Rahman":"VI Kahayan",
+  "Gavin Ahmad Farisakha Sahilin":"VI Kahayan",
+  "Hana Aish Sumayyah":"VI Kahayan",
+  "Javier Al Majid":"VI Kahayan",
+  "Muhammad Alfindra Auvar Rahardja":"VI Kahayan",
+  "Muhammad Asyraf Al Farisi":"VI Kahayan",
+  "Muhammad Hafiz Faad Abqory":"VI Kahayan",
+  "Nuhammad Rezky Tri Ramadhan":"VI Kahayan",
+  "Nayhan Abqari":"VI Kahayan",
+  "Samytha Larisa Azzalea":"VI Kahayan",
+  "Zahratu Syifa":"VI Kahayan",
+  "Ahmad Faezya Rafa":"VI Kapuas",
+  "Ahmad Hamdan Nurzati":"VI Kapuas",
+  "Alkhalifi Hasyimi":"VI Kapuas",
+  "Andra Alghifari":"VI Kapuas",
+  "Angelina Natalia Tennes":"VI Kapuas",
+  "Arsenio Al Fattan Wibowo":"VI Kapuas",
+  "Chaerul Risyad Ferdansyah":"VI Kapuas",
+  "Devan Rafandra Pratama":"VI Kapuas",
+  "Ghaisan Adib Mubasyir":"VI Kapuas",
+  "Kanaya Lubna Janitra Hafizah":"VI Kapuas",
+  "Keisha Pratiwi Syahrizal":"VI Kapuas",
+  "Muhammad Ahza Farezell":"VI Kapuas",
+  "Muhammad Zaki Raditya":"VI Kapuas",
+  "Muhammad Zamzam Zidna Fahn":"VI Kapuas",
+  "Adelia Felicia":"VI Mahakam",
+  "Afiqah Humayra Arresky":"VI Mahakam",
+  "Alexandra Shavira Kaysa":"VI Mahakam",
+  "Alisya Zella Naura Saputro":"VI Mahakam",
+  "Alita Admiral":"VI Mahakam",
+  "Aqillah Khayyirah":"VI Mahakam",
+  "Azima Zafeera Khairiya":"VI Mahakam",
+  "Azka Aisy Muhammad Firdaus":"VI Mahakam",
+  "Farrel Azka Firlana":"VI Mahakam",
+  "Fattah Altaf Qusyairi":"VI Mahakam",
+  "Giovanny Syahputra":"VI Mahakam",
+  "Gusti Muhammad An-Nafis":"VI Mahakam",
+  "Hilmi Muhammad Nidho Mudhin":"VI Mahakam",
+  "Khalika Ismatullah Assahla":"VI Mahakam",
+  "Muhammad Abdurrahman Dzaki":"VI Mahakam",
+  "Muhammad El Junot Razqal":"VI Mahakam",
+  "Muhammad Fahri Ardani":"VI Mahakam",
+  "Muhammad Hafidz Setiadi":"VI Mahakam",
+  "Muhammad Juna Defa Alfarizie":"VI Mahakam",
+  "Muhammad Mezameru Arsyada":"VI Mahakam",
+  "Muhammad Zharif Syatir":"VI Mahakam",
+  "Nada Fajriah Salsabilla":"VI Mahakam",
+  "Nur Aisyah":"VI Mahakam",
+  "Nurul Farhana Aqilah Chandra":"VI Mahakam",
+  "Shazia Amira Zhafirah":"VI Mahakam",
+  "Shidqia Nabila Azzahra":"VI Mahakam",
+  "Super Novel Hardian":"VI Mahakam",
+  "Syaqila Marwa Putri Deandra":"VI Mahakam",
+  "Syifa Fathiyah Zahra":"VI Mahakam",
+  "Syrenia Carrisa Althafunnisa":"VI Mahakam"
+};
+
+function onNameSelect(){
+  const name = document.getElementById('editName').value;
+  const kelas = STUDENT_CLASSES[name] || '';
+  document.getElementById('editClass').value = kelas;
+  // Live preview student card
+  document.getElementById('dispName').textContent = name || 'Nama Kamu';
+  document.getElementById('sicName').textContent = name || '—';
+  document.getElementById('sicClass').textContent = kelas || '—';
+  document.getElementById('dispClass').textContent = kelas || '— Kelas —';
+}
+
 function saveProfile(){
   const name=document.getElementById('editName').value.trim()||localStorage.getItem('lbName')||'Anonim';
-  const kelas=document.getElementById('editClass').value;
+  const kelas=STUDENT_CLASSES[name]||document.getElementById('editClass').value||localStorage.getItem('profileClass')||'';
 
   const bio=document.getElementById('editBio').value.trim();
   localStorage.setItem('lbName',name);
@@ -401,8 +536,12 @@ function updateDisplayCard(){
 }
 
 function loadLocalProfile(){
-  document.getElementById('editName').value=localStorage.getItem('lbName')||'';
-  document.getElementById('editClass').value=localStorage.getItem('profileClass')||'';
+  const savedName=localStorage.getItem('lbName')||'';
+  const nameEl=document.getElementById('editName');
+  if(nameEl) nameEl.value=savedName;
+  const savedClass=localStorage.getItem('profileClass')||STUDENT_CLASSES[localStorage.getItem('lbName')]||'';
+  const classEl=document.getElementById('editClass');
+  if(classEl) classEl.value=savedClass;
   document.getElementById('editBio').value=localStorage.getItem('profileBio')||'';
   updateDisplayCard();
   buildAvatarGrid();
