@@ -27,7 +27,7 @@
 
     if (diff <= 0) {
       [elDays, elHours, elMins, elSecs].forEach(el => el.textContent = '00');
-      elMsg.textContent = '🎓 Selamat! Hari Wisuda telah tiba!';
+      elMsg.textContent = ' Selamat! Hari Wisuda telah tiba!';
       elMsg.classList.add('done');
       return;
     }
@@ -329,14 +329,14 @@ window.addEventListener('beforeunload', stopTyping);
           done++;
           progressFill.style.width = Math.round((done / arr.length) * 100) + '%';
           if (done === arr.length) {
-            progressText.textContent = '✓ Foto berhasil disimpan!';
+            progressText.textContent = ' Foto berhasil disimpan!';
             setTimeout(resetUploadUI, 1200);
           }
         })
         .catch(err => {
           console.error(err);
           progressText.style.color = '#e07a5f';
-          progressText.textContent = '⛔ Gagal: ' + err.message;
+          progressText.textContent = ' Gagal: ' + err.message;
           setTimeout(resetUploadUI, 3000);
         });
     });
@@ -514,7 +514,7 @@ window.addEventListener('beforeunload', stopTyping);
   // Error handling (file tidak ketemu)
   audio.addEventListener('error', () => {
     console.warn('File tidak ditemukan:', PLAYLIST[currentIdx].file);
-    mpTitle.textContent = '⚠ File tidak ditemukan: ' + PLAYLIST[currentIdx].file;
+    mpTitle.textContent = '! File tidak ditemukan: ' + PLAYLIST[currentIdx].file;
     // Coba lagu berikutnya setelah 2 detik
     setTimeout(() => loadTrack(currentIdx + 1), 2000);
   });
@@ -546,7 +546,7 @@ const gamePlayRef= firebase.database().ref('shared/gamePlays');
 
 function myUid(){return localStorage.getItem('auUid')||localStorage.getItem('mgUid')||('u'+Math.random().toString(36).substr(2,7));}
 function myNameStr(){return localStorage.getItem('lbName')||localStorage.getItem('auName')||localStorage.getItem('mgName')||'Anonim';}
-function myAvatarStr(){return localStorage.getItem('profileAvatar')||'👤';}
+function myAvatarStr(){return localStorage.getItem('profileAvatar')||'';}
 function esc2(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function fmtAgo2(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return 'barusan';if(s<3600)return Math.floor(s/60)+'m lalu';if(s<86400)return Math.floor(s/3600)+'j lalu';return Math.floor(s/86400)+'h lalu';}
 
@@ -564,12 +564,12 @@ onlineRef.on('value',snap=>{
     const mood=v.mood||'';
     const name=(v.name||'?').split(' ')[0];
     const isMe=uid===me;
-    const av=v.avatar||'👤';
+    const av=v.avatar||'';
     html+=`<div class="online-chip" onclick="window.location='profil.html'" title="${esc2(v.name||'?')}">
       <div class="online-dot-sm"></div>
       <span style="font-size:.85rem">${av}</span>
       ${mood?`<span class="online-mood" style="font-size:.75rem">${mood.split(' ')[0]}</span>`:''}
-      <span>${esc2(name)}${isMe?' ★':''}</span>
+      <span>${esc2(name)}${isMe?' &#9733;':''}</span>
     </div>`;
   });
   chips.innerHTML=html||'<span style="font-size:.75rem;color:rgba(255,255,255,.3)">Tidak ada yang online</span>';
@@ -663,7 +663,7 @@ function submitMading(){
   madingRef.push(post);
   document.getElementById('madingInput').value='';
   // Send notification
-  notifRef.push({msg:`📝 ${myNameStr()} membuat ${madingType==='pengumuman'?'pengumuman':madingType==='poll'?'poll':'postingan'} baru!`,ts:Date.now(),id:Date.now().toString()});
+  notifRef.push({msg:`<svg class="icon" aria-hidden="true"><use href="#ic-edit"/></svg> ${myNameStr()} membuat ${madingType==='pengumuman'?'pengumuman':madingType==='poll'?'poll':'postingan'} baru!`,ts:Date.now(),id:Date.now().toString()});
 }
 
 madingRef.orderByChild('ts').limitToLast(30).on('value',snap=>{
@@ -677,7 +677,7 @@ function renderMading(){
   if(!feed) return;
   const posts=Object.entries(madingPosts).reverse();
   if(!posts.length){
-    feed.innerHTML='<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem">Belum ada postingan. Jadilah yang pertama! ✨</div>';
+    feed.innerHTML='<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem">Belum ada postingan. Jadilah yang pertama! </div>';
     return;
   }
   feed.innerHTML=posts.map(([id,p])=>buildMadingCard(id,p)).join('');
@@ -689,7 +689,7 @@ function buildMadingCard(id,p){
   const liked=(p.likes||{})[me];
   const commentCount=Object.keys(p.comments||{}).length;
   const typeTag={post:'tag-post',pengumuman:'tag-pengumuman',poll:'tag-poll'}[p.type]||'tag-post';
-  const typeLabel={post:'Post',pengumuman:'📢 Pengumuman',poll:'📊 Poll'}[p.type]||'Post';
+  const typeLabel={post:'Post',pengumuman:'<svg class="icon" aria-hidden="true"><use href="#ic-announce"/></svg> Pengumuman',poll:' Poll'}[p.type]||'Post';
 
   let bodyHtml=`<div class="mc-body">${esc2(p.text)}</div>`;
 
@@ -714,7 +714,7 @@ function buildMadingCard(id,p){
 
   return `<div class="mading-card type-${p.type}">
     <div class="mc-head">
-      <div class="mc-avatar">${p.avatar||'👤'}</div>
+      <div class="mc-avatar">${p.avatar||''}</div>
       <div class="mc-meta">
         <div class="mc-name">${esc2(p.name||'?')}</div>
         <div class="mc-time">${fmtAgo2(p.ts||0)}</div>
@@ -723,15 +723,15 @@ function buildMadingCard(id,p){
     </div>
     ${bodyHtml}
     <div class="mc-actions">
-      <button class="mc-action-btn${liked?' liked':''}" onclick="likeMading('${id}')">❤️ ${likeCount}</button>
-      <button class="mc-action-btn" onclick="toggleComments('${id}')">💬 ${commentCount}</button>
-      ${p.uid===me?`<button class="mc-action-btn" onclick="deleteMading('${id}')" style="margin-left:auto;color:rgba(255,100,100,.5)">🗑</button>`:''}
+      <button class="mc-action-btn${liked?' liked':''}" onclick="likeMading('${id}')">️ ${likeCount}</button>
+      <button class="mc-action-btn" onclick="toggleComments('${id}')"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> ${commentCount}</button>
+      ${p.uid===me?`<button class="mc-action-btn" onclick="deleteMading('${id}')" style="margin-left:auto;color:rgba(255,100,100,.5)">[del]</button>`:''}
     </div>
     <div class="mc-comments" id="mc-comm-${id}" style="display:none">
       ${commHtml}
       <div class="mc-comment-input-row">
         <input class="mc-comment-input" id="ci-${id}" placeholder="Tulis komentar...">
-        <button class="mc-comment-send" onclick="sendComment('${id}')">➤</button>
+        <button class="mc-comment-send" onclick="sendComment('${id}')"></button>
       </div>
     </div>
   </div>`;
@@ -775,7 +775,7 @@ function requestSong(){
   if(!song) return;
   songReqRef.push({song,reqBy:myNameStr(),votes:1,voters:{[myUid()]:true},ts:Date.now()});
   inp.value='';
-  notifRef.push({msg:`🎵 ${myNameStr()} request lagu: ${song}`,ts:Date.now(),id:Date.now().toString()});
+  notifRef.push({msg:` ${myNameStr()} request lagu: ${song}`,ts:Date.now(),id:Date.now().toString()});
 }
 
 function voteForSong(id){
@@ -820,12 +820,12 @@ gamePlayRef.on('value',snap=>{
   if(games.length>0){
     const topId=games[0][0].replace(/_/g,'-');
     const topEl=document.getElementById('tag-'+topId);
-    if(topEl) topEl.innerHTML='<span class="game-tag game-tag-rec">⭐ RECOMMENDED</span>';
+    if(topEl) topEl.innerHTML='<span class="game-tag game-tag-rec">&#9733; RECOMMENDED</span>';
     // Second most = Hot
     if(games.length>1){
       const secId=games[1][0].replace(/_/g,'-');
       const secEl=document.getElementById('tag-'+secId);
-      if(secEl&&!secEl.innerHTML.includes('NEW')) secEl.innerHTML='<span class="game-tag game-tag-hot">🔥 HOT</span>';
+      if(secEl&&!secEl.innerHTML.includes('NEW')) secEl.innerHTML='<span class="game-tag game-tag-hot">+ HOT</span>';
     }
   }
 });
@@ -845,7 +845,7 @@ if(navProfil){
   if(av) navProfil.textContent=av+' Profil';
 }
 const madAv=document.getElementById('madingAvatarSm');
-if(madAv) madAv.textContent=localStorage.getItem('profileAvatar')||'👤';
+if(madAv) madAv.textContent=localStorage.getItem('profileAvatar')||'';
 
 // Update nav profil link with avatar
 const navP=document.getElementById('navProfil');
@@ -882,12 +882,12 @@ if(navP){
     const isMe = nameToKey(myName()) === key;
     if (!text && !isMe) { el.innerHTML = ''; return; }
     if (!text && isMe) {
-      el.innerHTML = `<span style="color:rgba(201,168,76,0.5);font-size:.75rem">Klik ✏️ untuk tambah bio</span>
-        <span class="sc-bio-edit" onclick="editBio(event,'${key}')">✏️ Tambah</span>`;
+      el.innerHTML = `<span style="color:rgba(201,168,76,0.5);font-size:.75rem">Klik &#9998;️ untuk tambah bio</span>
+        <span class="sc-bio-edit" onclick="editBio(event,'${key}')">&#9998;️ Tambah</span>`;
       return;
     }
     el.innerHTML = `<span class="sc-bio-text">${esc(text)}</span>`
-      + (isMe ? `<span class="sc-bio-edit" onclick="editBio(event,'${key}')">✏️ Edit</span>` : '');
+      + (isMe ? `<span class="sc-bio-edit" onclick="editBio(event,'${key}')">&#9998;️ Edit</span>` : '');
   }
 
   function esc(t) {
