@@ -43,6 +43,8 @@
   <symbol id="ic-poll" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
   <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
   <symbol id="ic-circle" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></symbol>
+  <symbol id="ic-billiard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><line x1="12" y1="3" x2="12" y2="8.5"/></symbol>
+  <symbol id="ic-chess" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 22h6M8 22v-2h8v2M10 20v-5L6 9h12l-4 6v5M10 9V5M14 9V5M9 5h6M12 2v3"/></symbol>
 </svg>
 <div id="notifPanel">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
@@ -479,6 +481,28 @@
         </a>
 
         <!-- Sambung Kata tag -->
+
+        <!-- Billiard -->
+        <a href="billiard.html" class="game-card" data-game="billiard">
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-billiard"/></svg></div>
+          <div class="game-card-info">
+            <h3>Billiard 8-Ball<span class="game-tag game-tag-new">NEW</span></h3>
+            <p>Game billiard 8-ball vs AI! Masukkan semua bolamu lalu potong 8-ball untuk menang.</p>
+          </div>
+          <div class="game-card-badge">vs AI</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
+        </a>
+
+        <!-- Catur -->
+        <a href="catur.html" class="game-card" data-game="catur">
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-chess"/></svg></div>
+          <div class="game-card-info">
+            <h3>Catur<span class="game-tag game-tag-new">NEW</span></h3>
+            <p>Main catur lawan AI dengan 3 tingkat kesulitan — mudah, sedang, dan sulit.</p>
+          </div>
+          <div class="game-card-badge">vs AI</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
+        </a>
 
       </div>
     </section>
