@@ -847,3 +847,85 @@ if(navP){
   const nm=localStorage.getItem('lbName')||'Profil';
   navP.textContent=(av?av+' ':'')+nm;
 }
+
+/* ─── Student Card Bio ─── */
+(function() {
+  const bioRef = firebase.database().ref('studentBios');
+  const biosCache = {};
+
+  // Load all bios from Firebase once
+  bioRef.on('value', snap => {
+    const data = snap.val() || {};
+    Object.entries(data).forEach(([key, val]) => {
+      biosCache[key] = val;
+      const el = document.getElementById('bio_' + key);
+      if (el) renderBio(el, key, val);
+    });
+  });
+
+  function nameToKey(name) {
+    return name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  }
+
+  function myName() {
+    return localStorage.getItem('lbName') || '';
+  }
+
+  function renderBio(el, key, text) {
+    const isMe = nameToKey(myName()) === key;
+    if (!text && !isMe) { el.innerHTML = ''; return; }
+    if (!text && isMe) {
+      el.innerHTML = `<span style="color:rgba(201,168,76,0.5);font-size:.75rem">Klik ✏️ untuk tambah bio</span>
+        <span class="sc-bio-edit" onclick="editBio(event,'${key}')">✏️ Tambah</span>`;
+      return;
+    }
+    el.innerHTML = `<span class="sc-bio-text">${esc(text)}</span>`
+      + (isMe ? `<span class="sc-bio-edit" onclick="editBio(event,'${key}')">✏️ Edit</span>` : '');
+  }
+
+  function esc(t) {
+    return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  window.toggleStudentCard = function(card) {
+    const wasActive = card.classList.contains('active');
+    // Close all others
+    document.querySelectorAll('.student-card.active').forEach(c => {
+      if (c !== card) c.classList.remove('active');
+    });
+    card.classList.toggle('active', !wasActive);
+    if (!wasActive) {
+      const name = card.dataset.name || '';
+      const key = nameToKey(name);
+      const bioEl = card.querySelector('.sc-bio');
+      if (bioEl) renderBio(bioEl, key, biosCache[key] || '');
+    }
+  };
+
+  window.editBio = function(e, key) {
+    e.stopPropagation();
+    const bioEl = document.getElementById('bio_' + key);
+    if (!bioEl) return;
+    const current = biosCache[key] || '';
+    bioEl.innerHTML = `<div class="sc-bio-input-wrap">
+      <input class="sc-bio-input" id="bioinp_${key}" placeholder="Tulis bio kamu..." maxlength="100" value="${esc(current)}">
+      <button class="sc-bio-save" onclick="saveBio(event,'${key}')">Simpan</button>
+    </div>`;
+    const inp = document.getElementById('bioinp_' + key);
+    if (inp) {
+      inp.focus();
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') saveBio(e, key); });
+    }
+  };
+
+  window.saveBio = function(e, key) {
+    e.stopPropagation();
+    const inp = document.getElementById('bioinp_' + key);
+    if (!inp) return;
+    const val = inp.value.trim();
+    bioRef.child(key).set(val || null);
+    biosCache[key] = val;
+    const bioEl = document.getElementById('bio_' + key);
+    if (bioEl) renderBio(bioEl, key, val);
+  };
+})();
