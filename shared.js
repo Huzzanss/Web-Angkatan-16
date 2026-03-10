@@ -409,134 +409,133 @@
     const s = document.createElement('style');
     s.id = '_sh_css';
     s.textContent = `
-@keyframes sh_pulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.5)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
+/* ─── Name Modal ─── */
+#_sh_nm{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);z-index:9999;display:none;align-items:flex-end;justify-content:center;}
+@media(min-width:600px){#_sh_nm{align-items:center;}}
+._sh_nmc{background:#0F0F14;width:100%;max-width:460px;border-radius:20px 20px 0 0;padding:0;overflow:hidden;max-height:92dvh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.08);border-bottom:none;}
+@media(min-width:600px){._sh_nmc{border-radius:16px;border-bottom:1px solid rgba(255,255,255,.08);max-height:85dvh;}}
+._sh_drag{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin:12px auto 0;flex-shrink:0;}
+._sh_head{padding:1.2rem 1.4rem .8rem;flex-shrink:0;}
+._sh_nmt{font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#fff;line-height:1;}
+._sh_nmt em{color:#F9C74F;font-style:italic;}
+._sh_nms{font-size:.75rem;color:rgba(255,255,255,.38);margin-top:.3rem;font-family:'Space Mono',monospace;letter-spacing:.5px;}
+._sh_srch{padding:.6rem 1.4rem;flex-shrink:0;position:relative;}
+._sh_srch input{width:100%;padding:.7rem 1rem .7rem 2.4rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#fff;font-size:.95rem;outline:none;font-family:'Barlow',sans-serif;-webkit-appearance:none;transition:border-color .2s;}
+._sh_srch input:focus{border-color:rgba(249,199,79,.5);}
+._sh_srch input::placeholder{color:rgba(255,255,255,.28);}
+._sh_srch svg{position:absolute;left:1.9rem;top:50%;transform:translateY(-50%);width:1rem;height:1rem;color:rgba(255,255,255,.3);pointer-events:none;}
+._sh_list{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+._sh_list::-webkit-scrollbar{width:3px;}._sh_list::-webkit-scrollbar-thumb{background:rgba(249,199,79,.3);}
+._sh_item{display:flex;align-items:center;gap:.85rem;padding:.85rem 1.4rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);transition:background .12s;-webkit-tap-highlight-color:transparent;user-select:none;}
+._sh_item:active,._sh_item:hover{background:rgba(249,199,79,.08);}
+._sh_item.selected{background:rgba(249,199,79,.12);border-left:3px solid #F9C74F;}
+._sh_av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:#000;flex-shrink:0;}
+._sh_nm2{font-size:.92rem;font-weight:600;color:#F0EFE8;flex:1;}
+._sh_chk{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+._sh_item.selected ._sh_chk{background:#F9C74F;border-color:#F9C74F;color:#000;}
+._sh_empty{padding:2rem;text-align:center;color:rgba(255,255,255,.3);font-size:.82rem;font-family:'Space Mono',monospace;}
+._sh_foot{padding:.9rem 1.4rem;flex-shrink:0;background:#0F0F14;border-top:1px solid rgba(255,255,255,.06);}
+#_sh_nmbtn{width:100%;padding:.9rem;background:#F9C74F;color:#000;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:opacity .18s;-webkit-tap-highlight-color:transparent;}
+#_sh_nmbtn:hover{opacity:.88;}
+#_sh_nmbtn:disabled{opacity:.35;cursor:not-allowed;}
 
-#_sh_nm{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);z-index:9999;display:none;align-items:center;justify-content:center;padding:1rem;font-family:'DM Sans',sans-serif;}
-._sh_nmc{background:#111827;border-radius:26px;padding:2.5rem 2rem;max-width:400px;width:100%;text-align:center;border:1px solid rgba(255,255,255,.12);}
-._sh_nmi{font-size:3.5rem;margin-bottom:.7rem;display:block;}
-._sh_nmt{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#fff;margin-bottom:.25rem;}
-._sh_nmt em{color:#e8c97a;font-style:italic;}
-._sh_nms{font-size:.83rem;color:rgba(255,255,255,.4);margin-bottom:1.5rem;line-height:1.6;}
-#_sh_nminp{width:100%;padding:.85rem 1.2rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:50px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;text-align:center;margin-bottom:.9rem;transition:border-color .2s;cursor:pointer;appearance:none;-webkit-appearance:none;}
-#_sh_nminp option{background:#111827;color:#fff;}
-#_sh_nminp:focus{border-color:#c9a84c;}
-#_sh_nmbtn{width:100%;padding:.9rem;background:linear-gradient(135deg,#c9a84c,#e8c97a);color:#0a1628;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;}
-#_sh_nmbtn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,.4);}
+/* ─── Voice / LB buttons ─── */
+#_sh_vc{position:fixed;bottom:5.5rem;left:.9rem;z-index:900;display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+#_sh_vcbtn,#_sh_lbbtn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.15);color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5);transition:background .2s,transform .18s;position:relative;}
+#_sh_vcbtn{background:#16161E;}
+#_sh_lbbtn{background:#16161E;border-color:rgba(249,199,79,.3);color:#F9C74F;}
+#_sh_vcbtn:hover,#_sh_lbbtn:hover{transform:scale(1.08);}
+#_sh_vccnt{position:absolute;top:-2px;right:-2px;min-width:14px;height:14px;border-radius:50%;background:#22c55e;color:#fff;font-size:.5rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 2px;border:1.5px solid #06060A;}
+#_sh_vcpanel{display:none;position:absolute;bottom:52px;left:0;width:200px;background:#16161E;border-radius:10px;padding:.8rem;border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 32px rgba(0,0,0,.6);}
+._sh_vph{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:#F9C74F;font-weight:700;margin-bottom:.5rem;font-family:'Space Mono',monospace;}
 
-#_sh_vc{position:fixed;bottom:1.2rem;left:1.2rem;z-index:900;display:flex;flex-direction:column;align-items:center;gap:.4rem;}
-#_sh_vcbtn,#_sh_lbbtn{width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.18);color:#fff;font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.5);transition:background .25s,transform .18s;position:relative;line-height:1;}
-#_sh_vcbtn{background:linear-gradient(135deg,#1d3461,#0f3460);}
-#_sh_lbbtn{background:linear-gradient(135deg,#0a1628,#1d3461);border-color:rgba(201,168,76,.3);color:#e8c97a;}
-#_sh_vcbtn:hover,#_sh_lbbtn:hover{transform:scale(1.1);}
-#_sh_vccnt{position:absolute;top:-3px;right:-3px;min-width:15px;height:15px;border-radius:50%;background:#22c55e;color:#fff;font-size:.52rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 2px;border:1.5px solid #0a1628;pointer-events:none;}
-#_sh_vcpanel{display:none;position:absolute;bottom:52px;left:0;width:200px;background:#111827;border-radius:14px;padding:.9rem;border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 32px rgba(0,0,0,.6);}
-._sh_vph{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:#c9a84c;font-weight:700;margin-bottom:.5rem;}
-#_sh_vclist{}
-
-#_sh_toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.95);backdrop-filter:blur(10px);color:#fff;padding:.62rem 1.4rem;border-radius:50px;font-size:.82rem;font-weight:500;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(201,168,76,.22);white-space:nowrap;max-width:92vw;}
-
-@media(max-width:480px){
-  #_sh_vc{bottom:.75rem;left:.75rem;}
-  #_sh_vcbtn,#_sh_lbbtn{width:40px;height:40px;font-size:1rem;}
-}`;
-    document.head.appendChild(s);
+/* ─── Toast ─── */
+#_sh_toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#16161E;color:#fff;padding:.55rem 1.3rem;font-size:.8rem;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(249,199,79,.2);white-space:nowrap;max-width:92vw;font-family:'Space Mono',monospace;}
+`; document.head.appendChild(s);
   }
 
-  /* ══════════════════════════════════════════
-     HTML
-  ══════════════════════════════════════════ */
   function injectHTML() {
     if (document.getElementById('_sh_nm')) return;
+    const NAMES=["Abdullah Raziq Hanan","Adelia Felicia","Aditya Narendra Pambudi","Afiqah Humayra Arresky","Ahmad Abdullah Hafi Munaji","Ahmad Faezya Rafa","Ahmad Hamdan Nurzati","Alesha Zevanna Annayla Alfian","Alexandra Shavira Kaysa","Alisha Nur Afiyah","Alisya Zella Naura Saputro","Alita Admiral","Alkhalifi Hasyimi","Andra Alghifari","Angelina Natalia Tennes","Aqillah Khayyirah","Arsenio Al Fattan Wibowo","Azim Evano Rahman","Azima Zafeera Khairiya","Azka Aisy Muhammad Firdaus","Chaerul Risyad Ferdansyah","Deeandra Mikhailla Hariyadi","Devan Rafandra Pratama","Faqih Hamizan Rahman","Farrel Azka Firlana","Fattah Altaf Qusyairi","Gavin Ahmad Farisakha Sahilin","Ghaisan Adib Mubasyir","Giovanny Syahputra","Gusti Muhammad An-Nafis","Hana Aish Sumayyah","Hilmi Muhammad Nidho Mudhin","Javier Al Majid","Kanaya Lubna Janitra Hafizah","Keisha Pratiwi Syahrizal","Khalika Ismatullah Assahla","Muhammad Abdurrahman Dzaki","Muhammad Ahza Farezell","Muhammad Alfindra Auvar Rahardja","Muhammad Asyraf Al Farisi","Muhammad El Junot Razqal","Muhammad Fahri Ardani","Muhammad Hafidz Setiadi","Muhammad Hafiz Faad Abqory","Muhammad Juna Defa Alfarizie","Muhammad Mezameru Arsyada","Muhammad Zaki Raditya","Muhammad Zamzam Zidna Fahn","Muhammad Zharif Syatir","Nada Fajriah Salsabilla","Nayhan Abqari","Nuhammad Rezky Tri Ramadhan","Nur Aisyah","Nurul Farhana Aqilah Chandra","Samytha Larisa Azzalea","Shazia Amira Zhafirah","Shidqia Nabila Azzahra","Super Novel Hardian","Syaqila Marwa Putri Deandra","Syifa Fathiyah Zahra","Syrenia Carrisa Althafunnisa","Zahratu Syifa"];
 
-    // Name modal
+    const COLORS = ['#FF6B6B','#00D4AA','#8B7CF6','#F9C74F','#38BDF8','#FB923C','#4ADE80','#F472B6'];
+    function nameColor(n){ let h=0; for(let c of n) h=(h*31+c.charCodeAt(0))&0xFFFFFF; return COLORS[h%COLORS.length]; }
+
+    let selectedName = localStorage.getItem('lbName') || '';
+    let filteredNames = [...NAMES];
+
+    // ── Name Modal ──
     const nm = document.createElement('div');
     nm.id = '_sh_nm';
+
+    function renderList(names) {
+      return names.map(n => {
+        const initial = n[0];
+        const color = nameColor(n);
+        const sel = n === selectedName;
+        return `<div class="_sh_item${sel?' selected':''}" data-name="${n}" onclick="_shPick('${n.replace(/'/g,"\'")}')">
+          <div class="_sh_av" style="background:${color}">${initial}</div>
+          <span class="_sh_nm2">${n}</span>
+          <div class="_sh_chk">${sel?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
+        </div>`;
+      }).join('') || '<div class="_sh_empty">Nama tidak ditemukan</div>';
+    }
+
     nm.innerHTML = `<div class="_sh_nmc">
-      <span class="_sh_nmi"></span>
-      <div class="_sh_nmt">Angkatan <em>XVI</em></div>
-      <div class="_sh_nms">Pilih namamu untuk mulai bermain dan custom kartu siswa kamu!</div>
-      <select id="_sh_nminp">
-        <option value="">— Pilih namamu —</option>
-      <option value="Abdullah Raziq Hanan">Abdullah Raziq Hanan</option>
-      <option value="Adelia Felicia">Adelia Felicia</option>
-      <option value="Aditya Narendra Pambudi">Aditya Narendra Pambudi</option>
-      <option value="Afiqah Humayra Arresky">Afiqah Humayra Arresky</option>
-      <option value="Ahmad Abdullah Hafi Munaji">Ahmad Abdullah Hafi Munaji</option>
-      <option value="Ahmad Faezya Rafa">Ahmad Faezya Rafa</option>
-      <option value="Ahmad Hamdan Nurzati">Ahmad Hamdan Nurzati</option>
-      <option value="Alesha Zevanna Annayla Alfian">Alesha Zevanna Annayla Alfian</option>
-      <option value="Alexandra Shavira Kaysa">Alexandra Shavira Kaysa</option>
-      <option value="Alisha Nur Afiyah">Alisha Nur Afiyah</option>
-      <option value="Alisya Zella Naura Saputro">Alisya Zella Naura Saputro</option>
-      <option value="Alita Admiral">Alita Admiral</option>
-      <option value="Alkhalifi Hasyimi">Alkhalifi Hasyimi</option>
-      <option value="Andra Alghifari">Andra Alghifari</option>
-      <option value="Angelina Natalia Tennes">Angelina Natalia Tennes</option>
-      <option value="Aqillah Khayyirah">Aqillah Khayyirah</option>
-      <option value="Arsenio Al Fattan Wibowo">Arsenio Al Fattan Wibowo</option>
-      <option value="Azim Evano Rahman">Azim Evano Rahman</option>
-      <option value="Azima Zafeera Khairiya">Azima Zafeera Khairiya</option>
-      <option value="Azka Aisy Muhammad Firdaus">Azka Aisy Muhammad Firdaus</option>
-      <option value="Chaerul Risyad Ferdansyah">Chaerul Risyad Ferdansyah</option>
-      <option value="Deeandra Mikhailla Hariyadi">Deeandra Mikhailla Hariyadi</option>
-      <option value="Devan Rafandra Pratama">Devan Rafandra Pratama</option>
-      <option value="Faqih Hamizan Rahman">Faqih Hamizan Rahman</option>
-      <option value="Farrel Azka Firlana">Farrel Azka Firlana</option>
-      <option value="Fattah Altaf Qusyairi">Fattah Altaf Qusyairi</option>
-      <option value="Gavin Ahmad Farisakha Sahilin">Gavin Ahmad Farisakha Sahilin</option>
-      <option value="Ghaisan Adib Mubasyir">Ghaisan Adib Mubasyir</option>
-      <option value="Giovanny Syahputra">Giovanny Syahputra</option>
-      <option value="Gusti Muhammad An-Nafis">Gusti Muhammad An-Nafis</option>
-      <option value="Hana Aish Sumayyah">Hana Aish Sumayyah</option>
-      <option value="Hilmi Muhammad Nidho Mudhin">Hilmi Muhammad Nidho Mudhin</option>
-      <option value="Javier Al Majid">Javier Al Majid</option>
-      <option value="Kanaya Lubna Janitra Hafizah">Kanaya Lubna Janitra Hafizah</option>
-      <option value="Keisha Pratiwi Syahrizal">Keisha Pratiwi Syahrizal</option>
-      <option value="Khalika Ismatullah Assahla">Khalika Ismatullah Assahla</option>
-      <option value="Muhammad Abdurrahman Dzaki">Muhammad Abdurrahman Dzaki</option>
-      <option value="Muhammad Ahza Farezell">Muhammad Ahza Farezell</option>
-      <option value="Muhammad Alfindra Auvar Rahardja">Muhammad Alfindra Auvar Rahardja</option>
-      <option value="Muhammad Asyraf Al Farisi">Muhammad Asyraf Al Farisi</option>
-      <option value="Muhammad El Junot Razqal">Muhammad El Junot Razqal</option>
-      <option value="Muhammad Fahri Ardani">Muhammad Fahri Ardani</option>
-      <option value="Muhammad Hafidz Setiadi">Muhammad Hafidz Setiadi</option>
-      <option value="Muhammad Hafiz Faad Abqory">Muhammad Hafiz Faad Abqory</option>
-      <option value="Muhammad Juna Defa Alfarizie">Muhammad Juna Defa Alfarizie</option>
-      <option value="Muhammad Mezameru Arsyada">Muhammad Mezameru Arsyada</option>
-      <option value="Muhammad Zaki Raditya">Muhammad Zaki Raditya</option>
-      <option value="Muhammad Zamzam Zidna Fahn">Muhammad Zamzam Zidna Fahn</option>
-      <option value="Muhammad Zharif Syatir">Muhammad Zharif Syatir</option>
-      <option value="Nada Fajriah Salsabilla">Nada Fajriah Salsabilla</option>
-      <option value="Nayhan Abqari">Nayhan Abqari</option>
-      <option value="Nuhammad Rezky Tri Ramadhan">Nuhammad Rezky Tri Ramadhan</option>
-      <option value="Nur Aisyah">Nur Aisyah</option>
-      <option value="Nurul Farhana Aqilah Chandra">Nurul Farhana Aqilah Chandra</option>
-      <option value="Samytha Larisa Azzalea">Samytha Larisa Azzalea</option>
-      <option value="Shazia Amira Zhafirah">Shazia Amira Zhafirah</option>
-      <option value="Shidqia Nabila Azzahra">Shidqia Nabila Azzahra</option>
-      <option value="Super Novel Hardian">Super Novel Hardian</option>
-      <option value="Syaqila Marwa Putri Deandra">Syaqila Marwa Putri Deandra</option>
-      <option value="Syifa Fathiyah Zahra">Syifa Fathiyah Zahra</option>
-      <option value="Syrenia Carrisa Althafunnisa">Syrenia Carrisa Althafunnisa</option>
-      <option value="Zahratu Syifa">Zahratu Syifa</option>
-      </select>
-      <button id="_sh_nmbtn">Masuk </button>
+      <div class="_sh_drag"></div>
+      <div class="_sh_head">
+        <div class="_sh_nmt">Angkatan <em>XVI</em></div>
+        <div class="_sh_nms">Pilih namamu dulu sebelum main</div>
+      </div>
+      <div class="_sh_srch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="_sh_search" type="search" placeholder="Cari nama..." autocomplete="off" spellcheck="false">
+      </div>
+      <div class="_sh_list" id="_sh_listbox">${renderList(NAMES)}</div>
+      <div class="_sh_foot">
+        <button id="_sh_nmbtn" ${selectedName?'':'disabled'}>
+          ${selectedName ? 'Masuk sebagai ' + selectedName.split(' ')[0] : 'Pilih nama dulu'}
+        </button>
+      </div>
     </div>`;
     document.body.appendChild(nm);
 
-    // Voice widget
+    window._shPick = function(name) {
+      selectedName = name;
+      document.getElementById('_sh_listbox').innerHTML = renderList(filteredNames);
+      const btn = document.getElementById('_sh_nmbtn');
+      if (btn) { btn.disabled = false; btn.textContent = 'Masuk sebagai ' + name.split(' ')[0]; }
+    };
+
+    const searchEl = document.getElementById('_sh_search');
+    if (searchEl) {
+      searchEl.addEventListener('input', function() {
+        const q = this.value.toLowerCase();
+        filteredNames = q ? NAMES.filter(n => n.toLowerCase().includes(q)) : [...NAMES];
+        document.getElementById('_sh_listbox').innerHTML = renderList(filteredNames);
+      });
+    }
+
+    // swipe-down to close on mobile
+    let startY = 0;
+    nm.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, {passive:true});
+    nm.addEventListener('touchmove', e => {
+      const dy = e.touches[0].clientY - startY;
+      if (dy > 80) nm.style.display = 'none';
+    }, {passive:true});
+
+    // ── Voice widget ──
     const vc = document.createElement('div');
     vc.id = '_sh_vc';
     vc.innerHTML = `
       <div id="_sh_vcpanel">
-        <div class="_sh_vph">️ Voice Chat</div>
+        <div class="_sh_vph">Voice Chat</div>
         <div id="_sh_vclist"></div>
       </div>
-      <button id="_sh_vcbtn">️<span id="_sh_vccnt"></span></button>
-      <button id="_sh_lbbtn" title="Leaderboard"></button>`;
+      <button id="_sh_vcbtn" title="Voice"><svg style="width:1rem;height:1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg><span id="_sh_vccnt"></span></button>
+      <button id="_sh_lbbtn" title="Leaderboard" onclick="location.href='leaderboard.html'"><svg style="width:1rem;height:1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></button>`;
     document.body.appendChild(vc);
 
-    // Hover to show panel
     vc.addEventListener('mouseenter', () => {
       const p = document.getElementById('_sh_vcpanel');
       if (p) p.style.display = 'block';
@@ -551,5 +550,6 @@
     t.id = '_sh_toast';
     document.body.appendChild(t);
   }
+
 
 })();
