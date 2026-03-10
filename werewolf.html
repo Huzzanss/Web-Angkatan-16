@@ -229,17 +229,53 @@ body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;background:var
   .mr-icon{font-size:1.8rem;}
 }
 </style>
-</head>
+<style>
+.icon{display:inline-block;width:1em;height:1em;vertical-align:-.125em;flex-shrink:0;}
+.icon.ic-lg{width:2rem;height:2rem;opacity:.35;}
+</style></head>
 <body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ic-graduation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3.33 2 8.67 2 12 0v-5"/></symbol>
+  <symbol id="ic-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></symbol>
+  <symbol id="ic-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="ic-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/></symbol>
+  <symbol id="ic-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></symbol>
+  <symbol id="ic-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="ic-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="ic-arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="ic-heart" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+  <symbol id="ic-music" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="ic-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+  <symbol id="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></symbol>
+  <symbol id="ic-skip-b" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="ic-skip-f" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="ic-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
+  <symbol id="ic-type" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></symbol>
+  <symbol id="ic-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></symbol>
+  <symbol id="ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="ic-cards" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="12" height="14" rx="2"/><path d="M7 5V3a1 1 0 0 1 1-1h12a2 2 0 0 1 2 2v12a1 1 0 0 1-1 1h-2"/></symbol>
+  <symbol id="ic-golf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="19" cy="19" r="2"/><path d="M12 19h-7a2 2 0 0 1-1.9-1.4l-1-3.5A2 2 0 0 1 4 12h16"/><line x1="12" y1="3" x2="12" y2="14"/><polyline points="8 7 12 3 16 7"/></symbol>
+  <symbol id="ic-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="ic-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+  <symbol id="ic-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="ic-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="ic-announce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+  <symbol id="ic-poll" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="ic-circle" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></symbol>
+</svg>
 <nav class="navbar">
   <a href="index.html" class="nav-logo">Angkatan <span>XVI</span></a>
-  <a href="index.html" class="nav-back">← Kembali</a>
+  <a href="index.html" class="nav-back"><svg class="icon ic-flip" aria-hidden="true"><use href="#ic-arrow-r"/></svg> Kembali</a>
 </nav>
 
 <!-- JOIN -->
 <div id="sJoin" class="screen">
   <div class="join-card">
-    <div class="j-icon">🐺</div>
+    <div class="j-icon"><svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg></div>
     <h1 class="j-title">Were<em>wolf</em></h1>
     <p class="j-sub">Temukan serigala tersembunyi sebelum desa hancur! 4–16 pemain, 8 peran unik dengan kemampuan malam hari masing-masing.</p>
     <input class="j-inp" id="jName" placeholder="Nama kamu..." maxlength="20" autocomplete="off">
@@ -255,14 +291,14 @@ body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;background:var
       <p>Tunggu semua pemain bergabung, lalu host atur peran dan mulai.</p>
     </div>
     <div class="lcard">
-      <div class="lcard-t">🧑‍🤝‍🧑 Pemain (<span id="lobCount">0</span>)</div>
+      <div class="lcard-t">‍‍ Pemain (<span id="lobCount">0</span>)</div>
       <div class="plyr-grid" id="lobPlayers"></div>
     </div>
     <div class="lcard" id="hostPanel" style="display:none">
-      <div class="lcard-t">⚙️ Konfigurasi Peran</div>
+      <div class="lcard-t">&#9881;️ Konfigurasi Peran</div>
       <div class="role-rows" id="roleRows"></div>
       <div class="role-summary" id="roleSummary"></div>
-      <button class="start-btn" id="startBtn" onclick="startGame()" disabled>🐺 Mulai Game</button>
+      <button class="start-btn" id="startBtn" onclick="startGame()" disabled><svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg> Mulai Game</button>
       <p class="start-hint" id="startHint">Butuh minimal 4 pemain</p>
     </div>
     <div class="lcard" id="guestPanel" style="display:none">
@@ -276,12 +312,12 @@ body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;background:var
   <div class="game-wrap">
     <div class="ph-banner ph-night" id="phBanner">
       <div class="pb-label" id="pbLabel">MALAM HARI</div>
-      <div class="pb-title" id="pbTitle">🌙 Malam Pertama</div>
+      <div class="pb-title" id="pbTitle"> Malam Pertama</div>
       <div class="pb-sub"  id="pbSub">Desa tertidur...</div>
       <div class="pb-timer" id="pbTimer"></div>
     </div>
     <div class="my-role-bar mr-villager" id="myRoleBar">
-      <div class="mr-icon" id="mrIcon">🏘</div>
+      <div class="mr-icon" id="mrIcon">⌂</div>
       <div>
         <div class="mr-team" id="mrTeam">TIM WARGA</div>
         <div class="mr-name" id="mrName">Warga</div>
@@ -289,7 +325,7 @@ body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;background:var
         <div class="mr-extra" id="mrExtra" style="display:none"></div>
       </div>
     </div>
-    <div class="dead-bar" id="deadBar" style="display:none">💀 Kamu sudah mati. Kamu bisa menonton sisa permainan.</div>
+    <div class="dead-bar" id="deadBar" style="display:none">[Mati] Kamu sudah mati. Kamu bisa menonton sisa permainan.</div>
     <div class="game-body" id="gameBody">
       <div class="left-col">
         <div class="panel">
@@ -302,13 +338,13 @@ body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;background:var
       <div class="right-col">
         <div class="chat-box">
           <div class="chat-head">
-            <div class="chat-head-title">💬 Diskusi Desa</div>
+            <div class="chat-head-title"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> Diskusi Desa</div>
             <div class="chat-head-sub" id="chatSub">—</div>
           </div>
           <div class="chat-msgs" id="chatMsgs"></div>
           <div class="chat-row">
             <input class="chat-inp" id="chatInp" placeholder="Tulis pesan..." maxlength="200" autocomplete="off">
-            <button class="chat-send" onclick="sendPublicChat()">➤</button>
+            <button class="chat-send" onclick="sendPublicChat()"><svg class="icon" aria-hidden="true"><use href="#ic-send"/></svg></button>
           </div>
         </div>
       </div>
@@ -319,18 +355,18 @@ body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;background:var
 <!-- END -->
 <div id="sEnd" class="screen">
   <div class="end-wrap">
-    <div class="end-big" id="endBig">🎉</div>
+    <div class="end-big" id="endBig"></div>
     <div class="end-title" id="endTitle">Game Selesai</div>
     <div class="end-sub"  id="endSub"></div>
     <div class="end-roles" id="endRoles"></div>
-    <button class="restart-btn" onclick="backToLobby()">🔄 Main Lagi</button>
+    <button class="restart-btn" onclick="backToLobby()">↺ Main Lagi</button>
   </div>
 </div>
 
 <!-- Seer Modal -->
 <div class="modal-bg" id="seerModal">
   <div class="modal-card">
-    <div class="modal-icon" id="smIcon">🔮</div>
+    <div class="modal-icon" id="smIcon">[Ramal]</div>
     <div class="modal-title" id="smTitle"></div>
     <div class="modal-sub" id="smSub"></div>
     <button class="modal-btn" onclick="closeModal('seerModal')">Mengerti</button>
@@ -340,7 +376,7 @@ body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;background:var
 <!-- Hunter Modal -->
 <div class="modal-bg" id="hunterModal">
   <div class="modal-card">
-    <div class="modal-icon">🏹</div>
+    <div class="modal-icon">[Pemburu]</div>
     <div class="modal-title">Kamu Mati!</div>
     <div class="modal-sub">Kamu adalah Pemburu! Sebelum mati, kamu bisa menembak satu pemain.</div>
     <div id="hunterTargets" style="margin-bottom:.8rem;display:flex;flex-direction:column;gap:.4rem;max-height:240px;overflow-y:auto;"></div>
@@ -370,23 +406,23 @@ const vRef=db.ref('ww/votes');
 
 /* ── Role Definitions ── */
 const ROLES={
-  wolf:     {icon:'🐺',name:'Werewolf',  team:'SERIGALA',cls:'wolf',
+  wolf:     {icon:'<svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg>',name:'Werewolf',  team:'SERIGALA',cls:'wolf',
              desc:'Tiap malam pilih korban bersama. Chat serigala aktif saat malam.'},
-  seer:     {icon:'🔮',name:'Peramal',   team:'WARGA',   cls:'seer',
+  seer:     {icon:'[Ramal]',name:'Peramal',   team:'WARGA',   cls:'seer',
              desc:'Tiap malam cek peran satu pemain. Hasilnya hanya kamu yang tahu.'},
-  doctor:   {icon:'💉',name:'Dokter',    team:'WARGA',   cls:'doctor',
+  doctor:   {icon:'[Dokter]',name:'Dokter',    team:'WARGA',   cls:'doctor',
              desc:'Tiap malam selamatkan satu pemain dari serangan. Boleh selamatkan diri sendiri.'},
-  hunter:   {icon:'🏹',name:'Pemburu',   team:'WARGA',   cls:'hunter',
+  hunter:   {icon:'[Pemburu]',name:'Pemburu',   team:'WARGA',   cls:'hunter',
              desc:'Saat mati, kamu bisa menembak satu pemain ikut mati bersamamu.'},
-  witch:    {icon:'🧙',name:'Penyihir',  team:'WARGA',   cls:'witch',
+  witch:    {icon:'[Penyihir]',name:'Penyihir',  team:'WARGA',   cls:'witch',
              desc:'Punya 1 ramuan selamat & 1 ramuan racun. Masing-masing hanya bisa dipakai sekali.'},
-  cupid:    {icon:'💘',name:'Cupid',     team:'WARGA',   cls:'cupid',
+  cupid:    {icon:'[Cupid]',name:'Cupid',     team:'WARGA',   cls:'cupid',
              desc:'Malam pertama: pilih 2 pemain sebagai kekasih. Jika satu mati, yang lain ikut mati.'},
-  bodyguard:{icon:'🛡',name:'Bodyguard', team:'WARGA',   cls:'bodyguard',
+  bodyguard:{icon:'[Guard]',name:'Bodyguard', team:'WARGA',   cls:'bodyguard',
              desc:'Tiap malam lindungi satu pemain. Jika diserang, kamu yang mati. Tidak bisa melindungi orang sama dua malam berturut.'},
-  jester:   {icon:'🃏',name:'Badut',     team:'SPESIAL', cls:'jester',
+  jester:   {icon:'<svg class="icon" aria-hidden="true"><use href="#ic-cards"/></svg>',name:'Badut',     team:'SPESIAL', cls:'jester',
              desc:'Menang jika dieliminasi oleh vote warga! Usahakan terlihat mencurigakan.'},
-  villager: {icon:'🏘',name:'Warga',     team:'WARGA',   cls:'villager',
+  villager: {icon:'⌂',name:'Warga',     team:'WARGA',   cls:'villager',
              desc:'Gunakan diskusi dan logika untuk menemukan dan mengeliminasi semua serigala.'},
 };
 
@@ -561,9 +597,9 @@ function handlePhase(){
   if(phase==='night'){
     banner.className='ph-banner ph-night';
     document.getElementById('pbLabel').textContent=`MALAM KE-${round}`;
-    document.getElementById('pbTitle').textContent='🌙 Malam Hari';
+    document.getElementById('pbTitle').textContent=' Malam Hari';
     document.getElementById('pbSub').textContent='Desa tertidur... Serigala dan peran khusus beraksi!';
-    document.getElementById('chatSub').textContent='🔇 Chat dinonaktifkan saat malam';
+    document.getElementById('chatSub').textContent=' Chat dinonaktifkan saat malam';
     chatInp.disabled=true;
     chatInp.placeholder='Tidak bisa chat saat malam...';
     renderPlayers();
@@ -574,8 +610,8 @@ function handlePhase(){
   else if(phase==='day'){
     banner.className='ph-banner ph-day';
     document.getElementById('pbLabel').textContent=`SIANG KE-${round}`;
-    document.getElementById('pbTitle').textContent='☀️ Siang Hari';
-    document.getElementById('chatSub').textContent='💬 Diskusi bebas — semua bisa chat!';
+    document.getElementById('pbTitle').textContent='️ Siang Hari';
+    document.getElementById('chatSub').textContent='<svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> Diskusi bebas — semua bisa chat!';
     chatInp.disabled=!isAlive;
     chatInp.placeholder=isAlive?'Tulis pesan...':'Kamu sudah mati...';
     document.getElementById('actionArea').innerHTML='';
@@ -586,11 +622,11 @@ function handlePhase(){
       if(n.killed&&n.killed!==n.saved){
         const p=playersData[n.killed];
         const R=ROLES[p?.role||'villager'];
-        const msg=`💀 ${p?.name||'?'} ditemukan tewas semalam! Perannya: ${R.icon} ${R.name}`;
+        const msg=`[Mati] ${p?.name||'?'} ditemukan tewas semalam! Perannya: ${R.icon} ${R.name}`;
         document.getElementById('pbSub').textContent=msg;
         announceChat(msg);
       } else {
-        const msg='🌅 Tidak ada korban semalam. Seseorang diselamatkan!';
+        const msg=' Tidak ada korban semalam. Seseorang diselamatkan!';
         document.getElementById('pbSub').textContent=msg;
         announceChat(msg);
       }
@@ -602,9 +638,9 @@ function handlePhase(){
   else if(phase==='voting'){
     banner.className='ph-banner ph-vote';
     document.getElementById('pbLabel').textContent=`VOTING RONDE ${round}`;
-    document.getElementById('pbTitle').textContent='🗳️ Waktu Voting';
+    document.getElementById('pbTitle').textContent='<svg class="icon" aria-hidden="true"><use href="#ic-poll"/></svg>️ Waktu Voting';
     document.getElementById('pbSub').textContent='Pilih siapa yang dieliminasi dari desa!';
-    document.getElementById('chatSub').textContent='🗳️ Vote sekarang!';
+    document.getElementById('chatSub').textContent='<svg class="icon" aria-hidden="true"><use href="#ic-poll"/></svg>️ Vote sekarang!';
     chatInp.disabled=!isAlive;
     chatInp.placeholder=isAlive?'Tulis pesan...':'Kamu sudah mati...';
     document.getElementById('nightChatArea').innerHTML='';
@@ -622,8 +658,8 @@ function handlePhase(){
 /* ── Night Actions ── */
 function renderNightAction(){
   const area=document.getElementById('actionArea');
-  if(!isAlive){area.innerHTML='<div class="act-done">💀 Kamu sudah mati.</div>';return;}
-  if(hasActed){area.innerHTML='<div class="act-done">✓ Aksi malam sudah dilakukan</div>';return;}
+  if(!isAlive){area.innerHTML='<div class="act-done">[Mati] Kamu sudah mati.</div>';return;}
+  if(hasActed){area.innerHTML='<div class="act-done">&#10003; Aksi malam sudah dilakukan</div>';return;}
 
   const alive=getAlive();
   const others=alive.filter(([id])=>id!==myId);
@@ -631,34 +667,34 @@ function renderNightAction(){
 
   if(myRole==='wolf'){
     const targets=alive.filter(([,p])=>p.role!=='wolf');
-    html=`<div class="act-label">🐺 Pilih korban malam ini:</div>`+
+    html=`<div class="act-label"><svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg> Pilih korban malam ini:</div>`+
       renderTargets(targets,'wolf-t')+
-      `<button class="act-btn btn-wolf" id="actMainBtn" onclick="submitNight('kill')" disabled>🐺 Mangsa!</button>`;
+      `<button class="act-btn btn-wolf" id="actMainBtn" onclick="submitNight('kill')" disabled><svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg> Mangsa!</button>`;
   } else if(myRole==='seer'){
-    html=`<div class="act-label">🔮 Periksa peran siapa?</div>`+
+    html=`<div class="act-label">[Ramal] Periksa peran siapa?</div>`+
       renderTargets(others,'seer-t')+
-      `<button class="act-btn btn-seer" id="actMainBtn" onclick="submitNight('seer')" disabled>🔮 Periksa</button>`;
+      `<button class="act-btn btn-seer" id="actMainBtn" onclick="submitNight('seer')" disabled>[Ramal] Periksa</button>`;
   } else if(myRole==='doctor'){
-    html=`<div class="act-label">💉 Selamatkan siapa?</div>`+
+    html=`<div class="act-label">[Dokter] Selamatkan siapa?</div>`+
       renderTargets(alive,'doctor-t')+
-      `<button class="act-btn btn-doctor" id="actMainBtn" onclick="submitNight('doctor')" disabled>💉 Selamatkan</button>`;
+      `<button class="act-btn btn-doctor" id="actMainBtn" onclick="submitNight('doctor')" disabled>[Dokter] Selamatkan</button>`;
   } else if(myRole==='witch'){
     renderWitchAction(area); return;
   } else if(myRole==='cupid'){
     if(gameData.round===1&&!cupidDone){
-      html=`<div class="act-label">💘 Pilih 2 kekasih (klik 2 orang):</div>`+
+      html=`<div class="act-label">[Cupid] Pilih 2 kekasih (klik 2 orang):</div>`+
         renderTargets(others,'cupid-t',true)+
-        `<button class="act-btn btn-cupid" id="actMainBtn" onclick="submitNight('cupid')" disabled>💘 Satukan!</button>`;
+        `<button class="act-btn btn-cupid" id="actMainBtn" onclick="submitNight('cupid')" disabled>[Cupid] Satukan!</button>`;
     } else {
-      html='<div class="act-done">💘 Kekasih sudah dipilih!</div>';
+      html='<div class="act-done">[Cupid] Kekasih sudah dipilih!</div>';
     }
   } else if(myRole==='bodyguard'){
     const canGuard=alive.filter(([id])=>id!==lastBgTarget);
-    html=`<div class="act-label">🛡 Lindungi siapa malam ini?</div>`+
+    html=`<div class="act-label">[Guard] Lindungi siapa malam ini?</div>`+
       renderTargets(canGuard,'bg-t')+
-      `<button class="act-btn btn-bg" id="actMainBtn" onclick="submitNight('bg')" disabled>🛡 Lindungi</button>`;
+      `<button class="act-btn btn-bg" id="actMainBtn" onclick="submitNight('bg')" disabled>[Guard] Lindungi</button>`;
   } else {
-    html='<div class="act-done">😴 Kamu tertidur... Tunggu siang hari.</div>';
+    html='<div class="act-done"> Kamu tertidur... Tunggu siang hari.</div>';
   }
   area.innerHTML=html;
   bindTargets();
@@ -704,19 +740,19 @@ function renderWitchAction(area){
   nRef.child('wolfTarget').once('value',snap=>{
     const wolfTarget=snap.val();
     const tname=wolfTarget?(playersData[wolfTarget]?.name||'?'):'Tidak ada';
-    let html=`<div class="act-label">☠️ Korban serigala: <strong style="color:#fca5a5">${esc(tname)}</strong></div>`;
+    let html=`<div class="act-label">️ Korban serigala: <strong style="color:#fca5a5">${esc(tname)}</strong></div>`;
     if(!witchSaveUsed&&wolfTarget){
-      html+=`<button class="act-btn btn-witch-save" onclick="submitNight('witch-save','${wolfTarget}')">💉 Ramuan Selamat (1 sisa)</button>`;
+      html+=`<button class="act-btn btn-witch-save" onclick="submitNight('witch-save','${wolfTarget}')">[Dokter] Ramuan Selamat (1 sisa)</button>`;
     } else if(witchSaveUsed){
-      html+=`<div class="act-done">💉 Ramuan selamat sudah dipakai</div>`;
+      html+=`<div class="act-done">[Dokter] Ramuan selamat sudah dipakai</div>`;
     }
-    html+=`<div class="act-label" style="margin-top:.5rem">☠️ Racun (targetkan seseorang):</div>`;
+    html+=`<div class="act-label" style="margin-top:.5rem">️ Racun (targetkan seseorang):</div>`;
     if(!witchKillUsed){
       const others=getAlive().filter(([id])=>id!==myId);
       html+=renderTargets(others,'witch-t')+
-        `<button class="act-btn btn-witch-kill" id="actMainBtn" onclick="submitNight('witch-kill')" disabled>☠️ Racun!</button>`;
+        `<button class="act-btn btn-witch-kill" id="actMainBtn" onclick="submitNight('witch-kill')" disabled>️ Racun!</button>`;
     } else {
-      html+=`<div class="act-done">☠️ Ramuan racun sudah dipakai</div>`;
+      html+=`<div class="act-done">️ Ramuan racun sudah dipakai</div>`;
     }
     html+=`<button class="act-btn btn-skip" style="margin-top:.4rem" onclick="submitNight('witch-pass')">Lewati malam ini</button>`;
     area.innerHTML=html;
@@ -727,7 +763,7 @@ function renderWitchAction(area){
 function submitNight(type,forced){
   const tgt=forced||(type==='cupid'?selectedTargets:selectedTargets[0]);
   hasActed=true;
-  document.getElementById('actionArea').innerHTML='<div class="act-done">✓ Aksi malam sudah dilakukan</div>';
+  document.getElementById('actionArea').innerHTML='<div class="act-done">&#10003; Aksi malam sudah dilakukan</div>';
 
   if(type==='kill'){
     nRef.child('wolfVotes/'+myId).set(tgt);
@@ -741,42 +777,42 @@ function submitNight(type,forced){
         nRef.update({wolfTarget:top[0]});
       }
     });
-    toast('🐺 Target dipilih!');
-    ncPush('wolf',{uid:'sys',name:'Sistem',text:`🐺 Kamu memilih ${playersData[tgt]?.name||'?'} sebagai target`,ts:Date.now()});
+    toast('<svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg> Target dipilih!');
+    ncPush('wolf',{uid:'sys',name:'Sistem',text:`<svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg> Kamu memilih ${playersData[tgt]?.name||'?'} sebagai target`,ts:Date.now()});
   } else if(type==='seer'){
     const r=playersData[tgt]?.role||'villager';
     const R=ROLES[r];
     const isWolf=r==='wolf';
-    document.getElementById('smIcon').textContent=isWolf?'🐺':'👼';
+    document.getElementById('smIcon').textContent=isWolf?'<svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg>':'[Malaikat]';
     document.getElementById('smTitle').textContent=`${playersData[tgt]?.name||'?'} adalah...`;
-    document.getElementById('smSub').textContent=`${R.icon} ${R.name} — ${isWolf?'🔴 TIM SERIGALA':'🟢 TIM WARGA'}`;
+    document.getElementById('smSub').textContent=`${R.icon} ${R.name} — ${isWolf?' TIM SERIGALA':'● TIM WARGA'}`;
     document.getElementById('seerModal').classList.add('show');
-    toast('🔮 Hasil pemeriksaan diketahui!');
+    toast('[Ramal] Hasil pemeriksaan diketahui!');
   } else if(type==='doctor'){
     nRef.child('doctorSave').set(tgt);
-    toast('💉 Diselamatkan!');
+    toast('[Dokter] Diselamatkan!');
   } else if(type==='witch-save'){
     nRef.child('witchSave').set(forced);
     witchSaveUsed=true;
-    toast('💉 Ramuan selamat digunakan!');
+    toast('[Dokter] Ramuan selamat digunakan!');
   } else if(type==='witch-kill'){
     nRef.child('witchKill').set(tgt);
     witchKillUsed=true;
-    toast('☠️ Ramuan racun digunakan!');
+    toast('️ Ramuan racun digunakan!');
   } else if(type==='cupid'){
     if(!Array.isArray(tgt)||tgt.length!==2) return;
     nRef.child('lovers').set({a:tgt[0],b:tgt[1]});
     cupidDone=true;
-    toast('💘 Pasangan kekasih dipilih!');
+    toast('[Cupid] Pasangan kekasih dipilih!');
     const [a,b]=tgt;
     if(a===myId||b===myId){
       const other=a===myId?b:a;
-      toast(`💘 Kamu jatuh cinta dengan ${playersData[other]?.name||'?'}!`);
+      toast(`[Cupid] Kamu jatuh cinta dengan ${playersData[other]?.name||'?'}!`);
     }
   } else if(type==='bg'){
     nRef.child('bodyguardProtect').set(tgt);
     lastBgTarget=tgt;
-    toast('🛡 Pemain dilindungi!');
+    toast('[Guard] Pemain dilindungi!');
   }
   // witch-pass: do nothing, just mark acted
 }
@@ -790,15 +826,15 @@ function renderNightChat(){
   const area=document.getElementById('nightChatArea');
   if(!isAlive){area.innerHTML='';return;}
   const roleChats={
-    wolf:{room:'wolf',title:'🐺 Chat Serigala (hanya serigala)',cls:'nc-wolf',
+    wolf:{room:'wolf',title:'<svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg> Chat Serigala (hanya serigala)',cls:'nc-wolf',
           hint:'Chat dengan sesama serigala malam ini...'},
-    seer:{room:'seer_'+myId,title:'🔮 Catatan Peramal',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
-    doctor:{room:'doc_'+myId,title:'💉 Catatan Dokter',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
-    witch:{room:'witch_'+myId,title:'🧙 Catatan Penyihir',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
-    cupid:{room:'cupid_'+myId,title:'💘 Catatan Cupid',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
-    bodyguard:{room:'bg_'+myId,title:'🛡 Catatan Bodyguard',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
-    hunter:{room:'hunter_'+myId,title:'🏹 Catatan Pemburu',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
-    jester:{room:'jester_'+myId,title:'🃏 Catatan Badut',cls:'nc-solo',hint:'Rencanakan strategimu...'},
+    seer:{room:'seer_'+myId,title:'[Ramal] Catatan Peramal',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
+    doctor:{room:'doc_'+myId,title:'[Dokter] Catatan Dokter',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
+    witch:{room:'witch_'+myId,title:'[Penyihir] Catatan Penyihir',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
+    cupid:{room:'cupid_'+myId,title:'[Cupid] Catatan Cupid',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
+    bodyguard:{room:'bg_'+myId,title:'[Guard] Catatan Bodyguard',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
+    hunter:{room:'hunter_'+myId,title:'[Pemburu] Catatan Pemburu',cls:'nc-solo',hint:'Tulis catatan pribadimu...'},
+    jester:{room:'jester_'+myId,title:'<svg class="icon" aria-hidden="true"><use href="#ic-cards"/></svg> Catatan Badut',cls:'nc-solo',hint:'Rencanakan strategimu...'},
   };
   const cfg=roleChats[myRole];
   if(!cfg){area.innerHTML='';return;}
@@ -809,7 +845,7 @@ function renderNightChat(){
       <div class="nc-msgs" id="ncMsgs"></div>
       <div class="nc-row">
         <input class="nc-inp" id="ncInp" placeholder="${cfg.hint}" maxlength="150">
-        <button class="nc-send" onclick="sendNightChat()">➤</button>
+        <button class="nc-send" onclick="sendNightChat()"><svg class="icon" aria-hidden="true"><use href="#ic-send"/></svg></button>
       </div>
     </div>`;
   document.getElementById('ncInp').addEventListener('keydown',e=>{if(e.key==='Enter')sendNightChat();});
@@ -906,15 +942,15 @@ let localVoteTarget=null;
 function renderVoteAction(){
   const area=document.getElementById('actionArea');
   if(!isAlive){area.innerHTML='';return;}
-  if(hasVoted){area.innerHTML='<div class="act-done">✓ Vote terkirim!</div>';return;}
+  if(hasVoted){area.innerHTML='<div class="act-done">&#10003; Vote terkirim!</div>';return;}
   const targets=getAlive().filter(([id])=>id!==myId);
-  area.innerHTML=`<div class="act-label">🗳️ Pilih siapa yang dieliminasi:</div>`+
+  area.innerHTML=`<div class="act-label"><svg class="icon" aria-hidden="true"><use href="#ic-poll"/></svg>️ Pilih siapa yang dieliminasi:</div>`+
     targets.map(([id,p])=>`
       <div class="pc alive clickable" data-vid="${id}">
         <div class="pc-av" style="background:${avBg(id)}">${p.name.charAt(0).toUpperCase()}</div>
         <span class="pc-name">${esc(p.name)}</span>
       </div>`).join('')+
-    `<button class="act-btn btn-vote" id="voteBtn" onclick="castVote()" disabled>🗳️ Eliminasi!</button>
+    `<button class="act-btn btn-vote" id="voteBtn" onclick="castVote()" disabled><svg class="icon" aria-hidden="true"><use href="#ic-poll"/></svg>️ Eliminasi!</button>
      <button class="act-btn btn-skip" onclick="skipVote()">Lewati</button>`;
   localVoteTarget=null;
   document.querySelectorAll('[data-vid]').forEach(el=>{
@@ -931,8 +967,8 @@ function castVote(){
   if(!localVoteTarget||hasVoted) return;
   hasVoted=true;
   vRef.child(myId).set(localVoteTarget);
-  toast('🗳️ Vote terkirim!');
-  document.getElementById('actionArea').innerHTML='<div class="act-done">✓ Vote terkirim!</div>';
+  toast('<svg class="icon" aria-hidden="true"><use href="#ic-poll"/></svg>️ Vote terkirim!');
+  document.getElementById('actionArea').innerHTML='<div class="act-done">&#10003; Vote terkirim!</div>';
   vRef.once('value',snap=>{
     if(Object.keys(snap.val()||{}).length>=getAlive().length&&isHost) resolveVoting();
   });
@@ -957,16 +993,16 @@ function resolveVoting(){
       const p=playersData[eliminated];
       const R=ROLES[p?.role||'villager'];
       if(p?.role==='jester'){
-        announceChat(`🃏 ${p.name} dieliminasi! Mereka adalah BADUT — Badut MENANG! 🎉`);
-        announceChat('🎮 Game berlanjut untuk Warga vs Serigala!');
+        announceChat(`<svg class="icon" aria-hidden="true"><use href="#ic-cards"/></svg> ${p.name} dieliminasi! Mereka adalah BADUT — Badut MENANG! `);
+        announceChat('<svg class="icon" aria-hidden="true"><use href="#ic-gamepad"/></svg> Game berlanjut untuk Warga vs Serigala!');
       } else {
-        announceChat(`⚖️ ${p?.name||'?'} dieliminasi oleh desa! Perannya: ${R.icon} ${R.name}`);
+        announceChat(`&#9878;️ ${p?.name||'?'} dieliminasi oleh desa! Perannya: ${R.icon} ${R.name}`);
       }
       pRef.child(eliminated).update({alive:false});
       // Hunter?
       if(p?.role==='hunter'&&eliminated===myId) showHunterModal();
     } else {
-      announceChat('⚖️ Vote seri! Tidak ada yang dieliminasi.');
+      announceChat('&#9878;️ Vote seri! Tidak ada yang dieliminasi.');
     }
     vRef.remove();
     const nextRound=(gameData.round||1)+1;
@@ -980,7 +1016,7 @@ function showHunterModal(){
   const targets=document.getElementById('hunterTargets');
   targets.innerHTML=getAlive().filter(([id])=>id!==myId).map(([id,p])=>
     `<button style="width:100%;padding:.6rem;background:rgba(124,45,18,.35);color:#fca5a5;border:1px solid rgba(239,68,68,.3);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .18s;" onmouseover="this.style.background='rgba(124,45,18,.6)'" onmouseout="this.style.background='rgba(124,45,18,.35)'" onclick="hunterShoot('${id}')">
-      🏹 Tembak ${esc(p.name)}
+      [Pemburu] Tembak ${esc(p.name)}
     </button>`
   ).join('');
   modal.classList.add('show');
@@ -990,7 +1026,7 @@ function hunterShoot(id){
   document.getElementById('hunterModal').classList.remove('show');
   const p=playersData[id];
   const R=ROLES[p?.role||'villager'];
-  announceChat(`🏹 Pemburu menembak ${p?.name||'?'}! Perannya: ${R.icon} ${R.name}`);
+  announceChat(`[Pemburu] Pemburu menembak ${p?.name||'?'}! Perannya: ${R.icon} ${R.name}`);
   pRef.child(id).update({alive:false});
 }
 
@@ -1024,15 +1060,15 @@ function renderEndScreen(){
     else if(myRole==='jester' && !isAlive){ window.LB_addPoints(myName,myId,200); window.LB_addWin&&window.LB_addWin(myName,myId); }
     else { window.LB_addPoints(myName,myId,25); }
   }
-  document.getElementById('endBig').textContent=wolfWin?'🐺':'🏘️';
+  document.getElementById('endBig').textContent=wolfWin?'<svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg>':'⌂️';
   document.getElementById('endTitle').textContent=wolfWin?'Serigala Menang!':'Warga Menang!';
   document.getElementById('endSub').textContent=wolfWin
     ?'Para serigala berhasil menguasai desa... Lebih waspada lain kali!'
-    :'Semua serigala berhasil ditemukan! Desa aman 🎉';
+    :'Semua serigala berhasil ditemukan! Desa aman ';
   document.getElementById('endRoles').innerHTML=Object.entries(playersData).map(([,p])=>{
     const R=ROLES[p.role||'villager'];
     const cls=p.role==='wolf'?'wolf':p.role==='jester'?'spec':'good';
-    return `<div class="er ${cls}">${R.icon} ${esc(p.name)} = ${R.name}${p.alive===false?' 💀':''}</div>`;
+    return `<div class="er ${cls}">${R.icon} ${esc(p.name)} = ${R.name}${p.alive===false?' [Mati]':''}</div>`;
   }).join('');
 }
 
@@ -1065,12 +1101,12 @@ function renderPlayers(){
       const isLover=lovers.includes(id)&&alive&&(id===myId||myRole==='cupid'||gameData.phase==='end');
       const votes=vc[id]||0;
       return `<div class="pc ${alive?'alive':'dead'}">
-        <div class="pc-av" style="background:${avBg(id)}">${p.name.charAt(0).toUpperCase()}${!alive?'<div class="pc-dm">💀</div>':''}
+        <div class="pc-av" style="background:${avBg(id)}">${p.name.charAt(0).toUpperCase()}${!alive?'<div class="pc-dm">[Mati]</div>':''}
         </div>
         <span class="pc-name">${esc(p.name)}${id===myId?' (kamu)':''}</span>
         ${showRole?`<span class="pc-badge pb-${p.role||'villager'}">${R.icon}${R.name}</span>`:''}
-        ${isLover?'<span class="pc-lover">💘</span>':''}
-        ${votes>0&&gameData.phase==='voting'?`<span class="pc-vcount">🗳 ${votes}</span>`:''}
+        ${isLover?'<span class="pc-lover">[Cupid]</span>':''}
+        ${votes>0&&gameData.phase==='voting'?`<span class="pc-vcount"><svg class="icon" aria-hidden="true"><use href="#ic-poll"/></svg> ${votes}</span>`:''}
       </div>`;
     }).join('');
     document.getElementById('deadBar').style.display=isAlive?'none':'flex';
@@ -1090,7 +1126,7 @@ function renderMyRole(){
   const extra=document.getElementById('mrExtra');
   if(myRole==='wolf'){
     const mates=Object.entries(playersData).filter(([id,p])=>p.role==='wolf'&&id!==myId);
-    if(mates.length>0){extra.textContent='🐺 Sesama serigala: '+mates.map(([,p])=>p.name).join(', ');extra.style.display='block';}
+    if(mates.length>0){extra.textContent='<svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg> Sesama serigala: '+mates.map(([,p])=>p.name).join(', ');extra.style.display='block';}
   } else {
     extra.style.display='none';
   }
