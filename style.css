@@ -1539,3 +1539,57 @@ footer span { color: var(--gold); font-weight: 600; }
 @media (max-width: 600px) {
   .student-card.active { grid-column: span 1; }
 }
+
+/* ─── SVG Icon System ─── */
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+.icon.ic-lg { width: 2.5rem; height: 2.5rem; opacity: .3; }
+.icon.ic-online-dot { width: .55rem; height: .55rem; color: #7adf9f; vertical-align: middle; margin-right: .1rem; }
+.icon.ic-heart-red { color: #e63946; width: .9em; height: .9em; }
+.icon.ic-section-icon { width: 2rem; height: 2rem; color: #7adf9f; }
+.icon.mp-icon { width: 1rem; height: 1rem; color: rgba(255,255,255,.6); }
+.icon.mp-play-icon { width: .85rem; height: .85rem; }
+
+/* nav icon sizing */
+.nav-right a .icon { width: .85rem; height: .85rem; margin-right: .2rem; }
+.notif-bell .icon { width: 1rem; height: 1rem; }
+
+/* game card icon */
+.game-card-icon .icon { width: 1.6rem; height: 1.6rem; }
+.game-card-icon { display: flex; align-items: center; justify-content: center; }
+.game-card-arrow .icon { width: .9rem; height: .9rem; }
+
+/* chat */
+.chat-header-icon .icon { width: 1.3rem; height: 1.3rem; }
+#sendBtn .icon { width: .9rem; height: .9rem; pointer-events: none; }
+
+/* upload */
+.upload-icon .icon { width: 2.5rem; height: 2.5rem; opacity: .4; }
+
+/* mading */
+.mading-avatar-sm .icon { width: 1.2rem; height: 1.2rem; }
+.mading-pill .icon { width: .75rem; height: .75rem; margin-right: .15rem; }
+.post-btn .icon { width: .75rem; height: .75rem; margin-left: .2rem; }
+.add-opt-btn .icon { width: .7rem; height: .7rem; }
+
+/* sr */
+.sr-btn .icon { width: .8rem; height: .8rem; margin-left: .2rem; }
+
+/* ─── Flipped arrow for back button ─── */
+.icon.ic-flip { transform: scaleX(-1); }
+
+/* ─── Role badges in Werewolf (text replacement styling) ─── */
+.role-badge {
+  display: inline-block;
+  padding: .1rem .4rem;
+  border-radius: 4px;
+  font-size: .7rem;
+  font-weight: 700;
+  background: rgba(255,255,255,.12);
+  margin-left: .2rem;
+}
