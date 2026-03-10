@@ -102,7 +102,7 @@
     if (!db) { setTimeout(startOnlineTracking, 600); return; }
     const ref = db.ref('shared/online/' + myId);
     ref.set({ name: myName, since: Date.now(),
-      avatar: localStorage.getItem('profileAvatar')||'👤',
+      avatar: localStorage.getItem('profileAvatar')||'',
       mood: localStorage.getItem('profileMood')||'' });
     ref.onDisconnect().remove();
     // Ensure LB entry exists with correct name
@@ -115,7 +115,7 @@
       ref.remove();
     });
     // Heartbeat every 60s
-    setInterval(() => ref.update({ name: myName, beat: Date.now(), avatar: localStorage.getItem('profileAvatar')||'👤', mood: localStorage.getItem('profileMood')||'' }), 60000);
+    setInterval(() => ref.update({ name: myName, beat: Date.now(), avatar: localStorage.getItem('profileAvatar')||'', mood: localStorage.getItem('profileMood')||'' }), 60000);
     // Save time every 5 min
     setInterval(saveOnlineTime, 300000);
   }
@@ -187,9 +187,9 @@
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     } catch (e) {
-      if (e.name === 'NotAllowedError') showToast('❌ Izin mikrofon ditolak. Cek pengaturan browser!');
-      else if (e.name === 'NotFoundError') showToast('❌ Mikrofon tidak ditemukan!');
-      else showToast('❌ Gagal akses mikrofon: ' + e.message);
+      if (e.name === 'NotAllowedError') showToast(' Izin mikrofon ditolak. Cek pengaturan browser!');
+      else if (e.name === 'NotFoundError') showToast(' Mikrofon tidak ditemukan!');
+      else showToast(' Gagal akses mikrofon: ' + e.message);
       return;
     }
 
@@ -200,7 +200,7 @@
     voiceRoomRef = db.ref('shared/voice/room/' + myId);
     voiceRoomRef.set({ name: myName, joined: Date.now() });
     voiceRoomRef.onDisconnect().remove();
-    showToast('🎙️ Gabung voice chat!');
+    showToast('️ Gabung voice chat!');
 
     // Listen for incoming signals (offers/answers/ICE)
     const mySigRef = db.ref('shared/voice/sig/' + myId);
@@ -233,7 +233,7 @@
       db.ref('shared/voice/sig/' + myId).remove();
     }
     updateVoiceBtn();
-    showToast('🔇 Keluar dari voice chat');
+    showToast(' Keluar dari voice chat');
   }
 
   function createPC(peerId, isOfferer) {
@@ -265,7 +265,7 @@
       // Force play (handle autoplay policy)
       audio.play().catch(() => {
         // Need user gesture — add click-to-unmute
-        showToast('🔊 Klik di mana saja untuk aktifkan suara');
+        showToast(' Klik di mana saja untuk aktifkan suara');
         const unlock = () => { audio.play(); document.removeEventListener('click', unlock); };
         document.addEventListener('click', unlock);
       });
@@ -348,12 +348,12 @@
     const btn = document.getElementById('_sh_vcbtn');
     if (!btn) return;
     if (inVoice) {
-      btn.innerHTML = '🔴<span id="_sh_vccnt"></span>';
+      btn.innerHTML = '<span id="_sh_vccnt"></span>';
       btn.title = 'Keluar voice chat';
       btn.style.background = 'linear-gradient(135deg,#dc2626,#b91c1c)';
       btn.style.animation = 'sh_pulse 2s ease infinite';
     } else {
-      btn.innerHTML = '🎙️<span id="_sh_vccnt"></span>';
+      btn.innerHTML = '️<span id="_sh_vccnt"></span>';
       btn.title = 'Masuk voice chat';
       btn.style.background = 'linear-gradient(135deg,#1d3461,#0f3460)';
       btn.style.animation = '';
@@ -369,7 +369,7 @@
     if (cnt) cnt.textContent = entries.length > 0 ? entries.length : '';
     if (panel) panel.style.display = (entries.length > 0 || inVoice) ? 'block' : 'none';
     list.innerHTML = entries.length === 0
-      ? '<p style="color:rgba(255,255,255,.3);font-size:.72rem;text-align:center;margin:.3rem 0">Kosong — klik 🎙️ untuk gabung!</p>'
+      ? '<p style="color:rgba(255,255,255,.3);font-size:.72rem;text-align:center;margin:.3rem 0">Kosong — klik ️ untuk gabung!</p>'
       : entries.map(([uid, p]) =>
           `<div style="display:flex;align-items:center;gap:.45rem;padding:.22rem 0">
             <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0${uid===myId?';box-shadow:0 0 6px #22c55e':''};"></span>
@@ -452,7 +452,7 @@
     const nm = document.createElement('div');
     nm.id = '_sh_nm';
     nm.innerHTML = `<div class="_sh_nmc">
-      <span class="_sh_nmi">🎓</span>
+      <span class="_sh_nmi"></span>
       <div class="_sh_nmt">Angkatan <em>XVI</em></div>
       <div class="_sh_nms">Pilih namamu untuk mulai bermain dan custom kartu siswa kamu!</div>
       <select id="_sh_nminp">
@@ -520,7 +520,7 @@
       <option value="Syrenia Carrisa Althafunnisa">Syrenia Carrisa Althafunnisa</option>
       <option value="Zahratu Syifa">Zahratu Syifa</option>
       </select>
-      <button id="_sh_nmbtn">Masuk ✦</button>
+      <button id="_sh_nmbtn">Masuk </button>
     </div>`;
     document.body.appendChild(nm);
 
@@ -529,11 +529,11 @@
     vc.id = '_sh_vc';
     vc.innerHTML = `
       <div id="_sh_vcpanel">
-        <div class="_sh_vph">🎙️ Voice Chat</div>
+        <div class="_sh_vph">️ Voice Chat</div>
         <div id="_sh_vclist"></div>
       </div>
-      <button id="_sh_vcbtn">🎙️<span id="_sh_vccnt"></span></button>
-      <button id="_sh_lbbtn" title="Leaderboard">🏆</button>`;
+      <button id="_sh_vcbtn">️<span id="_sh_vccnt"></span></button>
+      <button id="_sh_lbbtn" title="Leaderboard"></button>`;
     document.body.appendChild(vc);
 
     // Hover to show panel
