@@ -1,13 +1,142 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Among Us — Angkatan XVI</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Among Us — Angkatan XVI</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=Barlow:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-body{background:#0d1b2a;font-family:'Nunito',sans-serif;color:#fff;overflow:hidden;width:100vw;height:100dvh;}
+:root{
+  --bg:#06060A;--surface:#0F0F14;--panel:#16161E;
+  --border:rgba(255,255,255,.07);--text:#F0EFE8;--muted:rgba(240,239,232,.4);
+  --white:#ffffff;--acc:#F9C74F;--acc2:#E8B94A;
+  --green:#4ADE80;--red:#FF6B6B;--blue:#38BDF8;--orange:#FB923C;
+  --radius:4px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--acc);}
+
+/* ── NAVBAR ── */
+#navbar{position:fixed;top:0;width:100%;z-index:1000;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(6,6,10,.96);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);}
+.nav-left h1,.nav-left a h1{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:var(--white);}
+.nav-left h1 span,.nav-left a h1 span{color:var(--acc);}
+.nav-right{display:flex;align-items:center;gap:.05rem;}
+.nav-right a{color:var(--muted);text-decoration:none;padding:.3rem .65rem;font-family:'Space Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:1.5px;transition:color .2s;display:flex;align-items:center;gap:.2rem;}
+.nav-right a:hover{color:var(--acc);}
+.nav-right a .icon{width:.68rem;height:.68rem;}
+.nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:.4rem .3rem;-webkit-tap-highlight-color:transparent;}
+.nav-burger span{display:block;width:22px;height:2px;background:var(--muted);border-radius:1px;transition:all .25s;}
+.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);background:var(--acc);}
+.nav-burger.open span:nth-child(2){opacity:0;}
+.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:var(--acc);}
+.mobile-nav{display:none;position:fixed;top:48px;left:0;right:0;z-index:999;background:var(--surface);border-bottom:1px solid var(--border);flex-direction:column;padding:.4rem 0;box-shadow:0 8px 32px rgba(0,0,0,.6);transform:translateY(-8px);opacity:0;transition:transform .2s,opacity .2s;pointer-events:none;}
+.mobile-nav.open{display:flex;transform:translateY(0);opacity:1;pointer-events:auto;}
+.mobile-nav a{padding:.8rem 1.4rem;color:var(--muted);text-decoration:none;font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);-webkit-tap-highlight-color:transparent;transition:color .15s,background .15s;}
+.mobile-nav a:last-child{border-bottom:none;}
+.mobile-nav a:active,.mobile-nav a:hover{background:rgba(249,199,79,.06);color:var(--acc);}
+.mobile-nav a .icon{width:.68rem;height:.68rem;}
+@media(max-width:768px){.nav-desktop{display:none!important;}.nav-burger{display:flex;}}
+@media(min-width:769px){.mobile-nav{display:none!important;}}
+
+/* ── ICONS ── */
+.icon{display:inline-block;width:1em;height:1em;vertical-align:-.125em;flex-shrink:0;}
+.icon.ic-heart-red{color:var(--red);}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:1.2rem 2rem;text-align:center;font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted);letter-spacing:1px;}
+footer span{color:var(--acc);}
+
+/* ── MUSIC PLAYER ── */
+.music-player{position:fixed;bottom:0;right:0;z-index:400;background:var(--panel);border:1px solid var(--border);border-top:2px solid var(--acc);min-width:210px;max-width:260px;box-shadow:0 8px 30px rgba(0,0,0,.6);}
+.music-player-inner{display:flex;align-items:center;gap:.4rem;padding:.48rem .6rem;}
+.mp-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:.15rem;display:flex;align-items:center;transition:color .15s;}
+.mp-btn:hover{color:var(--acc);}
+.mp-btn .icon{width:.7rem;height:.7rem;}
+.mp-play{color:var(--acc)!important;}
+.mp-play .icon{width:.8rem;height:.8rem;}
+.mp-info{flex:1;min-width:0;display:flex;align-items:center;gap:.3rem;overflow:hidden;}
+.mp-icon{color:var(--acc);flex-shrink:0;width:.68rem;height:.68rem;}
+.mp-title{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mp-progress-wrap{padding:0 .6rem .35rem;}
+.mp-progress-bar{height:2px;background:rgba(255,255,255,.07);cursor:pointer;}
+.mp-progress-fill{height:100%;background:var(--acc);transition:width .5s linear;}
+@media(max-width:768px){.music-player{right:0;left:0;max-width:100%;width:100%;border-radius:0;border-left:none;border-right:none;}}
+
+/* ── COMMON GAME UI ── */
+.page-wrap{max-width:960px;margin:0 auto;padding:2rem 1.2rem 5rem;}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.5rem,8vw,5rem);font-weight:900;text-transform:uppercase;letter-spacing:2px;color:var(--white);line-height:.92;margin-bottom:.3rem;}
+.page-title span{color:var(--acc);}
+.page-eyebrow{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:4px;text-transform:uppercase;color:var(--acc);display:block;margin-bottom:.5rem;}
+.page-sub{font-size:.8rem;color:var(--muted);margin-bottom:2rem;}
+
+/* Panels / Cards */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;}
+.panel-title{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--white);margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;}
+.panel-title .icon{width:1.1rem;height:1.1rem;color:var(--acc);}
+
+/* Buttons */
+.btn{padding:.6rem 1.4rem;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:all .18s;display:inline-flex;align-items:center;gap:.4rem;-webkit-tap-highlight-color:transparent;}
+.btn .icon{width:.85rem;height:.85rem;}
+.btn-primary{background:var(--acc);color:#000;}
+.btn-primary:hover{background:var(--acc2);}
+.btn-secondary{background:var(--panel);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-danger:hover{opacity:.85;}
+.btn-ghost{background:none;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,.2);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+.btn-sm{padding:.38rem .85rem;font-size:.8rem;letter-spacing:1px;}
+.btn-full{width:100%;justify-content:center;}
+
+/* Inputs */
+.input{width:100%;padding:.6rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;}
+.input:focus{border-color:rgba(249,199,79,.5);}
+.input::placeholder{color:rgba(255,255,255,.2);}
+.input-row{display:flex;gap:.4rem;flex-wrap:wrap;}
+.input-row .input{flex:1;min-width:0;}
+
+/* Status badges */
+.badge{font-family:'Space Mono',monospace;font-size:.55rem;padding:.15rem .45rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.badge-green{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.25);}
+.badge-red{background:rgba(255,107,107,.12);color:var(--red);border:1px solid rgba(255,107,107,.25);}
+.badge-yellow{background:rgba(249,199,79,.12);color:var(--acc);border:1px solid rgba(249,199,79,.25);}
+.badge-blue{background:rgba(56,189,248,.12);color:var(--blue);border:1px solid rgba(56,189,248,.25);}
+
+/* Player chips */
+.player-chip{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .7rem;background:var(--panel);border:1px solid var(--border);font-size:.78rem;}
+.player-chip .chip-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;color:#000;flex-shrink:0;}
+
+/* Dividers */
+.divider{border:none;border-top:1px solid var(--border);margin:1.2rem 0;}
+
+/* Room code display */
+.room-code{font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:900;letter-spacing:8px;color:var(--acc);text-align:center;padding:1rem;background:var(--panel);border:1px solid rgba(249,199,79,.2);border-top:3px solid var(--acc);}
+
+/* Scrollable list */
+.scroll-list{overflow-y:auto;max-height:280px;display:flex;flex-direction:column;gap:.3rem;}
+.scroll-list::-webkit-scrollbar{width:3px;}
+.scroll-list::-webkit-scrollbar-thumb{background:var(--acc);}
+
+/* Toast */
+.toast-msg{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:var(--panel);color:var(--text);padding:.5rem 1.2rem;font-family:'Space Mono',monospace;font-size:.72rem;z-index:9000;border:1px solid rgba(249,199,79,.2);pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:92vw;}
+
+/* Grid helpers */
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.5rem;}
+
+@media(max-width:600px){
+  .page-wrap{padding:1.4rem .8rem 5rem;}
+  .panel{padding:.9rem 1rem;}
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+  .grid-auto{grid-template-columns:repeat(2,1fr);}
+  .btn{padding:.55rem 1rem;font-size:.88rem;}
+  .room-code{font-size:2rem;letter-spacing:4px;}
+}
+/* ════ GAME STYLES ════ */
 canvas{display:block;position:fixed;inset:0;z-index:0;}
 
 /* ─── SCREENS ─── */
@@ -149,11 +278,11 @@ canvas#wireCanvas{position:absolute;top:0;left:0;pointer-events:none;}
   .task-card{padding:1.4rem 1rem;}
   #joystick-area{bottom:1rem;left:.7rem;}
 }
-</style>
-<style>
-.icon{display:inline-block;width:1em;height:1em;vertical-align:-.125em;flex-shrink:0;}
-.icon.ic-lg{width:2rem;height:2rem;opacity:.35;}
-</style></head>
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+</head>
 <body>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
   <symbol id="ic-graduation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3.33 2 8.67 2 12 0v-5"/></symbol>
@@ -188,6 +317,29 @@ canvas#wireCanvas{position:absolute;top:0;left:0;pointer-events:none;}
   <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
   <symbol id="ic-circle" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></symbol>
 </svg>
+<nav id="navbar">
+    <div class="nav-left">
+      <a href="index.html" style="text-decoration:none"><h1>Angkatan <span>XVI</span></h1></a>
+    </div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r" style="transform:scaleX(-1)"/></svg> Home</a>
+      <a href="index.html#games-section" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-gamepad"/></svg> Games</a>
+      <a href="leaderboard.html" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-trophy"/></svg> Leaderboard</a>
+      <button class="nav-burger" id="navBurger" onclick="toggleMobileNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-nav" id="mobileNav">
+      <a href="index.html" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg> Home</a>
+      <a href="index.html#games-section" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-gamepad"/></svg> Games</a>
+      <a href="leaderboard.html" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-trophy"/></svg> Leaderboard</a>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+    <span class="page-eyebrow">Game Room</span>
+    <h1 class="page-title">Among <span>Us</span></h1>
+    <p class="page-sub">Temukan impostornya! Selesaikan tugas dan jangan dibunuh.</p>
 <!-- JOIN -->
 <div id="sJoin" class="screen on">
   <div class="card">
@@ -285,10 +437,45 @@ canvas#wireCanvas{position:absolute;top:0;left:0;pointer-events:none;}
 <div class="toast" id="toastEl"></div>
 <div class="announce" id="announceEl"></div>
 <canvas id="canvas"></canvas>
+  </div>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <footer>
+    <p>Dibuat dengan <svg class="icon ic-heart-red" aria-hidden="true"><use href="#ic-heart"/></svg> oleh <span>Angkatan XVI</span></p>
+  </footer>
+  <!-- Music Player -->
+  <div class="music-player" id="musicPlayer">
+    <div class="music-player-inner">
+      <button class="mp-btn" id="mpPrev" title="Sebelumnya"><svg class="icon" aria-hidden="true"><use href="#ic-skip-b"/></svg></button>
+      <button class="mp-btn mp-play" id="mpPlay" title="Play/Pause"><svg class="icon mp-play-icon" aria-hidden="true"><use href="#ic-play"/></svg></button>
+      <button class="mp-btn" id="mpNext" title="Selanjutnya"><svg class="icon" aria-hidden="true"><use href="#ic-skip-f"/></svg></button>
+      <div class="mp-info">
+        <svg class="icon mp-icon" aria-hidden="true"><use href="#ic-music"/></svg>
+        <span class="mp-title" id="mpTitle">Memuat musik...</span>
+      </div>
+      <div class="mp-progress-wrap">
+        <div class="mp-progress-bar"><div class="mp-progress-fill" id="mpFill"></div></div>
+      </div>
+    </div>
+  </div>
+  <audio id="bgAudio" preload="auto"></audio>
+
 <script>
+function toggleMobileNav(){
+  document.getElementById('mobileNav').classList.toggle('open');
+  document.getElementById('navBurger').classList.toggle('open');
+}
+function closeMobileNav(){
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('navBurger').classList.remove('open');
+}
+document.addEventListener('click',function(e){
+  const n=document.getElementById('mobileNav'),b=document.getElementById('navBurger');
+  if(n&&n.classList.contains('open')&&!n.contains(e.target)&&!b.contains(e.target))closeMobileNav();
+});
+</script>
+  <script src="script.js"></script>
+  <script src="shared.js"></script>
+  <script>
 /* ══════════════════════════════════════════════
    FIREBASE
 ══════════════════════════════════════════════ */
@@ -1487,7 +1674,6 @@ function leaveGame(){PR.child(myId).remove();location.reload();}
 function playAgain(){db.ref('au').remove();location.reload();}
 
 document.getElementById('jName').value=myName||localStorage.getItem('lbName')||'';
-</script>
-<script src="shared.js"></script>
+  </script>
 </body>
 </html>
