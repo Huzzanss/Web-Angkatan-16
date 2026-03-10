@@ -31,7 +31,6 @@
       <a href="#chat-section">💬 Chat</a>
       <a href="#games-section">🎮 Games</a>
       <a href="#mading-section">📝 Mading</a>
-      <a href="profil.html" id="navProfil">👤 Profil</a>
       <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" title="Notifikasi">🔔<span class="notif-dot" id="notifDot" style="display:none"></span></button>
     </div>
   </nav>
@@ -97,24 +96,24 @@
         <div class="daftar-siswa">
           <h3>Daftar Siswa-Siswi</h3>
           <div class="student-grid">
-            <div class="student-card"><div class="initial"></div><p>Abdullah Raziq Hanan</p></div>
-            <div class="student-card"><div class="initial"></div><p>Aditya Narendra Pambudi</p></div>
-            <div class="student-card"><div class="initial"></div><p>Ahmad Abdullah Hafi Munaji</p></div>
-            <div class="student-card"><div class="initial"></div><p>Alesha Zevanna Annayla Alfian</p></div>
-            <div class="student-card"><div class="initial"></div><p>Alisha Nur Afiyah</p></div>
-            <div class="student-card"><div class="initial"></div><p>Azim Evano Rahman</p></div>
-            <div class="student-card"><div class="initial"></div><p>Deeandra Mikhailla Hariyadi</p></div>
-            <div class="student-card"><div class="initial"></div><p>Faqih Hamizan Rahman</p></div>
-            <div class="student-card"><div class="initial"></div><p>Gavin Ahmad Farisakha Sahilin</p></div>
-            <div class="student-card"><div class="initial"></div><p>Hana Aish Sumayyah</p></div>
-            <div class="student-card"><div class="initial"></div><p>Javier Al Majid</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Alfindra Auvar Rahardja</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Asyraf Al Farisi</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Hafiz Faad Abqory</p></div>
-            <div class="student-card"><div class="initial"></div><p>Nuhammad Rezky Tri Ramadhan</p></div>
-            <div class="student-card"><div class="initial"></div><p>Nayhan Abqari</p></div>
-            <div class="student-card"><div class="initial"></div><p>Samytha Larisa Azzalea</p></div>
-            <div class="student-card"><div class="initial"></div><p>Zahratu Syifa</p></div>
+            <div class="student-card" data-name="Abdullah Raziq Hanan" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Abdullah Raziq Hanan</p><div class="sc-bio" id="bio_abdullah_raziq_hanan"></div></div>
+            <div class="student-card" data-name="Aditya Narendra Pambudi" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Aditya Narendra Pambudi</p><div class="sc-bio" id="bio_aditya_narendra_pambudi"></div></div>
+            <div class="student-card" data-name="Ahmad Abdullah Hafi Munaji" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Ahmad Abdullah Hafi Munaji</p><div class="sc-bio" id="bio_ahmad_abdullah_hafi_munaji"></div></div>
+            <div class="student-card" data-name="Alesha Zevanna Annayla Alfian" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Alesha Zevanna Annayla Alfian</p><div class="sc-bio" id="bio_alesha_zevanna_annayla_alfian"></div></div>
+            <div class="student-card" data-name="Alisha Nur Afiyah" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Alisha Nur Afiyah</p><div class="sc-bio" id="bio_alisha_nur_afiyah"></div></div>
+            <div class="student-card" data-name="Azim Evano Rahman" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Azim Evano Rahman</p><div class="sc-bio" id="bio_azim_evano_rahman"></div></div>
+            <div class="student-card" data-name="Deeandra Mikhailla Hariyadi" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Deeandra Mikhailla Hariyadi</p><div class="sc-bio" id="bio_deeandra_mikhailla_hariyadi"></div></div>
+            <div class="student-card" data-name="Faqih Hamizan Rahman" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Faqih Hamizan Rahman</p><div class="sc-bio" id="bio_faqih_hamizan_rahman"></div></div>
+            <div class="student-card" data-name="Gavin Ahmad Farisakha Sahilin" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Gavin Ahmad Farisakha Sahilin</p><div class="sc-bio" id="bio_gavin_ahmad_farisakha_sahilin"></div></div>
+            <div class="student-card" data-name="Hana Aish Sumayyah" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Hana Aish Sumayyah</p><div class="sc-bio" id="bio_hana_aish_sumayyah"></div></div>
+            <div class="student-card" data-name="Javier Al Majid" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Javier Al Majid</p><div class="sc-bio" id="bio_javier_al_majid"></div></div>
+            <div class="student-card" data-name="Muhammad Alfindra Auvar Rahardja" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Alfindra Auvar Rahardja</p><div class="sc-bio" id="bio_muhammad_alfindra_auvar_rahardja"></div></div>
+            <div class="student-card" data-name="Muhammad Asyraf Al Farisi" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Asyraf Al Farisi</p><div class="sc-bio" id="bio_muhammad_asyraf_al_farisi"></div></div>
+            <div class="student-card" data-name="Muhammad Hafiz Faad Abqory" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Hafiz Faad Abqory</p><div class="sc-bio" id="bio_muhammad_hafiz_faad_abqory"></div></div>
+            <div class="student-card" data-name="Nuhammad Rezky Tri Ramadhan" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Nuhammad Rezky Tri Ramadhan</p><div class="sc-bio" id="bio_nuhammad_rezky_tri_ramadhan"></div></div>
+            <div class="student-card" data-name="Nayhan Abqari" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Nayhan Abqari</p><div class="sc-bio" id="bio_nayhan_abqari"></div></div>
+            <div class="student-card" data-name="Samytha Larisa Azzalea" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Samytha Larisa Azzalea</p><div class="sc-bio" id="bio_samytha_larisa_azzalea"></div></div>
+            <div class="student-card" data-name="Zahratu Syifa" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Zahratu Syifa</p><div class="sc-bio" id="bio_zahratu_syifa"></div></div>
           </div>
         </div>
       </div>
@@ -141,29 +140,29 @@
         <div class="daftar-siswa">
           <h3>Daftar Siswa-Siswi</h3>
           <div class="student-grid">
-            <div class="student-card"><div class="initial"></div><p>Ahmad Faezya Rafa</p></div>
-            <div class="student-card"><div class="initial"></div><p>Ahmad Hamdan Nurzati</p></div>
-            <div class="student-card"><div class="initial"></div><p>Alkhalifi Hasyimi</p></div>
-            <div class="student-card"><div class="initial"></div><p>Andra Alghifari</p></div>
-            <div class="student-card"><div class="initial"></div><p>Angelina Natalia Tennes</p></div>
-            <div class="student-card"><div class="initial"></div><p>Arsenio Al Fattan Wibowo</p></div>
-            <div class="student-card"><div class="initial"></div><p>Chaerul Risyad Ferdansyah</p></div>
-            <div class="student-card"><div class="initial"></div><p>Devan Rafandra Pratama</p></div>
-            <div class="student-card"><div class="initial"></div><p>Ghaisan Adib Mubasyir</p></div>
-            <div class="student-card"><div class="initial"></div><p>Kanaya Lubna Janitra Hafizah</p></div>
-            <div class="student-card"><div class="initial"></div><p>Keisha Pratiwi Syahrizal</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Ahza Farezell</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Zaki Raditya</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Zamzam Zidna Fahn</p></div>
-            <div class="student-card"><div class="initial"></div><p>Nada Fajriah Salsabilla</p></div>
-            <div class="student-card"><div class="initial"></div><p>Nur Aisyah</p></div>
-            <div class="student-card"><div class="initial"></div><p>Nurul Farhana Aqilah Chandra</p></div>
-            <div class="student-card"><div class="initial"></div><p>Shazia Amira Zhafirah</p></div>
-            <div class="student-card"><div class="initial"></div><p>Super Novel Hardian</p></div>
-            <div class="student-card"><div class="initial"></div><p>Syaqila Marwa Putri Deandra</p></div>
-            <div class="student-card"><div class="initial"></div><p>Syrenia Carrisa Althafunnisa</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Mezameru Arsyada</p></div>
-            <div class="student-card"><div class="initial"></div><p>Shidqia Nabila Azzahra</p></div>
+            <div class="student-card" data-name="Ahmad Faezya Rafa" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Ahmad Faezya Rafa</p><div class="sc-bio" id="bio_ahmad_faezya_rafa"></div></div>
+            <div class="student-card" data-name="Ahmad Hamdan Nurzati" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Ahmad Hamdan Nurzati</p><div class="sc-bio" id="bio_ahmad_hamdan_nurzati"></div></div>
+            <div class="student-card" data-name="Alkhalifi Hasyimi" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Alkhalifi Hasyimi</p><div class="sc-bio" id="bio_alkhalifi_hasyimi"></div></div>
+            <div class="student-card" data-name="Andra Alghifari" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Andra Alghifari</p><div class="sc-bio" id="bio_andra_alghifari"></div></div>
+            <div class="student-card" data-name="Angelina Natalia Tennes" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Angelina Natalia Tennes</p><div class="sc-bio" id="bio_angelina_natalia_tennes"></div></div>
+            <div class="student-card" data-name="Arsenio Al Fattan Wibowo" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Arsenio Al Fattan Wibowo</p><div class="sc-bio" id="bio_arsenio_al_fattan_wibowo"></div></div>
+            <div class="student-card" data-name="Chaerul Risyad Ferdansyah" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Chaerul Risyad Ferdansyah</p><div class="sc-bio" id="bio_chaerul_risyad_ferdansyah"></div></div>
+            <div class="student-card" data-name="Devan Rafandra Pratama" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Devan Rafandra Pratama</p><div class="sc-bio" id="bio_devan_rafandra_pratama"></div></div>
+            <div class="student-card" data-name="Ghaisan Adib Mubasyir" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Ghaisan Adib Mubasyir</p><div class="sc-bio" id="bio_ghaisan_adib_mubasyir"></div></div>
+            <div class="student-card" data-name="Kanaya Lubna Janitra Hafizah" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Kanaya Lubna Janitra Hafizah</p><div class="sc-bio" id="bio_kanaya_lubna_janitra_hafizah"></div></div>
+            <div class="student-card" data-name="Keisha Pratiwi Syahrizal" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Keisha Pratiwi Syahrizal</p><div class="sc-bio" id="bio_keisha_pratiwi_syahrizal"></div></div>
+            <div class="student-card" data-name="Muhammad Ahza Farezell" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Ahza Farezell</p><div class="sc-bio" id="bio_muhammad_ahza_farezell"></div></div>
+            <div class="student-card" data-name="Muhammad Zaki Raditya" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Zaki Raditya</p><div class="sc-bio" id="bio_muhammad_zaki_raditya"></div></div>
+            <div class="student-card" data-name="Muhammad Zamzam Zidna Fahn" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Zamzam Zidna Fahn</p><div class="sc-bio" id="bio_muhammad_zamzam_zidna_fahn"></div></div>
+            <div class="student-card" data-name="Nada Fajriah Salsabilla" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Nada Fajriah Salsabilla</p><div class="sc-bio" id="bio_nada_fajriah_salsabilla"></div></div>
+            <div class="student-card" data-name="Nur Aisyah" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Nur Aisyah</p><div class="sc-bio" id="bio_nur_aisyah"></div></div>
+            <div class="student-card" data-name="Nurul Farhana Aqilah Chandra" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Nurul Farhana Aqilah Chandra</p><div class="sc-bio" id="bio_nurul_farhana_aqilah_chandra"></div></div>
+            <div class="student-card" data-name="Shazia Amira Zhafirah" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Shazia Amira Zhafirah</p><div class="sc-bio" id="bio_shazia_amira_zhafirah"></div></div>
+            <div class="student-card" data-name="Super Novel Hardian" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Super Novel Hardian</p><div class="sc-bio" id="bio_super_novel_hardian"></div></div>
+            <div class="student-card" data-name="Syaqila Marwa Putri Deandra" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Syaqila Marwa Putri Deandra</p><div class="sc-bio" id="bio_syaqila_marwa_putri_deandra"></div></div>
+            <div class="student-card" data-name="Syrenia Carrisa Althafunnisa" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Syrenia Carrisa Althafunnisa</p><div class="sc-bio" id="bio_syrenia_carrisa_althafunnisa"></div></div>
+            <div class="student-card" data-name="Muhammad Mezameru Arsyada" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Mezameru Arsyada</p><div class="sc-bio" id="bio_muhammad_mezameru_arsyada"></div></div>
+            <div class="student-card" data-name="Shidqia Nabila Azzahra" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Shidqia Nabila Azzahra</p><div class="sc-bio" id="bio_shidqia_nabila_azzahra"></div></div>
           </div>
         </div>
       </div>
@@ -190,27 +189,27 @@
         <div class="daftar-siswa">
           <h3>Daftar Siswa-Siswi</h3>
           <div class="student-grid">
-            <div class="student-card"><div class="initial"></div><p>Adelia Felicia</p></div>
-            <div class="student-card"><div class="initial"></div><p>Afiqah Humayra Arresky</p></div>
-            <div class="student-card"><div class="initial"></div><p>Alexandra Shavira Kaysa</p></div>
-            <div class="student-card"><div class="initial"></div><p>Alisya Zella Naura Saputro</p></div>
-            <div class="student-card"><div class="initial"></div><p>Alita Admiral</p></div>
-            <div class="student-card"><div class="initial"></div><p>Aqillah Khayyirah</p></div>
-            <div class="student-card"><div class="initial"></div><p>Azima Zafeera Khairiya</p></div>
-            <div class="student-card"><div class="initial"></div><p>Azka Aisy Muhammad Firdaus</p></div>
-            <div class="student-card"><div class="initial"></div><p>Farrel Azka Firlana</p></div>
-            <div class="student-card"><div class="initial"></div><p>Fattah Altaf Qusyairi</p></div>
-            <div class="student-card"><div class="initial"></div><p>Giovanny Syahputra</p></div>
-            <div class="student-card"><div class="initial"></div><p>Gusti Muhammad An-Nafis</p></div>
-            <div class="student-card"><div class="initial"></div><p>Hilmi Muhammad Nidho Mudhin</p></div>
-            <div class="student-card"><div class="initial"></div><p>Khalika Ismatullah Assahla</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Abdurrahman Dzaki</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad El Junot Razqal</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Fahri Ardani</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Hafidz Setiadi</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Juna Defa Alfarizie</p></div>
-            <div class="student-card"><div class="initial"></div><p>Muhammad Zharif Syatir</p></div>
-            <div class="student-card"><div class="initial"></div><p>Syifa Fathiyah Zahra</p></div>
+            <div class="student-card" data-name="Adelia Felicia" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Adelia Felicia</p><div class="sc-bio" id="bio_adelia_felicia"></div></div>
+            <div class="student-card" data-name="Afiqah Humayra Arresky" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Afiqah Humayra Arresky</p><div class="sc-bio" id="bio_afiqah_humayra_arresky"></div></div>
+            <div class="student-card" data-name="Alexandra Shavira Kaysa" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Alexandra Shavira Kaysa</p><div class="sc-bio" id="bio_alexandra_shavira_kaysa"></div></div>
+            <div class="student-card" data-name="Alisya Zella Naura Saputro" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Alisya Zella Naura Saputro</p><div class="sc-bio" id="bio_alisya_zella_naura_saputro"></div></div>
+            <div class="student-card" data-name="Alita Admiral" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Alita Admiral</p><div class="sc-bio" id="bio_alita_admiral"></div></div>
+            <div class="student-card" data-name="Aqillah Khayyirah" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Aqillah Khayyirah</p><div class="sc-bio" id="bio_aqillah_khayyirah"></div></div>
+            <div class="student-card" data-name="Azima Zafeera Khairiya" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Azima Zafeera Khairiya</p><div class="sc-bio" id="bio_azima_zafeera_khairiya"></div></div>
+            <div class="student-card" data-name="Azka Aisy Muhammad Firdaus" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Azka Aisy Muhammad Firdaus</p><div class="sc-bio" id="bio_azka_aisy_muhammad_firdaus"></div></div>
+            <div class="student-card" data-name="Farrel Azka Firlana" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Farrel Azka Firlana</p><div class="sc-bio" id="bio_farrel_azka_firlana"></div></div>
+            <div class="student-card" data-name="Fattah Altaf Qusyairi" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Fattah Altaf Qusyairi</p><div class="sc-bio" id="bio_fattah_altaf_qusyairi"></div></div>
+            <div class="student-card" data-name="Giovanny Syahputra" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Giovanny Syahputra</p><div class="sc-bio" id="bio_giovanny_syahputra"></div></div>
+            <div class="student-card" data-name="Gusti Muhammad An-Nafis" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Gusti Muhammad An-Nafis</p><div class="sc-bio" id="bio_gusti_muhammad_an_nafis"></div></div>
+            <div class="student-card" data-name="Hilmi Muhammad Nidho Mudhin" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Hilmi Muhammad Nidho Mudhin</p><div class="sc-bio" id="bio_hilmi_muhammad_nidho_mudhin"></div></div>
+            <div class="student-card" data-name="Khalika Ismatullah Assahla" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Khalika Ismatullah Assahla</p><div class="sc-bio" id="bio_khalika_ismatullah_assahla"></div></div>
+            <div class="student-card" data-name="Muhammad Abdurrahman Dzaki" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Abdurrahman Dzaki</p><div class="sc-bio" id="bio_muhammad_abdurrahman_dzaki"></div></div>
+            <div class="student-card" data-name="Muhammad El Junot Razqal" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad El Junot Razqal</p><div class="sc-bio" id="bio_muhammad_el_junot_razqal"></div></div>
+            <div class="student-card" data-name="Muhammad Fahri Ardani" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Fahri Ardani</p><div class="sc-bio" id="bio_muhammad_fahri_ardani"></div></div>
+            <div class="student-card" data-name="Muhammad Hafidz Setiadi" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Hafidz Setiadi</p><div class="sc-bio" id="bio_muhammad_hafidz_setiadi"></div></div>
+            <div class="student-card" data-name="Muhammad Juna Defa Alfarizie" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Juna Defa Alfarizie</p><div class="sc-bio" id="bio_muhammad_juna_defa_alfarizie"></div></div>
+            <div class="student-card" data-name="Muhammad Zharif Syatir" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Muhammad Zharif Syatir</p><div class="sc-bio" id="bio_muhammad_zharif_syatir"></div></div>
+            <div class="student-card" data-name="Syifa Fathiyah Zahra" onclick="toggleStudentCard(this)"><div class="initial"></div><p>Syifa Fathiyah Zahra</p><div class="sc-bio" id="bio_syifa_fathiyah_zahra"></div></div>
           </div>
         </div>
       </div>
