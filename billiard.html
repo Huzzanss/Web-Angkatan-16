@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Billiard 8-Ball — Angkatan XVI</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900&family=Barlow:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#06060A;--surface:#0F0F14;--panel:#16161E;--border:rgba(255,255,255,.07);--text:#F0EFE8;--muted:rgba(240,239,232,.4);--white:#fff;--acc:#F9C74F;--acc2:#E8B94A;--green:#4ADE80;--red:#FF6B6B;--blue:#38BDF8;}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;padding-top:48px;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--acc);}
+#navbar{position:fixed;top:0;width:100%;z-index:1000;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(6,6,10,.97);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);}
+.nav-left a{text-decoration:none;}.nav-left h1{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:var(--white);}.nav-left h1 span{color:var(--acc);}
+.nav-right{display:flex;align-items:center;}.nav-right a{color:var(--muted);text-decoration:none;padding:.3rem .65rem;font-family:'Space Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:1.5px;transition:color .2s;}.nav-right a:hover{color:var(--acc);}
+.nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:.4rem .3rem;}.nav-burger span{display:block;width:22px;height:2px;background:var(--muted);border-radius:1px;transition:all .25s;}
+.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);background:var(--acc);}.nav-burger.open span:nth-child(2){opacity:0;}.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:var(--acc);}
+.mob-nav{position:fixed;top:48px;left:0;right:0;z-index:999;background:var(--surface);border-bottom:1px solid var(--border);display:none;flex-direction:column;padding:.4rem 0;pointer-events:none;opacity:0;transform:translateY(-6px);transition:.2s;}
+.mob-nav.open{display:flex;opacity:1;transform:none;pointer-events:auto;}.mob-nav a{padding:.8rem 1.4rem;color:var(--muted);text-decoration:none;font-family:'Space Mono',monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border);}.mob-nav a:last-child{border:none;}.mob-nav a:active{color:var(--acc);}
+@media(max-width:768px){.nd{display:none!important;}.nav-burger{display:flex;}}@media(min-width:769px){.mob-nav{display:none!important;}}
+.icon{display:inline-block;width:1em;height:1em;vertical-align:-.125em;flex-shrink:0;}.ic-heart-red{color:var(--red);}
+footer{border-top:1px solid var(--border);padding:1.2rem;text-align:center;font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted);}footer span{color:var(--acc);}
+.music-player{position:fixed;bottom:0;right:0;z-index:400;background:var(--panel);border:1px solid var(--border);border-top:2px solid var(--acc);min-width:200px;max-width:255px;}
+.music-player-inner{display:flex;align-items:center;gap:.4rem;padding:.48rem .6rem;}
+.mp-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:.15rem;display:flex;align-items:center;transition:color .15s;}.mp-btn:hover,.mp-play{color:var(--acc)!important;}.mp-btn .icon{width:.75rem;height:.75rem;}
+.mp-info{flex:1;min-width:0;display:flex;align-items:center;gap:.3rem;overflow:hidden;}.mp-icon{color:var(--acc);width:.68rem;height:.68rem;flex-shrink:0;}.mp-title{font-family:'Space Mono',monospace;font-size:.58rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mp-progress-wrap{padding:0 .6rem .35rem;}.mp-progress-bar{height:2px;background:rgba(255,255,255,.07);}.mp-progress-fill{height:100%;background:var(--acc);transition:width .5s linear;}
+@media(max-width:768px){.music-player{right:0;left:0;max-width:100%;width:100%;}}
+
+.page-wrap{max-width:980px;margin:0 auto;padding:1.5rem 1rem 6rem;}
+.page-eyebrow{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:4px;text-transform:uppercase;color:var(--acc);display:block;margin-bottom:.4rem;}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.5rem,8vw,4.5rem);font-weight:900;text-transform:uppercase;letter-spacing:2px;color:var(--white);line-height:.92;margin-bottom:.2rem;}
+.page-title span{color:var(--acc);}
+.page-sub{font-size:.8rem;color:var(--muted);margin-bottom:1.2rem;}
+
+.game-layout{display:grid;grid-template-columns:1fr 200px;gap:.8rem;align-items:start;}
+@media(max-width:680px){.game-layout{grid-template-columns:1fr;}}
+
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--acc);padding:.7rem;touch-action:none;}
+#tableCanvas{display:block;width:100%;height:auto;cursor:crosshair;touch-action:none;}
+
+.power-wrap{margin-top:.6rem;}
+.power-lbl{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:.3rem;}
+.power-lbl em{color:var(--acc);font-style:normal;font-size:.72rem;}
+.power-track{height:10px;background:rgba(255,255,255,.06);border:1px solid var(--border);cursor:pointer;border-radius:2px;position:relative;}
+.power-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#4ADE80 0%,#F9C74F 60%,#FF6B6B 100%);}
+
+.sidebar{display:flex;flex-direction:column;gap:.6rem;}
+.s-panel{background:var(--surface);border:1px solid var(--border);padding:.8rem;}
+.s-panel h3{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--white);margin-bottom:.55rem;padding-bottom:.35rem;border-bottom:1px solid var(--border);}
+.turn-box{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--acc);text-align:center;padding:.65rem;}
+.turn-lbl{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.18rem;}
+.turn-name{font-family:'Barlow Condensed',sans-serif;font-size:1.35rem;font-weight:700;letter-spacing:1px;color:var(--acc);}
+.turn-name.ai-t{color:var(--blue);}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.sr:last-child{border:none;}.sr-l{font-family:'Space Mono',monospace;font-size:.56rem;color:var(--muted);}.sr-v{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:700;color:var(--acc);}
+.balls-mini{display:flex;flex-wrap:wrap;gap:3px;margin-top:.35rem;}
+.bm{width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(0,0,0,.35);flex-shrink:0;}
+.log-scroll{max-height:130px;overflow-y:auto;font-family:'Space Mono',monospace;font-size:.57rem;color:var(--muted);display:flex;flex-direction:column;gap:.15rem;}
+.log-scroll::-webkit-scrollbar{width:2px;}.log-scroll::-webkit-scrollbar-thumb{background:rgba(249,199,79,.3);}
+.le{padding:.12rem 0;border-bottom:1px solid rgba(255,255,255,.03);}.le:last-child{color:var(--text);border:none;}
+.btn-new{width:100%;padding:.65rem;background:var(--acc);border:none;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:opacity .18s;}.btn-new:hover{opacity:.85;}
+
+#overlay{display:none;position:fixed;inset:0;background:rgba(6,6,10,.92);z-index:800;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+#overlay.show{display:flex;}
+.oc{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--acc);padding:2.5rem 2rem;max-width:340px;width:90%;text-align:center;}
+.ot{font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:900;text-transform:uppercase;letter-spacing:2px;line-height:1;margin-bottom:.3rem;}
+.ot.win{color:var(--acc);}.ot.lose{color:var(--red);}
+.op{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);margin-bottom:1.5rem;}
+.ob{display:flex;gap:.5rem;justify-content:center;}
+.ob button{padding:.6rem 1.3rem;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:opacity .18s;}.ob button:hover{opacity:.85;}
+.ob-p{background:var(--acc);color:#000;}.ob-s{background:var(--panel);color:var(--text);border:1px solid var(--border);}
+
+@media(max-width:480px){
+  .sidebar{flex-direction:row;flex-wrap:wrap;}
+  .s-panel{flex:1 1 140px;}
+  .log-scroll{max-height:80px;}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ic-heart" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+  <symbol id="ic-music" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="ic-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+  <symbol id="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></symbol>
+  <symbol id="ic-skip-b" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="ic-skip-f" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+
+<nav id="navbar">
+  <div class="nav-left"><a href="index.html"><h1>Angkatan <span>XVI</span></h1></a></div>
+  <div class="nav-right">
+    <a href="index.html" class="nd">← Home</a>
+    <a href="index.html#games-section" class="nd">Games</a>
+    <a href="leaderboard.html" class="nd">Leaderboard</a>
+    <button class="nav-burger" id="navBurger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mob-nav" id="mobNav">
+    <a href="index.html" onclick="closeNav()">← Home</a>
+    <a href="index.html#games-section" onclick="closeNav()">Games</a>
+    <a href="leaderboard.html" onclick="closeNav()">Leaderboard</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <span class="page-eyebrow">Game Room · vs AI</span>
+  <h1 class="page-title">Billiard <span>8-Ball</span></h1>
+  <p class="page-sub">Masukkan semua bola kelompokmu lalu potong 8-ball untuk menang. Drag dari bola putih untuk bidik &amp; lepas untuk tembak. Atur kekuatan di slider.</p>
+
+  <div class="game-layout">
+    <div>
+      <div class="table-wrap"><canvas id="tableCanvas"></canvas></div>
+      <div class="power-wrap">
+        <div class="power-lbl">Power <em id="pwrNum">50</em>%</div>
+        <div class="power-track" id="pwrTrack"><div class="power-fill" id="pwrFill" style="width:50%"></div></div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="turn-box"><span class="turn-lbl">Giliran</span><div class="turn-name" id="turnName">Kamu</div></div>
+      <div class="s-panel">
+        <h3>Skor</h3>
+        <div class="sr"><span class="sr-l" id="p1Lbl">Kamu</span><span class="sr-v" id="p1Score">0</span></div>
+        <div class="sr"><span class="sr-l">AI</span><span class="sr-v" id="p2Score">0</span></div>
+        <div style="margin-top:.5rem;font-family:'Space Mono',monospace;font-size:.54rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Bola tersisa</div>
+        <div class="balls-mini" id="p1Balls"></div>
+        <div style="height:.25rem"></div>
+        <div class="balls-mini" id="p2Balls"></div>
+      </div>
+      <div class="s-panel"><h3>Log</h3><div class="log-scroll" id="logBox"></div></div>
+      <button class="btn-new" onclick="newGame()">▶ Mulai Game</button>
+    </div>
+  </div>
+</div>
+
+<div id="overlay">
+  <div class="oc">
+    <div class="ot" id="ovTitle">MENANG!</div>
+    <div class="op" id="ovPts">+200 poin</div>
+    <div class="ob">
+      <button class="ob-p" onclick="newGame()">Main Lagi</button>
+      <button class="ob-s" onclick="location.href='leaderboard.html'">Leaderboard</button>
+    </div>
+  </div>
+</div>
+
+<footer><p>Dibuat dengan <svg class="icon ic-heart-red"><use href="#ic-heart"/></svg> oleh <span>Angkatan XVI</span></p></footer>
+<div class="music-player"><div class="music-player-inner">
+  <button class="mp-btn" id="mpPrev"><svg class="icon"><use href="#ic-skip-b"/></svg></button>
+  <button class="mp-btn mp-play" id="mpPlay"><svg class="icon"><use href="#ic-play"/></svg></button>
+  <button class="mp-btn" id="mpNext"><svg class="icon"><use href="#ic-skip-f"/></svg></button>
+  <div class="mp-info"><svg class="icon mp-icon"><use href="#ic-music"/></svg><span class="mp-title" id="mpTitle">Memuat...</span></div>
+  <div class="mp-progress-wrap"><div class="mp-progress-bar"><div class="mp-progress-fill" id="mpFill"></div></div></div>
+</div></div>
+<audio id="bgAudio" preload="auto"></audio>
+
+<script>
+function toggleNav(){document.getElementById('mobNav').classList.toggle('open');document.getElementById('navBurger').classList.toggle('open');}
+function closeNav(){document.getElementById('mobNav').classList.remove('open');document.getElementById('navBurger').classList.remove('open');}
+document.addEventListener('click',e=>{const n=document.getElementById('mobNav'),b=document.getElementById('navBurger');if(n&&n.classList.contains('open')&&!n.contains(e.target)&&!b.contains(e.target))closeNav();});
+
+/* ═══════════════════════════════
+   BILLIARD ENGINE
+═══════════════════════════════ */
+const canvas=document.getElementById('tableCanvas');
+const ctx=canvas.getContext('2d');
+const TW=800,TH=440,PX=42,PY=42;
+const TBX=PX,TBY=PY,TBW=TW-PX*2,TBH=TH-PY*2;
+const BR=13,PR=20,FRIC=0.9875,MINV=0.06;
+
+const POCKETS=[
+  {x:TBX,y:TBY},{x:TBX+TBW/2,y:TBY-8},{x:TBX+TBW,y:TBY},
+  {x:TBX,y:TBY+TBH},{x:TBX+TBW/2,y:TBY+TBH+8},{x:TBX+TBW,y:TBY+TBH}
+];
+const BCOL={1:'#F5E030',2:'#1055F5',3:'#E52020',4:'#8020D0',5:'#F07010',6:'#208020',7:'#9B1C1C',8:'#181818',9:'#F5E030',10:'#1055F5',11:'#E52020',12:'#8020D0',13:'#F07010',14:'#208020',15:'#9B1C1C'};
+
+let balls=[],cueBall=null;
+let playerTurn=true,groupAssigned=false,playerGroup='';
+let gameRunning=false,shotInProgress=false,aiTimer=null;
+let aiming=false,aimPos={x:0,y:0},power=50;
+let pocketedThisShot=[];
+
+function mkBall(id,x,y){
+  return{id,x,y,vx:0,vy:0,r:BR,col:BCOL[id]||'#F5F5F5',
+    type:id===0?'cue':id===8?'eight':id<=7?'solid':'stripe',pocketed:false};
+}
+
+function initBalls(){
+  balls=[];
+  cueBall=mkBall(0,TBX+TBW*0.25,TBY+TBH/2);
+  balls.push(cueBall);
+  const rx=TBX+TBW*0.72,ry=TBY+TBH/2,sp=BR*2+1.5;
+  [[1],[9,2],[3,8,10],[11,4,12,5],[6,13,14,7,15]].forEach((row,ri)=>{
+    row.forEach((id,ci)=>{
+      balls.push(mkBall(id,rx+ri*sp*Math.cos(Math.PI/6),ry+(ci-(row.length-1)/2)*sp));
+    });
+  });
+}
+
+function step(){
+  let moving=false;
+  const active=balls.filter(b=>!b.pocketed);
+  for(const b of active){b.x+=b.vx;b.y+=b.vy;b.vx*=FRIC;b.vy*=FRIC;if(Math.abs(b.vx)<MINV)b.vx=0;if(Math.abs(b.vy)<MINV)b.vy=0;if(b.vx||b.vy)moving=true;}
+  for(const b of active){
+    if(b.x-b.r<TBX){b.x=TBX+b.r;b.vx=Math.abs(b.vx)*.86;}
+    if(b.x+b.r>TBX+TBW){b.x=TBX+TBW-b.r;b.vx=-Math.abs(b.vx)*.86;}
+    if(b.y-b.r<TBY){b.y=TBY+b.r;b.vy=Math.abs(b.vy)*.86;}
+    if(b.y+b.r>TBY+TBH){b.y=TBY+TBH-b.r;b.vy=-Math.abs(b.vy)*.86;}
+  }
+  for(let i=0;i<active.length;i++)for(let j=i+1;j<active.length;j++){
+    const a=active[i],b=active[j];
+    const dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy,minD=a.r+b.r;
+    if(d2<minD*minD&&d2>0){
+      const d=Math.sqrt(d2),nx=dx/d,ny=dy/d,ov=(minD-d)/2;
+      a.x-=nx*ov;a.y-=ny*ov;b.x+=nx*ov;b.y+=ny*ov;
+      const dot=(a.vx-b.vx)*nx+(a.vy-b.vy)*ny;
+      if(dot>0){a.vx-=dot*nx;a.vy-=dot*ny;b.vx+=dot*nx;b.vy+=dot*ny;}
+    }
+  }
+  for(const b of active)for(const p of POCKETS){
+    const dx=b.x-p.x,dy=b.y-p.y;
+    if(dx*dx+dy*dy<PR*PR){b.pocketed=true;b.vx=0;b.vy=0;pocketedThisShot.push(b);break;}
+  }
+  return moving;
+}
+
+let raf;
+function loop(){const moving=step();render();if(shotInProgress&&!moving){shotInProgress=false;resolveShot();}raf=requestAnimationFrame(loop);}
+
+function resolveShot(){
+  const pocketed=pocketedThisShot.slice();pocketedThisShot=[];
+  let foul=false,scored=false;
+  if(cueBall.pocketed){foul=true;respawnCue();log('FOUL – cue ball masuk! Giliran berganti.');}
+  for(const b of pocketed){
+    if(b.id===0||b.type==='eight')continue;
+    if(!groupAssigned){
+      groupAssigned=true;
+      playerGroup=playerTurn?b.type:(b.type==='solid'?'stripe':'solid');
+      log(`Kamu: ${playerGroup==='solid'?'Solid 1-7':'Stripe 9-15'} | AI: ${playerGroup==='solid'?'Stripe':'Solid'}`);
+    }
+  }
+  const myGroup=playerTurn?playerGroup:(playerGroup==='solid'?'stripe':'solid');
+  for(const b of pocketed){
+    if(b.id===0)continue;
+    if(b.type==='eight'){
+      const cleared=balls.filter(bb=>bb.type===myGroup).every(bb=>bb.pocketed);
+      endGame(cleared);return;
+    }
+    if(b.type===myGroup){scored=true;if(playerTurn){incScore('p1Score');log(`Bola ${b.id} masuk! `);}else{incScore('p2Score');log(`AI memasukkan ${b.id}.`);}}
+    else{foul=true;log('FOUL – bola lawan masuk.');}
+  }
+  updateBallUI();
+  if(foul||!scored)playerTurn=!playerTurn;
+  updateTurnUI();
+  if(gameRunning&&!playerTurn)aiTimer=setTimeout(aiShoot,900);
+}
+
+function incScore(id){document.getElementById(id).textContent=+document.getElementById(id).textContent+1;}
+function respawnCue(){cueBall.pocketed=false;cueBall.x=TBX+TBW*.22;cueBall.y=TBY+TBH/2+(Math.random()-.5)*TBH*.35;cueBall.vx=cueBall.vy=0;}
+
+function aiShoot(){
+  if(!gameRunning)return;
+  const ag=playerGroup==='solid'?'stripe':'solid';
+  const allClear=balls.filter(b=>b.type===ag).every(b=>b.pocketed);
+  const targets=(allClear?balls.filter(b=>b.type==='eight'):balls.filter(b=>b.type===ag)).filter(b=>!b.pocketed);
+  if(!targets.length){playerTurn=true;updateTurnUI();return;}
+  let best=null,bestS=Infinity;
+  for(const t of targets)for(const p of POCKETS){
+    const ptx=p.x-t.x,pty=p.y-t.y,ptd=Math.sqrt(ptx*ptx+pty*pty)||1;
+    const cx=t.x-(ptx/ptd)*(BR*2+2),cy=t.y-(pty/ptd)*(BR*2+2);
+    const sc=ptd+Math.sqrt((cx-cueBall.x)**2+(cy-cueBall.y)**2)*.3;
+    if(sc<bestS){bestS=sc;best={t,p,cx,cy};}
+  }
+  if(!best){playerTurn=true;updateTurnUI();return;}
+  const dx=best.cx-cueBall.x,dy=best.cy-cueBall.y,d=Math.sqrt(dx*dx+dy*dy)||1;
+  const spd=(0.42+Math.random()*.28)*16,noise=(Math.random()-.5)*.08;
+  cueBall.vx=(dx/d+noise)*spd;cueBall.vy=(dy/d+noise)*spd;
+  shotInProgress=true;pocketedThisShot=[];log('AI menembak!');
+}
+
+function render(){
+  const sc=canvas.width/TW;ctx.save();ctx.scale(sc,sc);
+  // Rail
+  const wood=ctx.createLinearGradient(0,0,0,TH);wood.addColorStop(0,'#5C2E04');wood.addColorStop(1,'#3A1800');
+  ctx.fillStyle=wood;ctx.fillRect(0,0,TW,TH);
+  // Felt
+  const felt=ctx.createRadialGradient(TW/2,TH/2,10,TW/2,TH/2,TW*.7);
+  felt.addColorStop(0,'#1E7035');felt.addColorStop(1,'#155228');
+  ctx.fillStyle=felt;ctx.fillRect(TBX,TBY,TBW,TBH);
+  // Felt lines
+  ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(TBX+TBW*.25,TBY);ctx.lineTo(TBX+TBW*.25,TBY+TBH);ctx.moveTo(TBX+TBW/2,TBY);ctx.lineTo(TBX+TBW/2,TBY+TBH);ctx.stroke();
+  ctx.beginPath();ctx.arc(TBX+TBW*.25,TBY+TBH/2,5,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,.18)';ctx.stroke();
+  // Pockets
+  for(const p of POCKETS){
+    ctx.beginPath();ctx.arc(p.x,p.y,PR,0,Math.PI*2);
+    const pg=ctx.createRadialGradient(p.x,p.y,2,p.x,p.y,PR);pg.addColorStop(0,'#040404');pg.addColorStop(1,'#1a0800');
+    ctx.fillStyle=pg;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  // Balls
+  for(const b of balls){
+    if(b.pocketed)continue;
+    ctx.save();ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    if(b.type==='stripe'){ctx.fillStyle='#F8F8F0';ctx.fill();ctx.clip();ctx.fillStyle=b.col;ctx.fillRect(b.x-b.r,b.y-b.r*.42,b.r*2,b.r*.84);}
+    else{ctx.fillStyle=b.col;ctx.fill();}
+    if(b.type!=='cue'){
+      ctx.beginPath();ctx.arc(b.x,b.y,b.r*.4,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.88)';ctx.fill();
+      ctx.fillStyle='#111';ctx.font=`bold ${Math.floor(b.r*.44)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b.id,b.x,b.y);
+    }
+    ctx.restore();
+    ctx.save();ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.clip();
+    const sh=ctx.createRadialGradient(b.x-b.r*.32,b.y-b.r*.35,0,b.x,b.y,b.r);
+    sh.addColorStop(0,'rgba(255,255,255,.5)');sh.addColorStop(.45,'rgba(255,255,255,.07)');sh.addColorStop(1,'transparent');
+    ctx.fillStyle=sh;ctx.fill();ctx.restore();
+    ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=1;ctx.stroke();
+  }
+  // Aim
+  if(aiming&&playerTurn&&!shotInProgress&&gameRunning&&!cueBall.pocketed){
+    const dx=aimPos.x-cueBall.x,dy=aimPos.y-cueBall.y,d=Math.sqrt(dx*dx+dy*dy)||1;
+    const nx=dx/d,ny=dy/d;
+    ctx.beginPath();ctx.moveTo(cueBall.x-nx*(BR+4),cueBall.y-ny*(BR+4));ctx.lineTo(cueBall.x-nx*100,cueBall.y-ny*100);
+    ctx.strokeStyle='rgba(200,165,85,.7)';ctx.lineWidth=5;ctx.lineCap='round';ctx.setLineDash([]);ctx.stroke();ctx.lineCap='butt';
+    ctx.beginPath();ctx.moveTo(cueBall.x+nx*BR,cueBall.y+ny*BR);ctx.lineTo(cueBall.x+nx*150,cueBall.y+ny*150);
+    ctx.strokeStyle='rgba(249,199,79,.35)';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);ctx.stroke();ctx.setLineDash([]);
+    ctx.beginPath();ctx.arc(cueBall.x+nx*(BR+2),cueBall.y+ny*(BR+2),BR,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=1;ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function toPt(e){const r=canvas.getBoundingClientRect(),sc=TW/r.width,src=e.touches?e.touches[0]:e;return{x:(src.clientX-r.left)*sc,y:(src.clientY-r.top)*sc};}
+canvas.addEventListener('mousedown',e=>{if(!gameRunning||!playerTurn||shotInProgress||cueBall.pocketed)return;aiming=true;aimPos=toPt(e);});
+canvas.addEventListener('touchstart',e=>{if(!gameRunning||!playerTurn||shotInProgress||cueBall.pocketed)return;aiming=true;aimPos=toPt(e);},{passive:true});
+canvas.addEventListener('mousemove',e=>{if(aiming)aimPos=toPt(e);});
+canvas.addEventListener('touchmove',e=>{if(aiming)aimPos=toPt(e);},{passive:true});
+
+function doShoot(e){
+  if(!aiming||!gameRunning||!playerTurn||shotInProgress)return;
+  aiming=false;
+  const pos=toPt(e.changedTouches?{clientX:e.changedTouches[0].clientX,clientY:e.changedTouches[0].clientY}:e);
+  const dx=pos.x-cueBall.x,dy=pos.y-cueBall.y,d=Math.sqrt(dx*dx+dy*dy);
+  if(d<8)return;
+  const spd=(power/100)*18;
+  cueBall.vx=(dx/d)*spd;cueBall.vy=(dy/d)*spd;
+  shotInProgress=true;pocketedThisShot=[];log('Kamu menembak!');
+}
+canvas.addEventListener('mouseup',doShoot);
+canvas.addEventListener('touchend',doShoot);
+
+// Power slider
+let pwrDown=false;
+const pwrTrack=document.getElementById('pwrTrack');
+function setPwr(e){const r=pwrTrack.getBoundingClientRect(),src=e.touches?e.touches[0]:e;const p=Math.max(10,Math.min(100,((src.clientX-r.left)/r.width)*100));power=p;document.getElementById('pwrFill').style.width=p+'%';document.getElementById('pwrNum').textContent=Math.round(p);}
+pwrTrack.addEventListener('mousedown',e=>{pwrDown=true;setPwr(e);});pwrTrack.addEventListener('touchstart',e=>{pwrDown=true;setPwr(e);},{passive:true});
+document.addEventListener('mousemove',e=>{if(pwrDown)setPwr(e);});document.addEventListener('touchmove',e=>{if(pwrDown)setPwr(e);},{passive:true});
+document.addEventListener('mouseup',()=>pwrDown=false);document.addEventListener('touchend',()=>pwrDown=false);
+
+function updateTurnUI(){const el=document.getElementById('turnName');if(playerTurn){el.textContent=window.LB_myName?LB_myName()||'Kamu':'Kamu';el.className='turn-name';}else{el.textContent='AI';el.className='turn-name ai-t';}}
+function updateBallUI(){
+  const pg=playerGroup,ag=pg==='solid'?'stripe':'solid';
+  document.getElementById('p1Lbl').textContent=`Kamu (${pg||'?'})`;
+  const p1=document.getElementById('p1Balls'),p2=document.getElementById('p2Balls');
+  p1.innerHTML='';p2.innerHTML='';
+  balls.filter(b=>b.type===pg&&!b.pocketed).forEach(b=>{const d=document.createElement('div');d.className='bm';d.style.background=b.col;p1.appendChild(d);});
+  balls.filter(b=>b.type===ag&&!b.pocketed).forEach(b=>{const d=document.createElement('div');d.className='bm';d.style.background=b.col;p2.appendChild(d);});
+}
+function log(msg){const box=document.getElementById('logBox');const d=document.createElement('div');d.className='le';d.textContent=msg;box.appendChild(d);box.scrollTop=box.scrollHeight;}
+
+function newGame(){
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('logBox').innerHTML='';
+  document.getElementById('p1Score').textContent='0';
+  document.getElementById('p2Score').textContent='0';
+  if(aiTimer)clearTimeout(aiTimer);if(raf)cancelAnimationFrame(raf);
+  const wrap=document.querySelector('.table-wrap');
+  canvas.width=Math.min(TW,wrap.clientWidth-14);
+  canvas.height=Math.round(canvas.width*(TH/TW));
+  initBalls();groupAssigned=false;playerGroup='';
+  gameRunning=true;playerTurn=true;shotInProgress=false;aiming=false;pocketedThisShot=[];
+  updateTurnUI();updateBallUI();
+  log('Game dimulai! Drag dari bola putih, lepas untuk tembak.');
+  loop();
+}
+
+function endGame(playerWon){
+  gameRunning=false;
+  const T=document.getElementById('ovTitle'),P=document.getElementById('ovPts');
+  if(playerWon){T.textContent='MENANG!';T.className='ot win';P.textContent='+200 poin ke leaderboard';if(window.LB_addPoints)LB_addPoints(LB_myName?.(),LB_myId?.(),200);if(window.LB_addWin)LB_addWin(LB_myName?.(),LB_myId?.());log('Kamu MENANG! +200 poin.');}
+  else{T.textContent='KALAH!';T.className='ot lose';P.textContent='+30 poin ke leaderboard';if(window.LB_addPoints)LB_addPoints(LB_myName?.(),LB_myId?.(),30);log('Kamu kalah. +30 poin.');}
+  document.getElementById('overlay').classList.add('show');
+}
+
+window.addEventListener('resize',()=>{if(!gameRunning)return;const wrap=document.querySelector('.table-wrap');canvas.width=Math.min(TW,wrap.clientWidth-14);canvas.height=Math.round(canvas.width*(TH/TW));});
+window.addEventListener('load',()=>{const wrap=document.querySelector('.table-wrap');canvas.width=Math.min(TW,wrap.clientWidth-14);canvas.height=Math.round(canvas.width*(TH/TW));initBalls();render();});
+</script>
+<script src="script.js"></script>
+<script src="shared.js"></script>
+</body>
+</html>
