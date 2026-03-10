@@ -11,9 +11,42 @@
 </head>
 <body>
 
-  <div id="notifPanel">
+  <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ic-graduation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3.33 2 8.67 2 12 0v-5"/></symbol>
+  <symbol id="ic-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></symbol>
+  <symbol id="ic-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="ic-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/></symbol>
+  <symbol id="ic-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></symbol>
+  <symbol id="ic-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="ic-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="ic-arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="ic-heart" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+  <symbol id="ic-music" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="ic-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+  <symbol id="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></symbol>
+  <symbol id="ic-skip-b" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="ic-skip-f" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="ic-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
+  <symbol id="ic-type" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></symbol>
+  <symbol id="ic-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></symbol>
+  <symbol id="ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="ic-cards" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="12" height="14" rx="2"/><path d="M7 5V3a1 1 0 0 1 1-1h12a2 2 0 0 1 2 2v12a1 1 0 0 1-1 1h-2"/></symbol>
+  <symbol id="ic-golf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="19" cy="19" r="2"/><path d="M12 19h-7a2 2 0 0 1-1.9-1.4l-1-3.5A2 2 0 0 1 4 12h16"/><line x1="12" y1="3" x2="12" y2="14"/><polyline points="8 7 12 3 16 7"/></symbol>
+  <symbol id="ic-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="ic-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+  <symbol id="ic-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="ic-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="ic-announce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+  <symbol id="ic-poll" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="ic-circle" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></symbol>
+</svg>
+<div id="notifPanel">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
-    <span style="font-size:.85rem;font-weight:800">🔔 Notifikasi</span>
+    <svg class="icon" aria-hidden="true"><use href="#ic-bell"/></svg> <span style="font-size:.85rem;font-weight:800">Notifikasi</span>
     <button onclick="clearNotifs()" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:.75rem;cursor:pointer">Hapus semua</button>
   </div>
   <div id="notifList"><div class="notif-empty">Belum ada notifikasi</div></div>
@@ -23,22 +56,22 @@
       <h1>Angkatan <span>XVI</span></h1>
     </div>
     <div class="nav-right">
-      <a href="#countdown-hero">🎓 Wisuda</a>
+      <a href="#countdown-hero"><svg class="icon" aria-hidden="true"><use href="#ic-graduation"/></svg> Wisuda</a>
       <a href="#kahayan">Kahayan</a>
       <a href="#kapuas">Kapuas</a>
       <a href="#mahakam">Mahakam</a>
-      <a href="#gallery-section">📸 Gallery</a>
-      <a href="#chat-section">💬 Chat</a>
-      <a href="#games-section">🎮 Games</a>
-      <a href="#mading-section">📝 Mading</a>
-      <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" title="Notifikasi">🔔<span class="notif-dot" id="notifDot" style="display:none"></span></button>
+      <a href="#gallery-section"><svg class="icon" aria-hidden="true"><use href="#ic-image"/></svg> Gallery</a>
+      <a href="#chat-section"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> Chat</a>
+      <a href="#games-section"><svg class="icon" aria-hidden="true"><use href="#ic-gamepad"/></svg> Games</a>
+      <a href="#mading-section"><svg class="icon" aria-hidden="true"><use href="#ic-clipboard"/></svg> Mading</a>
+      <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" title="Notifikasi"><svg class="icon" aria-hidden="true"><use href="#ic-bell"/></svg><span class="notif-dot" id="notifDot" style="display:none"></span></button>
     </div>
   </nav>
 
   <!-- ─── Hero Countdown Wisuda ─── -->
   <section id="countdown-hero">
     <div class="countdown-content">
-      <p class="countdown-eyebrow">✦ Menuju Hari Istimewa ✦</p>
+      <p class="countdown-eyebrow">Menuju Hari Istimewa</p>
       <h1 class="countdown-title">Wisuda <span>Angkatan XVI</span></h1>
       <p class="countdown-date-label">13 Mei 2026</p>
       <div class="countdown-blocks">
@@ -62,14 +95,14 @@
           <span class="cd-label">Detik</span>
         </div>
       </div>
-      <p class="countdown-sub" id="countdown-msg">Semangat terus, pejuang Angkatan XVI! 🎓</p>
+      <p class="countdown-sub" id="countdown-msg">Semangat terus, pejuang Angkatan XVI!</p>
     </div>
     <div class="scroll-cue">Scroll</div>
   </section>
 
   <!-- Online strip -->
   <div id="onlineStrip">
-    <span class="online-label">🟢 Online:</span>
+    <span class="online-label"><svg class="icon ic-online-dot" aria-hidden="true"><use href="#ic-circle"/></svg> Online</span>
     <div id="onlineChips" style="display:flex;gap:.5rem;align-items:center"></div>
   </div>
 
@@ -218,7 +251,7 @@
     <!-- Chat Section -->
     <section id="chat-section">
       <div class="chat-header">
-        <div class="chat-header-icon">💬</div>
+        <div class="chat-header-icon"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg></div>
         <div class="chat-header-info">
           <h2>Chat Angkatan XVI</h2>
           <p><span class="chat-online-dot"></span>Semua angkatan terhubung</p>
@@ -232,7 +265,7 @@
         </div>
         <div class="chat-input-area">
           <input type="text" id="messageInput" placeholder="Tulis pesan kamu...">
-          <button id="sendBtn">➤</button>
+          <button id="sendBtn"><svg class="icon" aria-hidden="true"><use href="#ic-send"/></svg></button>
         </div>
       </div>
     </section>
@@ -241,7 +274,7 @@
     <!-- ─── Gallery Angkatan ─── -->
     <section id="gallery-section" class="gallery-section">
       <div class="gallery-header-wrap">
-        <span class="gallery-eyebrow">✦ Kenangan Bersama ✦</span>
+        <span class="gallery-eyebrow">Kenangan Bersama</span>
         <h2 class="gallery-title">Gallery <span>Angkatan XVI</span></h2>
         <p class="gallery-sub">Abadikan momen terbaik kalian di sini.</p>
       </div>
@@ -250,7 +283,7 @@
       <div class="upload-area" id="uploadArea">
         <input type="file" id="photoInput" accept="image/*" multiple hidden>
         <div class="upload-drop" id="uploadDrop">
-          <div class="upload-icon">📷</div>
+          <div class="upload-icon"><svg class="icon" aria-hidden="true"><use href="#ic-upload"/></svg></div>
           <p class="upload-text">Klik atau drag foto ke sini</p>
           <p class="upload-hint">JPG, PNG, WEBP · Maks 5MB per foto</p>
           <button class="upload-btn" onclick="document.getElementById('photoInput').click()">Pilih Foto</button>
@@ -264,14 +297,14 @@
       <!-- Grid Gallery -->
       <div class="gallery-grid" id="galleryGrid">
         <div class="gallery-empty" id="galleryEmpty">
-          <span>📭</span>
+          <svg class="icon ic-lg" aria-hidden="true"><use href="#ic-image"/></svg>
           <p>Belum ada foto. Jadilah yang pertama upload!</p>
         </div>
       </div>
 
       <!-- Lightbox -->
       <div class="lightbox" id="lightbox">
-        <button class="lightbox-close" id="lightboxClose">✕</button>
+        <button class="lightbox-close" id="lightboxClose"><svg class="icon" aria-hidden="true"><use href="#ic-x"/></svg></button>
         <button class="lightbox-nav prev" id="lightboxPrev">‹</button>
         <img class="lightbox-img" id="lightboxImg" src="" alt="">
         <button class="lightbox-nav next" id="lightboxNext">›</button>
@@ -284,7 +317,7 @@
     <!-- ─── Mading Digital ─── -->
     <section id="mading-section">
       <div class="mading-header">
-        <span class="mading-eyebrow">✦ Papan Pengumuman Digital ✦</span>
+        <span class="mading-eyebrow">Papan Pengumuman Digital</span>
         <h2 class="mading-title">Mading <span>Angkatan XVI</span></h2>
         <p class="mading-sub">Berbagi info, pengumuman, dan poll untuk angkatan!</p>
       </div>
@@ -292,7 +325,7 @@
       <!-- Compose -->
       <div class="mading-compose">
         <div class="mading-compose-row">
-          <div class="mading-avatar-sm" id="madingAvatarSm">👤</div>
+          <div class="mading-avatar-sm" id="madingAvatarSm"><svg class="icon" aria-hidden="true"><use href="#ic-user"/></svg></div>
           <textarea class="mading-input" id="madingInput" placeholder="Tulis sesuatu untuk angkatan..."></textarea>
         </div>
         <!-- Poll options (shown when type=poll) -->
@@ -300,28 +333,28 @@
           <input class="poll-opt-input" id="pollOpt1" placeholder="Pilihan 1...">
           <input class="poll-opt-input" id="pollOpt2" placeholder="Pilihan 2...">
           <div id="pollExtraOpts"></div>
-          <button class="add-opt-btn" onclick="addPollOpt()">+ Tambah pilihan</button>
+          <button class="add-opt-btn" onclick="addPollOpt()"><svg class="icon" aria-hidden="true"><use href="#ic-plus"/></svg> Tambah pilihan</button>
         </div>
         <div class="mading-tools">
           <div class="mading-type-pills">
-            <button class="mading-pill active" data-type="post" onclick="setMadingType('post')">💬 Post</button>
-            <button class="mading-pill type-pengumuman" data-type="pengumuman" onclick="setMadingType('pengumuman')">📢 Pengumuman</button>
-            <button class="mading-pill type-poll" data-type="poll" onclick="setMadingType('poll')">📊 Poll</button>
+            <button class="mading-pill active" data-type="post" onclick="setMadingType('post')"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> Post</button>
+            <button class="mading-pill type-pengumuman" data-type="pengumuman" onclick="setMadingType('pengumuman')"><svg class="icon" aria-hidden="true"><use href="#ic-announce"/></svg> Pengumuman</button>
+            <button class="mading-pill type-poll" data-type="poll" onclick="setMadingType('poll')"><svg class="icon" aria-hidden="true"><use href="#ic-poll"/></svg> Poll</button>
           </div>
-          <button class="post-btn" onclick="submitMading()">Kirim →</button>
+          <button class="post-btn" onclick="submitMading()">Kirim <svg class="icon" aria-hidden="true"><use href="#ic-send"/></svg></button>
         </div>
       </div>
 
       <!-- Feed -->
       <div class="mading-feed" id="madingFeed">
-        <div style="text-align:center;padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem">Belum ada postingan. Jadilah yang pertama! ✨</div>
+        <div style="text-align:center;padding:2rem;color:rgba(255,255,255,.3);font-size:.85rem">Belum ada postingan. Jadilah yang pertama!</div>
       </div>
     </section>
 
     <!-- ─── Song Request ─── -->
     <section id="songRequestSection">
       <div class="sr-header">
-        <span style="font-size:1.5rem">🎵</span>
+        <svg class="icon ic-section-icon" aria-hidden="true"><use href="#ic-music"/></svg>
         <div>
           <div class="sr-title">Request Lagu</div>
           <div style="font-size:.78rem;color:rgba(255,255,255,.4)">Request lagu ke DJ angkatan, vote lagu favorit kalian!</div>
@@ -329,7 +362,7 @@
       </div>
       <div class="sr-form">
         <input class="sr-input" id="srSongInput" placeholder="Judul lagu + artis... (cth: Bohemian Rhapsody - Queen)">
-        <button class="sr-btn" onclick="requestSong()">🎵 Request</button>
+        <button class="sr-btn" onclick="requestSong()">Request <svg class="icon" aria-hidden="true"><use href="#ic-send"/></svg></button>
       </div>
       <div class="sr-list" id="srList">
         <div style="text-align:center;padding:1rem;color:rgba(255,255,255,.3);font-size:.82rem">Belum ada request. Mulai request lagu!</div>
@@ -339,7 +372,7 @@
     <!-- ─── Game List ─── -->
     <section id="games-section" class="games-section">
       <div class="games-header">
-        <span class="games-eyebrow">✦ Hiburan Angkatan ✦</span>
+        <span class="games-eyebrow">Hiburan Angkatan</span>
         <h2 class="games-title">Game <span>Room</span></h2>
         <p class="games-sub">Main bareng teman-teman angkatan!</p>
       </div>
@@ -347,90 +380,90 @@
 
         <!-- Sambung Kata -->
         <a href="sambung-kata.html" class="game-card" data-game="sambung-kata">
-          <div class="game-card-icon">🔤</div>
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-type"/></svg></div>
           <div class="game-card-info">
             <h3>Sambung Kata<span id="tag-sambung-kata"></span></h3>
             <p>Sambung kata dari huruf terakhir — siapa yang mentok duluan kalah!</p>
           </div>
           <div class="game-card-badge">Realtime</div>
-          <div class="game-card-arrow">→</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
         </a>
 
         <!-- Gambar Bareng -->
         <a href="gambar-bareng.html" class="game-card" data-game="gambar-bareng">
-          <div class="game-card-icon">🎨</div>
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-pen"/></svg></div>
           <div class="game-card-info">
             <h3>Gambar Bareng<span id="tag-gambar-bareng"></span></h3>
             <p>Satu orang gambar, yang lain tebak! Mirip Skribbl.io</p>
           </div>
           <div class="game-card-badge">Realtime</div>
-          <div class="game-card-arrow">→</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
         </a>
 
         <!-- Werewolf -->
         <a href="werewolf.html" class="game-card" data-game="werewolf">
-          <div class="game-card-icon">🐺</div>
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-users"/></svg></div>
           <div class="game-card-info">
             <h3>Werewolf<span id="tag-werewolf"></span></h3>
             <p>Temukan werewolf di antara kalian sebelum semua warga dimangsa!</p>
           </div>
           <div class="game-card-badge">4-16 Pemain</div>
-          <div class="game-card-arrow">→</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
         </a>
 
         <!-- UNO -->
                 <!-- Leaderboard -->
         <a href="leaderboard.html" class="game-card" style="border-color:rgba(201,168,76,.3);background:linear-gradient(120deg,rgba(201,168,76,.08),transparent);">
-          <div class="game-card-icon">🏆</div>
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-trophy"/></svg></div>
           <div class="game-card-info">
             <h3>Leaderboard</h3>
             <p>Lihat siapa yang paling banyak poin dan paling lama online!</p>
           </div>
           <div class="game-card-badge" style="background:rgba(201,168,76,.2);color:#e8c97a">Realtime</div>
-          <div class="game-card-arrow">→</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
         </a>
 
         <a href="uno.html" class="game-card" data-game="uno">
-          <div class="game-card-icon">🃏</div>
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-cards"/></svg></div>
           <div class="game-card-info">
             <h3>UNO<span id="tag-uno"></span></h3>
             <p>Game kartu klasik! Habiskan kartu duluan, jangan lupa teriak UNO!</p>
           </div>
           <div class="game-card-badge">2-8 Pemain</div>
-          <div class="game-card-arrow">→</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
         </a>
 
         <!-- Who Is The Spy -->
         <!-- Mini Golf 3D -->
         <a href="minigolf.html" class="game-card" data-game="minigolf">
-          <div class="game-card-icon">⛳</div>
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-golf"/></svg></div>
           <div class="game-card-info">
             <h3>Mini Golf 3D<span class="game-tag game-tag-new">NEW</span></h3>
             <p>Game golf 3D! Masukkan bola ke lubang dengan pukulan sesedikit mungkin.</p>
           </div>
           <div class="game-card-badge">1-6 Pemain</div>
-          <div class="game-card-arrow">→</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
         </a>
 
         <a href="spy.html" class="game-card" data-game="spy">
-          <div class="game-card-icon">🕵️</div>
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-eye"/></svg></div>
           <div class="game-card-info">
             <h3>Who Is The Spy?<span id="tag-spy"></span></h3>
             <p>Semua dapat kata mirip, satu dapat kata berbeda. Temukan mata-matanya!</p>
           </div>
           <div class="game-card-badge">3-12 Pemain</div>
-          <div class="game-card-arrow">→</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
         </a>
 
         <!-- Among Us -->
         <a href="among-us.html" class="game-card" data-game="among-us">
-          <div class="game-card-icon">🚀</div>
+          <div class="game-card-icon"><svg class="icon" aria-hidden="true"><use href="#ic-rocket"/></svg></div>
           <div class="game-card-info">
             <h3>Among Us<span class="game-tag game-tag-new">NEW</span></h3>
             <p>Temukan siapa impostornya! Selesaikan tugas, laporkan mayat, dan jangan dibunuh.</p>
           </div>
           <div class="game-card-badge">2-10 Pemain</div>
-          <div class="game-card-arrow">→</div>
+          <div class="game-card-arrow"><svg class="icon" aria-hidden="true"><use href="#ic-arrow-r"/></svg></div>
         </a>
 
         <!-- Sambung Kata tag -->
@@ -441,18 +474,18 @@
   </main>
 
   <footer>
-    <p>Dibuat dengan ❤️ oleh <span>Angkatan XVI</span></p>
+    <p>Dibuat dengan <svg class="icon ic-heart-red" aria-hidden="true"><use href="#ic-heart"/></svg> oleh <span>Angkatan XVI</span></p>
   </footer>
 
 
   <!-- ─── Music Player Floating ─── -->
   <div class="music-player" id="musicPlayer">
     <div class="music-player-inner">
-      <button class="mp-btn" id="mpPrev" title="Sebelumnya">&#9664;&#9664;</button>
-      <button class="mp-btn mp-play" id="mpPlay" title="Play/Pause">&#9654;</button>
-      <button class="mp-btn" id="mpNext" title="Selanjutnya">&#9654;&#9654;</button>
+      <button class="mp-btn" id="mpPrev" title="Sebelumnya"><svg class="icon" aria-hidden="true"><use href="#ic-skip-b"/></svg></button>
+      <button class="mp-btn mp-play" id="mpPlay" title="Play/Pause"><svg class="icon mp-play-icon" aria-hidden="true"><use href="#ic-play"/></svg></button>
+      <button class="mp-btn" id="mpNext" title="Selanjutnya"><svg class="icon" aria-hidden="true"><use href="#ic-skip-f"/></svg></button>
       <div class="mp-info">
-        <span class="mp-icon">♪</span>
+        <svg class="icon mp-icon" aria-hidden="true"><use href="#ic-music"/></svg>
         <span class="mp-title" id="mpTitle">Memuat musik...</span>
       </div>
       <div class="mp-progress-wrap">
