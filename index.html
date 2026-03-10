@@ -56,15 +56,29 @@
       <h1>Angkatan <span>XVI</span></h1>
     </div>
     <div class="nav-right">
-      <a href="#countdown-hero"><svg class="icon" aria-hidden="true"><use href="#ic-graduation"/></svg> Wisuda</a>
-      <a href="#kahayan">Kahayan</a>
-      <a href="#kapuas">Kapuas</a>
-      <a href="#mahakam">Mahakam</a>
-      <a href="#gallery-section"><svg class="icon" aria-hidden="true"><use href="#ic-image"/></svg> Gallery</a>
-      <a href="#chat-section"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> Chat</a>
-      <a href="#games-section"><svg class="icon" aria-hidden="true"><use href="#ic-gamepad"/></svg> Games</a>
-      <a href="#mading-section"><svg class="icon" aria-hidden="true"><use href="#ic-clipboard"/></svg> Mading</a>
+      <a href="#countdown-hero" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-graduation"/></svg> Wisuda</a>
+      <a href="#kahayan" class="nav-desktop">Kahayan</a>
+      <a href="#kapuas" class="nav-desktop">Kapuas</a>
+      <a href="#mahakam" class="nav-desktop">Mahakam</a>
+      <a href="#gallery-section" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-image"/></svg> Gallery</a>
+      <a href="#chat-section" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> Chat</a>
+      <a href="#games-section" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-gamepad"/></svg> Games</a>
+      <a href="#mading-section" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-clipboard"/></svg> Mading</a>
       <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" title="Notifikasi"><svg class="icon" aria-hidden="true"><use href="#ic-bell"/></svg><span class="notif-dot" id="notifDot" style="display:none"></span></button>
+      <button class="nav-burger" id="navBurger" onclick="toggleMobileNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <!-- Mobile nav drawer -->
+    <div class="mobile-nav" id="mobileNav">
+      <a href="#countdown-hero" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-graduation"/></svg> Wisuda</a>
+      <a href="#kahayan" onclick="closeMobileNav()">Kahayan</a>
+      <a href="#kapuas" onclick="closeMobileNav()">Kapuas</a>
+      <a href="#mahakam" onclick="closeMobileNav()">Mahakam</a>
+      <a href="#gallery-section" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-image"/></svg> Gallery</a>
+      <a href="#chat-section" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> Chat</a>
+      <a href="#games-section" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-gamepad"/></svg> Games</a>
+      <a href="#mading-section" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-clipboard"/></svg> Mading</a>
     </div>
   </nav>
 
@@ -494,6 +508,25 @@
 
   <audio id="bgAudio" preload="auto"></audio>
 
+
+<script>
+function toggleMobileNav(){
+  const n=document.getElementById('mobileNav');
+  const b=document.getElementById('navBurger');
+  n.classList.toggle('open');
+  b.classList.toggle('open');
+}
+function closeMobileNav(){
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('navBurger').classList.remove('open');
+}
+// Close on outside click
+document.addEventListener('click',function(e){
+  const n=document.getElementById('mobileNav');
+  const b=document.getElementById('navBurger');
+  if(n && n.classList.contains('open') && !n.contains(e.target) && !b.contains(e.target)) closeMobileNav();
+});
+</script>
   <script src="script.js"></script>
 
 
