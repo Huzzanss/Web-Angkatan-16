@@ -70,18 +70,14 @@
   function showNameModal() {
     const m = document.getElementById('_sh_nm');
     if (m) m.style.display = 'flex';
-    const inp = document.getElementById('_sh_nminp');
-    if (inp) {
-      setTimeout(() => inp.focus(), 100);
-      inp.addEventListener('keydown', e => { if (e.key === 'Enter') confirmName(); });
-    }
+    // select dropdown - no focus/keydown needed
     const btn = document.getElementById('_sh_nmbtn');
     if (btn) btn.addEventListener('click', confirmName);
   }
 
   function confirmName() {
     const v = (document.getElementById('_sh_nminp').value || '').trim();
-    if (!v) { document.getElementById('_sh_nminp').focus(); return; }
+    if (!v) { alert('Pilih namamu dulu ya!'); return; }
     myName = v;
     localStorage.setItem('lbName', v);
     // Sync to all game name keys
@@ -421,8 +417,8 @@
 ._sh_nmt{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#fff;margin-bottom:.25rem;}
 ._sh_nmt em{color:#e8c97a;font-style:italic;}
 ._sh_nms{font-size:.83rem;color:rgba(255,255,255,.4);margin-bottom:1.5rem;line-height:1.6;}
-#_sh_nminp{width:100%;padding:.85rem 1.2rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:50px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;text-align:center;margin-bottom:.9rem;transition:border-color .2s;}
-#_sh_nminp::placeholder{color:rgba(255,255,255,.3);}
+#_sh_nminp{width:100%;padding:.85rem 1.2rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:50px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;text-align:center;margin-bottom:.9rem;transition:border-color .2s;cursor:pointer;appearance:none;-webkit-appearance:none;}
+#_sh_nminp option{background:#111827;color:#fff;}
 #_sh_nminp:focus{border-color:#c9a84c;}
 #_sh_nmbtn{width:100%;padding:.9rem;background:linear-gradient(135deg,#c9a84c,#e8c97a);color:#0a1628;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;}
 #_sh_nmbtn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,.4);}
@@ -456,10 +452,74 @@
     const nm = document.createElement('div');
     nm.id = '_sh_nm';
     nm.innerHTML = `<div class="_sh_nmc">
-      <span class="_sh_nmi">🏰</span>
+      <span class="_sh_nmi">🎓</span>
       <div class="_sh_nmt">Angkatan <em>XVI</em></div>
-      <div class="_sh_nms">Masukkan namamu untuk mulai bermain, melihat leaderboard, dan gabung voice chat!</div>
-      <input id="_sh_nminp" placeholder="Nama kamu..." maxlength="24" autocomplete="off">
+      <div class="_sh_nms">Pilih namamu untuk mulai bermain dan custom kartu siswa kamu!</div>
+      <select id="_sh_nminp">
+        <option value="">— Pilih namamu —</option>
+      <option value="Abdullah Raziq Hanan">Abdullah Raziq Hanan</option>
+      <option value="Adelia Felicia">Adelia Felicia</option>
+      <option value="Aditya Narendra Pambudi">Aditya Narendra Pambudi</option>
+      <option value="Afiqah Humayra Arresky">Afiqah Humayra Arresky</option>
+      <option value="Ahmad Abdullah Hafi Munaji">Ahmad Abdullah Hafi Munaji</option>
+      <option value="Ahmad Faezya Rafa">Ahmad Faezya Rafa</option>
+      <option value="Ahmad Hamdan Nurzati">Ahmad Hamdan Nurzati</option>
+      <option value="Alesha Zevanna Annayla Alfian">Alesha Zevanna Annayla Alfian</option>
+      <option value="Alexandra Shavira Kaysa">Alexandra Shavira Kaysa</option>
+      <option value="Alisha Nur Afiyah">Alisha Nur Afiyah</option>
+      <option value="Alisya Zella Naura Saputro">Alisya Zella Naura Saputro</option>
+      <option value="Alita Admiral">Alita Admiral</option>
+      <option value="Alkhalifi Hasyimi">Alkhalifi Hasyimi</option>
+      <option value="Andra Alghifari">Andra Alghifari</option>
+      <option value="Angelina Natalia Tennes">Angelina Natalia Tennes</option>
+      <option value="Aqillah Khayyirah">Aqillah Khayyirah</option>
+      <option value="Arsenio Al Fattan Wibowo">Arsenio Al Fattan Wibowo</option>
+      <option value="Azim Evano Rahman">Azim Evano Rahman</option>
+      <option value="Azima Zafeera Khairiya">Azima Zafeera Khairiya</option>
+      <option value="Azka Aisy Muhammad Firdaus">Azka Aisy Muhammad Firdaus</option>
+      <option value="Chaerul Risyad Ferdansyah">Chaerul Risyad Ferdansyah</option>
+      <option value="Deeandra Mikhailla Hariyadi">Deeandra Mikhailla Hariyadi</option>
+      <option value="Devan Rafandra Pratama">Devan Rafandra Pratama</option>
+      <option value="Faqih Hamizan Rahman">Faqih Hamizan Rahman</option>
+      <option value="Farrel Azka Firlana">Farrel Azka Firlana</option>
+      <option value="Fattah Altaf Qusyairi">Fattah Altaf Qusyairi</option>
+      <option value="Gavin Ahmad Farisakha Sahilin">Gavin Ahmad Farisakha Sahilin</option>
+      <option value="Ghaisan Adib Mubasyir">Ghaisan Adib Mubasyir</option>
+      <option value="Giovanny Syahputra">Giovanny Syahputra</option>
+      <option value="Gusti Muhammad An-Nafis">Gusti Muhammad An-Nafis</option>
+      <option value="Hana Aish Sumayyah">Hana Aish Sumayyah</option>
+      <option value="Hilmi Muhammad Nidho Mudhin">Hilmi Muhammad Nidho Mudhin</option>
+      <option value="Javier Al Majid">Javier Al Majid</option>
+      <option value="Kanaya Lubna Janitra Hafizah">Kanaya Lubna Janitra Hafizah</option>
+      <option value="Keisha Pratiwi Syahrizal">Keisha Pratiwi Syahrizal</option>
+      <option value="Khalika Ismatullah Assahla">Khalika Ismatullah Assahla</option>
+      <option value="Muhammad Abdurrahman Dzaki">Muhammad Abdurrahman Dzaki</option>
+      <option value="Muhammad Ahza Farezell">Muhammad Ahza Farezell</option>
+      <option value="Muhammad Alfindra Auvar Rahardja">Muhammad Alfindra Auvar Rahardja</option>
+      <option value="Muhammad Asyraf Al Farisi">Muhammad Asyraf Al Farisi</option>
+      <option value="Muhammad El Junot Razqal">Muhammad El Junot Razqal</option>
+      <option value="Muhammad Fahri Ardani">Muhammad Fahri Ardani</option>
+      <option value="Muhammad Hafidz Setiadi">Muhammad Hafidz Setiadi</option>
+      <option value="Muhammad Hafiz Faad Abqory">Muhammad Hafiz Faad Abqory</option>
+      <option value="Muhammad Juna Defa Alfarizie">Muhammad Juna Defa Alfarizie</option>
+      <option value="Muhammad Mezameru Arsyada">Muhammad Mezameru Arsyada</option>
+      <option value="Muhammad Zaki Raditya">Muhammad Zaki Raditya</option>
+      <option value="Muhammad Zamzam Zidna Fahn">Muhammad Zamzam Zidna Fahn</option>
+      <option value="Muhammad Zharif Syatir">Muhammad Zharif Syatir</option>
+      <option value="Nada Fajriah Salsabilla">Nada Fajriah Salsabilla</option>
+      <option value="Nayhan Abqari">Nayhan Abqari</option>
+      <option value="Nuhammad Rezky Tri Ramadhan">Nuhammad Rezky Tri Ramadhan</option>
+      <option value="Nur Aisyah">Nur Aisyah</option>
+      <option value="Nurul Farhana Aqilah Chandra">Nurul Farhana Aqilah Chandra</option>
+      <option value="Samytha Larisa Azzalea">Samytha Larisa Azzalea</option>
+      <option value="Shazia Amira Zhafirah">Shazia Amira Zhafirah</option>
+      <option value="Shidqia Nabila Azzahra">Shidqia Nabila Azzahra</option>
+      <option value="Super Novel Hardian">Super Novel Hardian</option>
+      <option value="Syaqila Marwa Putri Deandra">Syaqila Marwa Putri Deandra</option>
+      <option value="Syifa Fathiyah Zahra">Syifa Fathiyah Zahra</option>
+      <option value="Syrenia Carrisa Althafunnisa">Syrenia Carrisa Althafunnisa</option>
+      <option value="Zahratu Syifa">Zahratu Syifa</option>
+      </select>
       <button id="_sh_nmbtn">Masuk ✦</button>
     </div>`;
     document.body.appendChild(nm);
