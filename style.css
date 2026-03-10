@@ -331,3 +331,91 @@ footer span{color:var(--acc);}
   .cd-block{border:1px solid rgba(249,199,79,.2);min-width:72px;}
   .nav-right a{display:none;}
 }
+
+/* ════════════════════ MOBILE NAV ════════════════════ */
+.nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:.4rem .3rem;-webkit-tap-highlight-color:transparent;}
+.nav-burger span{display:block;width:22px;height:2px;background:var(--muted);border-radius:1px;transition:all .25s;}
+.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);background:var(--acc);}
+.nav-burger.open span:nth-child(2){opacity:0;}
+.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:var(--acc);}
+
+.mobile-nav{display:none;position:fixed;top:48px;left:0;right:0;z-index:999;background:var(--surface);border-bottom:1px solid var(--border);flex-direction:column;padding:.5rem 0;box-shadow:0 8px 32px rgba(0,0,0,.6);transform:translateY(-8px);opacity:0;transition:transform .2s,opacity .2s;pointer-events:none;}
+.mobile-nav.open{display:flex;transform:translateY(0);opacity:1;pointer-events:auto;}
+.mobile-nav a{padding:.85rem 1.5rem;color:var(--muted);text-decoration:none;font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);transition:color .15s,background .15s;-webkit-tap-highlight-color:transparent;}
+.mobile-nav a:last-child{border-bottom:none;}
+.mobile-nav a:active,.mobile-nav a:hover{background:rgba(249,199,79,.06);color:var(--acc);}
+.mobile-nav a .icon{width:.72rem;height:.72rem;}
+
+@media(max-width:768px){
+  .nav-desktop{display:none !important;}
+  .nav-burger{display:flex;}
+}
+@media(min-width:769px){
+  .mobile-nav{display:none !important;}
+}
+
+/* ════════════════════ MOBILE FULL OVERHAUL ════════════════════ */
+@media(max-width:768px){
+  /* hero */
+  .countdown-title{font-size:clamp(3.5rem,18vw,7rem);}
+  .countdown-blocks{flex-wrap:nowrap;overflow-x:auto;border:1px solid rgba(249,199,79,.2);gap:0;padding-bottom:0;scrollbar-width:none;}
+  .countdown-blocks::-webkit-scrollbar{display:none;}
+  .cd-block{min-width:72px;padding:.8rem .9rem;border-top:2px solid var(--acc);flex-shrink:0;}
+  .cd-block:not(:last-child){border-right:1px solid rgba(249,199,79,.15);}
+  .cd-num{font-size:2.6rem;}
+
+  /* kelas */
+  .kelas-photo{height:260px;}
+  .kelas-photo .class-title{left:1.2rem;bottom:1.2rem;}
+  .kelas-photo .class-title h2{font-size:3rem;}
+  .wali-strip{padding:.7rem 1.2rem;}
+  .student-roster{padding:1.2rem 1rem;}
+  .roster-grid{grid-template-columns:1fr 1fr;gap:.28rem;}
+  .student-card{padding:.55rem .6rem;gap:.5rem;}
+  .student-card .snum{display:none;}
+  .initial{width:32px;height:32px;font-size:1rem;}
+  .student-card p{font-size:.72rem;}
+  .student-card.active{grid-column:span 2;}
+
+  /* chat */
+  #chat-section{margin:2rem .8rem;}
+  .chat-messages{height:260px;}
+
+  /* gallery */
+  .gallery-section{padding:0 .8rem 2rem;}
+  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.3rem;}
+
+  /* mading */
+  #mading-section{padding:2rem .8rem;}
+  .mading-tools{flex-wrap:wrap;gap:.5rem;}
+  .mading-type-pills{flex:1;}
+  .post-btn{flex-shrink:0;}
+
+  /* song req */
+  #songRequestSection{padding:2rem .8rem;}
+  .sr-form{flex-direction:column;}
+  .sr-input{width:100%;}
+  .sr-btn{width:100%;justify-content:center;}
+
+  /* games */
+  .games-section{padding:2rem .8rem;}
+  .games-grid{grid-template-columns:1fr;}
+
+  /* music player */
+  .music-player{bottom:0;right:0;left:0;max-width:100%;width:100%;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:2px solid var(--acc);}
+
+  /* online strip */
+  #onlineStrip{padding:.28rem .8rem;}
+}
+
+@media(max-width:480px){
+  .kelas-photo{height:200px;}
+  .kelas-photo .class-title h2{font-size:2.4rem;}
+  .roster-grid{grid-template-columns:1fr;}
+  .student-card.active{grid-column:span 1;}
+  .cd-block{min-width:62px;padding:.65rem .7rem;}
+  .cd-num{font-size:2.1rem;}
+  .cd-label{font-size:.48rem;}
+  .gallery-grid{grid-template-columns:repeat(2,1fr);}
+  #mading-section,#songRequestSection,#chat-section{margin-left:.5rem;margin-right:.5rem;}
+}
