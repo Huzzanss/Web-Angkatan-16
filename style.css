@@ -1466,3 +1466,76 @@ footer span { color: var(--gold); font-weight: 600; }
 .game-tag-rec{background:linear-gradient(135deg,#ff6b6b,#e63946);color:#fff;}
 .game-tag-hot{background:linear-gradient(135deg,#ff9f1c,#ff6b35);color:#fff;}
 .game-card-badge-wrap{display:flex;align-items:center;flex-wrap:wrap;gap:.3rem;justify-content:flex-end;}
+
+/* ─── Student Card Bio ─── */
+.student-card {
+  cursor: pointer !important;
+  overflow: visible !important;
+}
+.student-card.active {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(10,22,40,0.18);
+  border-color: rgba(201,168,76,0.5);
+  grid-column: span 2;
+  flex-direction: row;
+  text-align: left;
+  align-items: flex-start;
+  padding: 1.2rem 1.3rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.student-card.active::before { opacity: 1; }
+.sc-bio {
+  display: none;
+  font-size: 0.78rem;
+  color: rgba(80,80,100,0.75);
+  font-style: italic;
+  width: 100%;
+  line-height: 1.5;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(201,168,76,0.15);
+  margin-top: 0.2rem;
+}
+.student-card.active .sc-bio {
+  display: block;
+}
+.sc-bio-edit {
+  display: inline-block;
+  margin-left: 0.4rem;
+  font-size: 0.7rem;
+  color: rgba(201,168,76,0.7);
+  cursor: pointer;
+  font-style: normal;
+}
+.sc-bio-edit:hover { color: #c9a84c; }
+.sc-bio-input-wrap {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  width: 100%;
+}
+.sc-bio-input {
+  flex: 1;
+  border: 1px solid rgba(201,168,76,0.4);
+  border-radius: 8px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  color: #333;
+  outline: none;
+  font-family: 'Nunito', sans-serif;
+}
+.sc-bio-input:focus { border-color: #c9a84c; }
+.sc-bio-save {
+  padding: 0.3rem 0.8rem;
+  background: linear-gradient(135deg, #c9a84c, #e8c97a);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #1a1a00;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .student-card.active { grid-column: span 1; }
+}
