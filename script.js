@@ -419,11 +419,18 @@ window.addEventListener('beforeunload', stopTyping);
    sesuai file di folder ./music/ di GitHub
 ══════════════════════════════════════ */
 (function() {
-  // ─── PLAYLIST — ganti sesuai nama file di ./music/ ───
+  // ─── PLAYLIST ───
   const PLAYLIST = [
-    { file: 'lagu1.mp3',  title: 'Lagu 1' },
-    { file: 'lagu2.mp3',  title: 'Lagu 2' },
-    { file: 'lagu3.mp3',  title: 'Lagu 3' },
+    { file: 'Kenangan Manis.mp3',        title: 'Kenangan Manis' },
+    { file: 'Kita Ke Sana.mp3',          title: 'Kita Ke Sana' },
+    { file: 'Lantas.mp3',                title: 'Lantas' },
+    { file: 'Monokrom.mp3',              title: 'Monokrom' },
+    { file: 'Monolog.mp3',               title: 'Monolog' },
+    { file: 'Ribuan Memori.mp3',         title: 'Ribuan Memori' },
+    { file: 'Secukupnya.mp3',            title: 'Secukupnya' },
+    { file: 'Terbuang Dalam Waktu.mp3',  title: 'Terbuang Dalam Waktu' },
+    { file: 'Tujuh Belas.mp3',           title: 'Tujuh Belas' },
+    { file: 'bergema sampai selamanya.mp3', title: 'Bergema Sampai Selamanya' },
   ];
 
   const BASE_PATH = './music/'; // folder musik di repo
