@@ -67,35 +67,89 @@
   /* ══════════════════════════════════════════
      NAME MODAL
   ══════════════════════════════════════════ */
-  function showNameModal() {
-    const m = document.getElementById('_sh_nm');
-    if (m) m.style.display = 'flex';
-    // select dropdown - no focus/keydown needed
-    const btn = document.getElementById('_sh_nmbtn');
-    if (btn) {
-      btn.removeEventListener('click', confirmName);
-      btn.addEventListener('click', confirmName);
-      btn.onclick = confirmName; // belt & suspenders for mobile
+  function showNameModal(isSwitch) {
+    // re-render so selected state is fresh
+    let m = document.getElementById('_sh_nm');
+    if (!m) { injectHTML(); m = document.getElementById('_sh_nm'); }
+
+    // Update subtitle
+    const sub = m.querySelector('._sh_nms');
+    if (sub) sub.textContent = isSwitch ? 'Pilih akun untuk digunakan' : 'Pilih namamu dulu sebelum main';
+
+    // Update button text if already has a selection
+    const cur = localStorage.getItem('lbName') || '';
+    if (cur) {
+      window._sh_selectedName = cur;
+      const btn = document.getElementById('_sh_nmbtn');
+      if (btn) { btn.disabled = false; btn.textContent = 'Masuk sebagai ' + cur.split(' ')[0]; }
     }
+
+    m.style.display = 'flex';
+    // Focus search after short delay (mobile keyboards)
+    setTimeout(() => {
+      const inp = document.getElementById('_sh_search');
+      if (inp) inp.focus();
+    }, 220);
+
+    const btn = document.getElementById('_sh_nmbtn');
+    if (btn) { btn.onclick = confirmName; }
+    m._isSwitch = isSwitch || false;
   }
 
   function confirmName() {
-    // _shPick stores the chosen name in window._sh_selectedName
     const v = (window._sh_selectedName || localStorage.getItem('lbName') || '').trim();
-    if (!v) return; // button is disabled anyway if nothing selected
+    if (!v) return;
+    const isSwitch = document.getElementById('_sh_nm')?._isSwitch;
+    const oldName = myName;
     myName = v;
     localStorage.setItem('lbName', v);
     ['lbName','wwName','unoName','spyName','gbPlayerName','wwPlayerName','auName','mgName'].forEach(k => localStorage.setItem(k, v));
     const nm = document.getElementById('_sh_nm');
     if (nm) nm.style.display = 'none';
-    afterName();
+
+    if (isSwitch) {
+      // Update floating button label
+      updateSwitchBtn();
+      // Update Firebase presence
+      const db = getDB();
+      if (db) {
+        // Remove old presence, create new
+        if (oldName !== v) {
+          db.ref('shared/online/' + myId).update({ name: v });
+          db.ref('shared/lb2/' + lbKey(v)).transaction(cur => {
+            if (!cur) return { name: v, points: 0, onlineMs: 0, wins: 0, games: 0, lastSeen: Date.now() };
+            return { ...cur, name: v, lastSeen: Date.now() };
+          });
+        }
+      }
+      showToast('✓ Akun diganti ke ' + v.split(' ')[0]);
+    } else {
+      afterName();
+    }
   }
-  window._shConfirm = confirmName; // so _shPick's onclick can call it
+  window._shConfirm = confirmName;
+
+  function updateSwitchBtn() {
+    const btn = document.getElementById('_sh_swbtn');
+    const av = document.getElementById('_sh_swav');
+    const lbl = document.getElementById('_sh_swlbl');
+    if (!btn) return;
+    const n = myName || '—';
+    const initial = n[0].toUpperCase();
+    if (av) av.textContent = initial;
+    if (lbl) lbl.textContent = n.split(' ')[0];
+    btn.title = 'Masuk sebagai: ' + n + '\nKlik untuk ganti akun';
+  }
+
+  // Public API
+  window.switchAccount = () => showNameModal(true);
 
   function afterName() {
     getDB();
     startOnlineTracking();
     buildVoiceWidget();
+    // update switch button after widget is built
+    setTimeout(updateSwitchBtn, 100);
   }
 
   /* ══════════════════════════════════════════
@@ -455,6 +509,13 @@
 #_sh_vcpanel{display:none;position:absolute;bottom:52px;left:0;width:200px;background:#16161E;border-radius:10px;padding:.8rem;border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 32px rgba(0,0,0,.6);}
 ._sh_vph{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:#F9C74F;font-weight:700;margin-bottom:.5rem;font-family:'Space Mono',monospace;}
 
+/* ─── Switch account button ─── */
+#_sh_swbtn{width:auto;min-width:44px;height:44px;border-radius:22px;background:#16161E;border:1px solid rgba(249,199,79,.4);color:#F9C74F;cursor:pointer;display:flex;align-items:center;gap:.35rem;padding:0 .7rem 0 .45rem;box-shadow:0 4px 16px rgba(0,0,0,.5);transition:background .2s,transform .18s;-webkit-tap-highlight-color:transparent;}
+#_sh_swbtn:hover,#_sh_swbtn:active{background:rgba(249,199,79,.12);transform:scale(1.05);}
+#_sh_swav{width:28px;height:28px;border-radius:50%;background:#F9C74F;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#_sh_swlbl{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+@media(max-width:480px){#_sh_swlbl{display:none;}#_sh_swbtn{padding:0 .45rem;border-radius:50%;min-width:44px;}}
+
 /* ─── Toast ─── */
 #_sh_toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#16161E;color:#fff;padding:.55rem 1.3rem;font-size:.8rem;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;border:1px solid rgba(249,199,79,.2);white-space:nowrap;max-width:92vw;font-family:'Space Mono',monospace;}
 `; document.head.appendChild(s);
@@ -509,13 +570,12 @@
 
     window._shPick = function(name) {
       selectedName = name;
-      window._sh_selectedName = name; // expose so confirmName can read it
+      window._sh_selectedName = name;
       document.getElementById('_sh_listbox').innerHTML = renderList(filteredNames);
       const btn = document.getElementById('_sh_nmbtn');
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'Masuk sebagai ' + name.split(' ')[0];
-        // Also bind click here to make sure it works on mobile
         btn.onclick = function() { window._shConfirm && window._shConfirm(); };
       }
     };
@@ -540,11 +600,16 @@
     // ── Voice widget ──
     const vc = document.createElement('div');
     vc.id = '_sh_vc';
+    const swInitial = (myName||'?')[0].toUpperCase();
     vc.innerHTML = `
       <div id="_sh_vcpanel">
         <div class="_sh_vph">Voice Chat</div>
         <div id="_sh_vclist"></div>
       </div>
+      <button id="_sh_swbtn" title="Ganti akun" onclick="window.switchAccount()" style="position:relative;">
+        <span id="_sh_swav">${swInitial}</span>
+        <span id="_sh_swlbl">${(myName||'').split(' ')[0]||'Akun'}</span>
+      </button>
       <button id="_sh_vcbtn" title="Voice"><svg style="width:1rem;height:1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg><span id="_sh_vccnt"></span></button>
       <button id="_sh_lbbtn" title="Leaderboard" onclick="location.href='leaderboard.html'"><svg style="width:1rem;height:1rem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></button>`;
     document.body.appendChild(vc);
