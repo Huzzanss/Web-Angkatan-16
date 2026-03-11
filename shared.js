@@ -72,19 +72,25 @@
     if (m) m.style.display = 'flex';
     // select dropdown - no focus/keydown needed
     const btn = document.getElementById('_sh_nmbtn');
-    if (btn) btn.addEventListener('click', confirmName);
+    if (btn) {
+      btn.removeEventListener('click', confirmName);
+      btn.addEventListener('click', confirmName);
+      btn.onclick = confirmName; // belt & suspenders for mobile
+    }
   }
 
   function confirmName() {
-    const v = (document.getElementById('_sh_nminp').value || '').trim();
-    if (!v) { alert('Pilih namamu dulu ya!'); return; }
+    // _shPick stores the chosen name in window._sh_selectedName
+    const v = (window._sh_selectedName || localStorage.getItem('lbName') || '').trim();
+    if (!v) return; // button is disabled anyway if nothing selected
     myName = v;
     localStorage.setItem('lbName', v);
-    // Sync to all game name keys
     ['lbName','wwName','unoName','spyName','gbPlayerName','wwPlayerName','auName','mgName'].forEach(k => localStorage.setItem(k, v));
-    document.getElementById('_sh_nm').style.display = 'none';
+    const nm = document.getElementById('_sh_nm');
+    if (nm) nm.style.display = 'none';
     afterName();
   }
+  window._shConfirm = confirmName; // so _shPick's onclick can call it
 
   function afterName() {
     getDB();
@@ -462,6 +468,7 @@
     function nameColor(n){ let h=0; for(let c of n) h=(h*31+c.charCodeAt(0))&0xFFFFFF; return COLORS[h%COLORS.length]; }
 
     let selectedName = localStorage.getItem('lbName') || '';
+    if (selectedName) window._sh_selectedName = selectedName;
     let filteredNames = [...NAMES];
 
     // ── Name Modal ──
@@ -493,7 +500,7 @@
       </div>
       <div class="_sh_list" id="_sh_listbox">${renderList(NAMES)}</div>
       <div class="_sh_foot">
-        <button id="_sh_nmbtn" ${selectedName?'':'disabled'}>
+        <button id="_sh_nmbtn" onclick="window._shConfirm&&window._shConfirm()" ${selectedName?'':'disabled'}>
           ${selectedName ? 'Masuk sebagai ' + selectedName.split(' ')[0] : 'Pilih nama dulu'}
         </button>
       </div>
@@ -502,9 +509,15 @@
 
     window._shPick = function(name) {
       selectedName = name;
+      window._sh_selectedName = name; // expose so confirmName can read it
       document.getElementById('_sh_listbox').innerHTML = renderList(filteredNames);
       const btn = document.getElementById('_sh_nmbtn');
-      if (btn) { btn.disabled = false; btn.textContent = 'Masuk sebagai ' + name.split(' ')[0]; }
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Masuk sebagai ' + name.split(' ')[0];
+        // Also bind click here to make sure it works on mobile
+        btn.onclick = function() { window._shConfirm && window._shConfirm(); };
+      }
     };
 
     const searchEl = document.getElementById('_sh_search');
