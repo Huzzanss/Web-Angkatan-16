@@ -45,6 +45,7 @@
   <symbol id="ic-circle" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></symbol>
   <symbol id="ic-billiard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><line x1="12" y1="3" x2="12" y2="8.5"/></symbol>
   <symbol id="ic-chess" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 22h6M8 22v-2h8v2M10 20v-5L6 9h12l-4 6v5M10 9V5M14 9V5M9 5h6M12 2v3"/></symbol>
+  <symbol id="ic-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/></symbol>
 </svg>
 <div id="notifPanel">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
@@ -66,6 +67,7 @@
       <a href="#chat-section" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> Chat</a>
       <a href="#games-section" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-gamepad"/></svg> Games</a>
       <a href="#mading-section" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-clipboard"/></svg> Mading</a>
+      <a href="#calendar-section" class="nav-desktop"><svg class="icon" aria-hidden="true"><use href="#ic-calendar"/></svg> Jadwal</a>
       <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" title="Notifikasi"><svg class="icon" aria-hidden="true"><use href="#ic-bell"/></svg><span class="notif-dot" id="notifDot" style="display:none"></span></button>
       <button class="nav-burger" id="navBurger" onclick="toggleMobileNav()" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -81,6 +83,7 @@
       <a href="#chat-section" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-chat"/></svg> Chat</a>
       <a href="#games-section" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-gamepad"/></svg> Games</a>
       <a href="#mading-section" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-clipboard"/></svg> Mading</a>
+      <a href="#calendar-section" onclick="closeMobileNav()"><svg class="icon" aria-hidden="true"><use href="#ic-calendar"/></svg> Jadwal</a>
     </div>
   </nav>
 
@@ -383,6 +386,31 @@
       </div>
     </section>
 
+    <!-- ─── Kalender Kegiatan ─── -->
+    <section id="calendar-section">
+      <div class="cal-header">
+        <span class="cal-eyebrow">Agenda Angkatan XVI</span>
+        <h2 class="cal-title">Kalender <span>Kegiatan</span></h2>
+        <p class="cal-sub">Jadwal kegiatan April – Mei 2026</p>
+      </div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#FF6B6B"></span>Akademik</div>
+        <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#00D4AA"></span>Keagamaan</div>
+        <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#8B7CF6"></span>Gladi Wisuda</div>
+        <div class="cal-legend-item"><span class="cal-legend-dot" style="background:#F9C74F"></span>Wisuda Akbar</div>
+      </div>
+      <div class="cal-months">
+        <div class="cal-month-card">
+          <div id="cal-grid-april"></div>
+          <div class="cal-events-list" id="cal-events-april"></div>
+        </div>
+        <div class="cal-month-card">
+          <div id="cal-grid-may"></div>
+          <div class="cal-events-list" id="cal-events-may"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ─── Game List ─── -->
     <section id="games-section" class="games-section">
       <div class="games-header">
@@ -533,25 +561,7 @@
   <audio id="bgAudio" preload="auto"></audio>
 
 
-<script>
-function toggleMobileNav(){
-  const n=document.getElementById('mobileNav');
-  const b=document.getElementById('navBurger');
-  n.classList.toggle('open');
-  b.classList.toggle('open');
-}
-function closeMobileNav(){
-  document.getElementById('mobileNav').classList.remove('open');
-  document.getElementById('navBurger').classList.remove('open');
-}
-// Close on outside click
-document.addEventListener('click',function(e){
-  const n=document.getElementById('mobileNav');
-  const b=document.getElementById('navBurger');
-  if(n && n.classList.contains('open') && !n.contains(e.target) && !b.contains(e.target)) closeMobileNav();
-});
-</script>
-  <script src="script.js"></script>
+<script src="script.js"></script>
 
 
 
