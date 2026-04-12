@@ -936,3 +936,157 @@ if(navP){
     if (bioEl) renderBio(bioEl, key, val);
   };
 })();
+
+// ─── Mobile Nav ───
+function toggleMobileNav() {
+  const nav    = document.getElementById('mobileNav');
+  const burger = document.getElementById('navBurger');
+  nav.classList.toggle('open');
+  burger.classList.toggle('open');
+}
+
+function closeMobileNav() {
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('navBurger').classList.remove('open');
+}
+
+document.addEventListener('click', function(e) {
+  const nav    = document.getElementById('mobileNav');
+  const burger = document.getElementById('navBurger');
+  if (nav && nav.classList.contains('open') && !nav.contains(e.target) && !burger.contains(e.target)) {
+    closeMobileNav();
+  }
+});
+
+// ─── Kalender Kegiatan ───
+(function() {
+  const EVENTS = [
+    { month: 4, start: 1,  end: 1,  label: 'Pra Munaqasyah',               type: 'religious', note: '' },
+    { month: 4, start: 2,  end: 10, label: 'UK 2',                          type: 'academic',  note: '' },
+    { month: 4, start: 10, end: 11, label: 'Pintar 2 Kelas 6',              type: 'academic',  note: '' },
+    { month: 4, start: 15, end: 15, label: 'Munaqosah',                     type: 'religious', note: '' },
+    { month: 4, start: 22, end: 23, label: 'TKA',                           type: 'academic',  note: 'di Lab Komputer' },
+    { month: 4, start: 27, end: 29, label: 'Pengambilan Nilai Praktik',     type: 'academic',  note: '' },
+    { month: 4, start: 30, end: 30, label: 'Istighosah / Doa Bersama',      type: 'religious', note: '' },
+    { month: 5, start: 4,  end: 8,  label: 'AAJ / Ujian Sekolah Kelas 6',  type: 'academic',  note: '' },
+    { month: 5, start: 11, end: 12, label: 'Gladi Wisuda Akbar',            type: 'graduation', note: '' },
+    { month: 5, start: 13, end: 13, label: 'Wisuda Akbar',                  type: 'wisuda',    note: '🎓' },
+    { month: 5, start: 23, end: 23, label: 'Imtihan Al-Quran',              type: 'religious', note: 'Bagi yang mengikuti Munaqosah' },
+  ];
+
+  const TYPE_COLOR = {
+    academic:   '#FF6B6B',
+    religious:  '#00D4AA',
+    graduation: '#8B7CF6',
+    wisuda:     '#F9C74F',
+  };
+
+  const MONTH_NAMES = { 4: 'April', 5: 'Mei' };
+  const DAY_ABBR    = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+  function buildDayMap(month) {
+    const map = {};
+    EVENTS.filter(e => e.month === month).forEach(ev => {
+      for (let d = ev.start; d <= ev.end; d++) {
+        map[d] = ev;
+      }
+    });
+    return map;
+  }
+
+  function renderGrid(containerId, year, month) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+
+    const firstDay    = new Date(year, month - 1, 1).getDay();
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const dayMap      = buildDayMap(month);
+    const today       = new Date();
+    const isThisMonth = today.getFullYear() === year && (today.getMonth() + 1) === month;
+    const todayNum    = today.getDate();
+
+    let html = `<div class="cal-month-title">${MONTH_NAMES[month]} <span>${year}</span></div>`;
+    html += '<div class="cal-grid">';
+    DAY_ABBR.forEach(d => { html += `<div class="cal-day-header">${d}</div>`; });
+
+    for (let i = 0; i < firstDay; i++) {
+      html += '<div class="cal-day cal-empty"></div>';
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const ev      = dayMap[d];
+      const isToday = isThisMonth && d === todayNum;
+      const col     = ev ? TYPE_COLOR[ev.type] : null;
+
+      let cls   = 'cal-day';
+      let style = '';
+      let title = '';
+
+      if (ev) {
+        cls  += ' cal-has-event';
+        style = `background:${col}1A; border-top:2px solid ${col};`;
+        title = `title="${ev.label}"`;
+        if (ev.start === d) cls += ' cal-ev-first';
+        if (ev.end   === d) cls += ' cal-ev-last';
+      }
+
+      if (isToday) {
+        cls  += ' cal-today';
+        style = ev ? `background:${col}2A; border-top:2px solid ${col};` : '';
+      }
+
+      const numStyle = isToday
+        ? `background:${ev ? col : 'var(--acc)'};color:${ev ? '#fff' : '#000'};font-weight:700;border-radius:50%;`
+        : '';
+
+      html += `<div class="${cls}" style="${style}" ${title}><span style="${numStyle}">${d}</span></div>`;
+    }
+
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  function renderList(containerId, month) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+
+    const events = EVENTS.filter(e => e.month === month);
+    const today  = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let html = '';
+    events.forEach(ev => {
+      const evEnd   = new Date(2026, ev.month - 1, ev.end);
+      evEnd.setHours(23, 59, 59);
+      const evStart = new Date(2026, ev.month - 1, ev.start);
+      evStart.setHours(0, 0, 0, 0);
+
+      const isPast    = evEnd < today;
+      const isOngoing = evStart <= today && today <= evEnd;
+      const col       = TYPE_COLOR[ev.type];
+      const dateStr   = ev.start === ev.end ? `${ev.start}` : `${ev.start}–${ev.end}`;
+      const mName     = MONTH_NAMES[ev.month];
+
+      let itemCls = 'cal-event-item';
+      if (isPast)    itemCls += ' cal-ev-past';
+      if (isOngoing) itemCls += ' cal-ev-active';
+
+      html += `<div class="${itemCls}" style="border-left-color:${isOngoing ? col : 'transparent'}">
+        <div class="cal-event-dot" style="background:${col};box-shadow:0 0 6px ${col}66"></div>
+        <div class="cal-event-body">
+          <div class="cal-event-date" style="color:${col}">${dateStr} ${mName}</div>
+          <div class="cal-event-name">${ev.label}${ev.note ? ` <span class="cal-event-note">${ev.note}</span>` : ''}</div>
+        </div>
+        ${isPast    ? '<div class="cal-ev-badge cal-ev-done">✓ Selesai</div>' : ''}
+        ${isOngoing ? '<div class="cal-ev-badge cal-ev-now">Berlangsung</div>' : ''}
+      </div>`;
+    });
+
+    el.innerHTML = html || '<div style="color:var(--muted);font-size:.75rem;text-align:center;padding:1rem">Tidak ada kegiatan</div>';
+  }
+
+  renderGrid('cal-grid-april', 2026, 4);
+  renderGrid('cal-grid-may',   2026, 5);
+  renderList('cal-events-april', 4);
+  renderList('cal-events-may',   5);
+})();
