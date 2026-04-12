@@ -419,3 +419,52 @@ footer span{color:var(--acc);}
   .gallery-grid{grid-template-columns:repeat(2,1fr);}
   #mading-section,#songRequestSection,#chat-section{margin-left:.5rem;margin-right:.5rem;}
 }
+
+/* ════════════════════ KALENDER KEGIATAN ════════════════════ */
+#calendar-section{padding:3rem 1.5rem;max-width:1000px;margin:0 auto;}
+.cal-header{margin-bottom:1.5rem;}
+.cal-eyebrow{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:4px;text-transform:uppercase;color:var(--acc);display:block;margin-bottom:.3rem;}
+.cal-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,5vw,3.8rem);font-weight:900;text-transform:uppercase;color:var(--white);line-height:.9;}
+.cal-title span{color:var(--acc);}
+.cal-sub{font-size:.76rem;color:var(--muted);margin-top:.3rem;}
+
+/* ── Legend ── */
+.cal-legend{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;margin-bottom:1.6rem;}
+.cal-legend-item{display:flex;align-items:center;gap:.35rem;font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.5px;}
+.cal-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── Month layout ── */
+.cal-months{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.cal-month-card{background:var(--surface);border:1px solid var(--border);padding:1.2rem;}
+
+/* ── Calendar grid ── */
+.cal-month-title{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;text-transform:uppercase;color:var(--white);margin-bottom:.75rem;letter-spacing:1px;}
+.cal-month-title span{color:var(--acc);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:1rem;}
+.cal-day-header{text-align:center;font-family:'Space Mono',monospace;font-size:.46rem;letter-spacing:.5px;color:rgba(255,255,255,.22);padding:.18rem 0;text-transform:uppercase;}
+.cal-day{text-align:center;font-size:.68rem;color:var(--muted);min-height:28px;display:flex;align-items:center;justify-content:center;position:relative;transition:opacity .15s;}
+.cal-day span{width:22px;height:22px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;transition:all .15s;}
+.cal-day.cal-has-event{color:var(--white);}
+.cal-day.cal-ev-first{border-radius:3px 0 0 3px;}
+.cal-day.cal-ev-last{border-radius:0 3px 3px 0;}
+.cal-day.cal-today span{border-radius:50%;}
+
+/* ── Event list ── */
+.cal-events-list{display:flex;flex-direction:column;gap:.35rem;border-top:1px solid var(--border);padding-top:.8rem;}
+.cal-event-item{display:flex;align-items:center;gap:.6rem;padding:.4rem .55rem;background:rgba(255,255,255,.02);border:1px solid var(--border);border-left:2px solid transparent;transition:all .15s;}
+.cal-event-item:hover{background:rgba(255,255,255,.045);}
+.cal-event-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.cal-event-body{flex:1;min-width:0;}
+.cal-event-date{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.5px;margin-bottom:.08rem;}
+.cal-event-name{font-size:.76rem;color:var(--text);font-weight:600;}
+.cal-event-note{font-size:.62rem;color:var(--muted);font-weight:400;}
+.cal-ev-past .cal-event-name{color:var(--muted);}
+.cal-ev-past .cal-event-date{opacity:.45;}
+.cal-ev-badge{font-family:'Space Mono',monospace;font-size:.48rem;letter-spacing:1px;padding:.12rem .4rem;flex-shrink:0;text-transform:uppercase;}
+.cal-ev-done{color:#4ade80;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);}
+.cal-ev-now{color:var(--acc);background:rgba(249,199,79,.1);border:1px solid rgba(249,199,79,.25);}
+
+@media(max-width:768px){
+  #calendar-section{padding:2rem .8rem;}
+  .cal-months{grid-template-columns:1fr;}
+}
