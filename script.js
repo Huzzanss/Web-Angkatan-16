@@ -321,16 +321,7 @@ window.addEventListener('beforeunload', stopTyping);
     { type:'youtube', id:'LByPEHhaz7A', title:'Kucari Kamu — Payung Teduh' },
     { type:'youtube', id:'yNcGtKAacts', title:'Rehat — Kunto Aji' },
     // ── File Lokal (dari folder ./music/) ──
-    { type:'local', file:'Kenangan Manis.mp3',           title:'Kenangan Manis' },
-    { type:'local', file:'Kita Ke Sana.mp3',             title:'Kita Ke Sana' },
-    { type:'local', file:'Lantas.mp3',                   title:'Lantas' },
-    { type:'local', file:'Monokrom.mp3',                 title:'Monokrom' },
-    { type:'local', file:'Monolog.mp3',                  title:'Monolog' },
-    { type:'local', file:'Ribuan Memori.mp3',            title:'Ribuan Memori' },
-    { type:'local', file:'Secukupnya.mp3',               title:'Secukupnya' },
-    { type:'local', file:'Terbuang Dalam Waktu.mp3',     title:'Terbuang Dalam Waktu' },
-    { type:'local', file:'Tujuh Belas.mp3',              title:'Tujuh Belas' },
-    { type:'local', file:'bergema sampai selamanya.mp3', title:'Bergema Sampai Selamanya' },
+    { type:'local', file:'.mp3',           title:'' },
   ];
 
   const BASE_PATH = './music/';
