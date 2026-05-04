@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Werewolf — Angkatan XVI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lora:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --bg:#0C0904;
+      --surface:#181108;
+      --panel:#221A0C;
+      --border:rgba(180,135,65,.14);
+      --text:#F0E8D4;
+      --muted:rgba(210,188,148,.45);
+      --acc:#8BBB3A;
+      --acc2:#739E2E;
+      --warm:#C98A35;
+      --red:#C4574A;
+      --green:#76BB54;
+    }
+    html{scroll-behavior:smooth;}
+    body{
+      font-family:'Lora',Georgia,serif;
+      background:var(--bg);color:var(--text);
+      min-height:100dvh;overflow-x:hidden;
+    }
+    ::-webkit-scrollbar{width:4px;}
+    ::-webkit-scrollbar-track{background:var(--bg);}
+    ::-webkit-scrollbar-thumb{background:var(--acc2);}
+
+    /* ── Screens ── */
+    .screen{display:none;min-height:100dvh;}
+    .screen.active{display:flex;flex-direction:column;}
+
+    /* ══ LOBBY SCREEN ══ */
+    #screen-lobby{
+      align-items:center;justify-content:center;
+      padding:2rem 1rem;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(139,187,58,.09) 0%, transparent 70%),
+        var(--bg);
+    }
+    .lobby-wrap{width:100%;max-width:440px;}
+    .lobby-logo{
+      text-align:center;margin-bottom:2rem;
+    }
+    .lobby-logo .eyebrow{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.55rem;letter-spacing:5px;text-transform:uppercase;
+      color:var(--acc);display:block;margin-bottom:.5rem;
+    }
+    .lobby-logo h1{
+      font-family:'Playfair Display',serif;
+      font-size:clamp(3.5rem,12vw,6rem);
+      font-weight:900;font-style:italic;
+      line-height:.9;color:var(--text);
+    }
+    .lobby-logo h1 span{color:var(--red);}
+    .lobby-logo .sub{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.58rem;color:var(--muted);
+      letter-spacing:3px;text-transform:uppercase;margin-top:.6rem;
+    }
+
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      padding:1.4rem;margin-bottom:.7rem;
+    }
+    .card-title{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.56rem;letter-spacing:3px;text-transform:uppercase;
+      color:var(--muted);margin-bottom:.9rem;
+    }
+
+    /* name input */
+    .name-input{
+      width:100%;padding:.65rem .9rem;
+      background:rgba(139,187,58,.05);
+      border:1px solid rgba(139,187,58,.18);
+      color:var(--text);font-size:.95rem;
+      font-family:'Lora',serif;outline:none;
+      transition:border-color .2s;
+    }
+    .name-input:focus{border-color:rgba(139,187,58,.5);}
+    .name-input::placeholder{color:rgba(210,188,148,.25);}
+
+    /* buttons */
+    .btn{
+      display:block;width:100%;
+      padding:.72rem 1rem;
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.72rem;font-weight:700;
+      letter-spacing:2px;text-transform:uppercase;
+      border:none;cursor:pointer;
+      transition:opacity .18s,transform .12s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn:active{transform:scale(.98);}
+    .btn:hover{opacity:.85;}
+    .btn-primary{background:var(--acc);color:#000;}
+    .btn-outline{
+      background:none;
+      border:1px solid rgba(139,187,58,.35);
+      color:var(--acc);
+    }
+    .btn-outline:hover{background:rgba(139,187,58,.08);}
+    .btn-danger{background:var(--red);color:#fff;}
+    .btn-sm{
+      padding:.38rem .75rem;font-size:.58rem;
+      display:inline-flex;align-items:center;gap:.3rem;width:auto;
+    }
+
+    .divider{
+      display:flex;align-items:center;gap:.6rem;
+      margin:.6rem 0;color:var(--muted);font-size:.6rem;
+      font-family:'IBM Plex Mono',monospace;
+    }
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    /* room code display */
+    .room-code-display{
+      background:rgba(139,187,58,.06);
+      border:1px solid rgba(139,187,58,.22);
+      padding:.7rem 1rem;text-align:center;margin-bottom:.7rem;
+    }
+    .room-code-display .rc-label{
+      font-family:'IBM Plex Mono',monospace;font-size:.5rem;
+      letter-spacing:3px;color:var(--muted);text-transform:uppercase;
+    }
+    .room-code-display .rc-code{
+      font-family:'Playfair Display',serif;
+      font-size:2.4rem;font-weight:900;font-style:italic;
+      color:var(--acc);letter-spacing:4px;line-height:1.1;
+    }
+
+    /* player list */
+    .player-list{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.8rem;}
+    .player-item{
+      display:flex;align-items:center;gap:.6rem;
+      padding:.45rem .7rem;
+      background:rgba(139,187,58,.04);
+      border:1px solid var(--border);
+      font-size:.82rem;
+    }
+    .player-item .pi-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:var(--green);flex-shrink:0;
+    }
+    .player-item .pi-name{flex:1;font-family:'Lora',serif;}
+    .player-item .pi-badge{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.5rem;letter-spacing:1px;
+      padding:.1rem .35rem;
+      background:rgba(201,138,53,.12);color:var(--warm);
+    }
+    .player-item .pi-host{
+      background:rgba(139,187,58,.12);color:var(--acc);
+    }
+
+    .info-text{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.62rem;color:var(--muted);
+      text-align:center;padding:.4rem;
+    }
+
+    /* ══ ROLE REVEAL SCREEN ══ */
+    #screen-role{
+      align-items:center;justify-content:center;
+      padding:2rem 1rem;
+    }
+    .role-reveal-wrap{width:100%;max-width:380px;text-align:center;}
+    .role-card{
+      padding:2.5rem 2rem;margin-bottom:1rem;
+      border:1px solid var(--border);
+      background:var(--surface);
+      position:relative;overflow:hidden;
+    }
+    .role-card::before{
+      content:'';position:absolute;inset:0;
+      opacity:.03;
+      background:repeating-linear-gradient(45deg,var(--text),var(--text) 1px,transparent 1px,transparent 8px);
+    }
+    .role-card-eyebrow{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.52rem;letter-spacing:4px;
+      text-transform:uppercase;color:var(--muted);
+      margin-bottom:1rem;
+    }
+    .role-icon{font-size:4.5rem;line-height:1;margin-bottom:.8rem;display:block;}
+    .role-name{
+      font-family:'Playfair Display',serif;
+      font-size:2.8rem;font-weight:900;font-style:italic;
+      line-height:1;margin-bottom:.6rem;
+    }
+    .role-desc{
+      font-size:.8rem;color:var(--muted);
+      font-family:'Lora',serif;font-style:italic;
+      line-height:1.55;
+    }
+    .role-werewolf .role-name{color:var(--red);}
+    .role-villager  .role-name{color:var(--acc);}
+    .role-seer      .role-name{color:#8B7CF6;}
+    .role-doctor    .role-name{color:#38BDF8;}
+    .role-hunter    .role-name{color:var(--warm);}
+
+    .btn-tap-reveal{
+      background:rgba(139,187,58,.08);
+      border:1px solid rgba(139,187,58,.25);
+      color:var(--muted);padding:1.8rem 1rem;
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.62rem;letter-spacing:2px;
+      text-transform:uppercase;cursor:pointer;
+      width:100%;transition:all .2s;margin-bottom:1rem;
+    }
+    .btn-tap-reveal:hover{background:rgba(139,187,58,.14);color:var(--text);}
+
+    /* ══ NIGHT / DAY SCREEN ══ */
+    #screen-night,#screen-day{
+      align-items:center;justify-content:center;
+      padding:2rem 1rem;
+    }
+    .phase-wrap{width:100%;max-width:480px;}
+    .phase-header{
+      text-align:center;margin-bottom:1.5rem;
+    }
+    .phase-icon{font-size:3rem;display:block;margin-bottom:.5rem;}
+    .phase-round{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.54rem;letter-spacing:4px;
+      text-transform:uppercase;color:var(--muted);
+      margin-bottom:.3rem;
+    }
+    .phase-title{
+      font-family:'Playfair Display',serif;
+      font-size:2.5rem;font-weight:900;font-style:italic;
+      line-height:1;
+    }
+    .phase-title.night{color:var(--red);}
+    .phase-title.day{color:var(--acc);}
+    .phase-sub{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.62rem;color:var(--muted);margin-top:.4rem;
+    }
+
+    /* action section */
+    .action-section{
+      background:var(--surface);border:1px solid var(--border);
+      padding:1rem;margin-bottom:.7rem;
+    }
+    .action-title{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.52rem;letter-spacing:3px;
+      text-transform:uppercase;color:var(--muted);
+      margin-bottom:.7rem;
+      border-bottom:1px solid var(--border);padding-bottom:.5rem;
+    }
+
+    /* vote / target grid */
+    .target-grid{
+      display:grid;grid-template-columns:repeat(2,1fr);
+      gap:.35rem;margin-bottom:.7rem;
+    }
+    .target-btn{
+      padding:.65rem .6rem;
+      background:rgba(139,187,58,.04);
+      border:1px solid var(--border);
+      color:var(--text);cursor:pointer;
+      font-family:'Lora',serif;font-size:.78rem;
+      text-align:left;transition:all .15s;
+      display:flex;align-items:center;gap:.45rem;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .target-btn:hover{
+      background:rgba(139,187,58,.1);
+      border-color:rgba(139,187,58,.3);
+    }
+    .target-btn.selected{
+      background:rgba(139,187,58,.16);
+      border-color:var(--acc);color:var(--acc);
+    }
+    .target-btn.voted-danger{
+      background:rgba(196,87,74,.08);
+      border-color:rgba(196,87,74,.3);
+    }
+    .target-btn .tb-num{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.55rem;color:var(--muted);flex-shrink:0;min-width:20px;
+    }
+    .target-btn .tb-votes{
+      margin-left:auto;
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.58rem;color:var(--warm);
+    }
+    .target-btn.dead{
+      opacity:.35;cursor:not-allowed;
+      text-decoration:line-through;
+    }
+
+    /* vote bar */
+    .vote-bar-wrap{margin-bottom:.5rem;}
+    .vote-bar-name{
+      display:flex;justify-content:space-between;
+      font-size:.68rem;margin-bottom:.2rem;font-family:'IBM Plex Mono',monospace;
+    }
+    .vote-bar-bg{height:3px;background:rgba(139,187,58,.08);overflow:hidden;}
+    .vote-bar-fill{height:100%;background:var(--red);transition:width .4s;}
+
+    /* log */
+    .game-log{
+      background:rgba(8,6,2,.6);border:1px solid var(--border);
+      padding:.7rem;max-height:160px;overflow-y:auto;
+      margin-bottom:.7rem;
+    }
+    .log-entry{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.6rem;color:var(--muted);
+      padding:.18rem 0;border-bottom:1px solid rgba(180,135,65,.06);
+      line-height:1.4;
+    }
+    .log-entry:last-child{border-bottom:none;}
+    .log-entry.log-kill{color:var(--red);}
+    .log-entry.log-save{color:var(--green);}
+    .log-entry.log-vote{color:var(--warm);}
+    .log-entry.log-sys{color:var(--acc);}
+
+    /* status badges for dead/alive */
+    .status-badge{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.5rem;padding:.1rem .35rem;
+      letter-spacing:.5px;
+    }
+    .badge-alive{background:rgba(118,187,84,.1);color:var(--green);}
+    .badge-dead{background:rgba(196,87,74,.1);color:var(--red);}
+    .badge-ww{background:rgba(196,87,74,.12);color:var(--red);}
+    .badge-vil{background:rgba(139,187,58,.1);color:var(--acc);}
+
+    /* ══ GAME OVER SCREEN ══ */
+    #screen-over{
+      align-items:center;justify-content:center;
+      padding:2rem 1rem;
+    }
+    .over-wrap{width:100%;max-width:400px;text-align:center;}
+    .over-icon{font-size:5rem;display:block;margin-bottom:.8rem;}
+    .over-eyebrow{
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.54rem;letter-spacing:4px;
+      text-transform:uppercase;color:var(--muted);
+    }
+    .over-title{
+      font-family:'Playfair Display',serif;
+      font-size:3rem;font-weight:900;font-style:italic;
+      line-height:.95;margin:.4rem 0 .8rem;
+    }
+    .over-werewolf .over-title{color:var(--red);}
+    .over-villager .over-title{color:var(--acc);}
+    .reveal-list{
+      background:var(--surface);border:1px solid var(--border);
+      padding:.8rem;margin-bottom:1rem;text-align:left;
+    }
+    .reveal-item{
+      display:flex;align-items:center;gap:.55rem;
+      padding:.35rem 0;border-bottom:1px solid var(--border);
+      font-size:.78rem;font-family:'Lora',serif;
+    }
+    .reveal-item:last-child{border-bottom:none;}
+
+    /* ══ ORNAMENTS ══ */
+    .ornament{
+      text-align:center;
+      font-family:'IBM Plex Mono',monospace;
+      font-size:.58rem;color:rgba(210,188,148,.18);
+      letter-spacing:3px;margin:.8rem 0;
+    }
+
+    /* ══ BACK BUTTON ══ */
+    .back-btn{
+      position:fixed;top:.8rem;left:.8rem;z-index:100;
+      background:var(--panel);border:1px solid var(--border);
+      color:var(--muted);padding:.4rem .7rem;
+      font-family:'IBM Plex Mono',monospace;font-size:.58rem;
+      letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+      text-decoration:none;transition:all .18s;
+    }
+    .back-btn:hover{color:var(--acc);border-color:rgba(139,187,58,.3);}
+
+    /* ══ TOAST ══ */
+    #toast{
+      position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+      background:var(--panel);color:var(--text);
+      padding:.55rem 1.2rem;border:1px solid rgba(139,187,58,.2);
+      font-family:'IBM Plex Mono',monospace;font-size:.72rem;
+      z-index:9999;opacity:0;transition:opacity .3s;
+      pointer-events:none;white-space:nowrap;max-width:90vw;
+    }
+    #toast.show{opacity:1;}
+
+    /* ══ MODAL CONFIRM ══ */
+    #modal-confirm{
+      position:fixed;inset:0;background:rgba(0,0,0,.85);
+      z-index:5000;display:none;align-items:center;justify-content:center;
+      padding:1rem;
+    }
+    #modal-confirm.open{display:flex;}
+    .modal-box{
+      background:var(--surface);border:1px solid var(--border);
+      border-top:2px solid var(--red);
+      padding:1.5rem;width:100%;max-width:340px;
+    }
+    .modal-title{
+      font-family:'Playfair Display',serif;
+      font-size:1.3rem;font-style:italic;
+      margin-bottom:.5rem;
+    }
+    .modal-msg{font-size:.8rem;color:var(--muted);font-family:'Lora',serif;margin-bottom:1rem;}
+    .modal-actions{display:flex;gap:.5rem;}
+    .modal-actions .btn{flex:1;}
+
+    /* ══ TIMER ══ */
+    .phase-timer{
+      text-align:center;
+      font-family:'Playfair Display',serif;
+      font-size:3.5rem;font-weight:900;
+      line-height:1;margin:.3rem 0 .8rem;
+      color:var(--warm);transition:color .3s;
+    }
+    .phase-timer.urgent{color:var(--red);animation:pulse-t .5s ease-in-out infinite alternate;}
+    @keyframes pulse-t{from{opacity:1;}to{opacity:.5;}}
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:480px){
+      .target-grid{grid-template-columns:1fr;}
+      .lobby-logo h1{font-size:3.8rem;}
+    }
+  </style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">← Kembali</a>
+<div id="toast"></div>
+
+<!-- ══════════════════════════════
+     MODAL CONFIRM
+══════════════════════════════ -->
+<div id="modal-confirm">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Konfirmasi</div>
+    <div class="modal-msg" id="modal-msg">Yakin?</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Batal</button>
+      <button class="btn btn-danger" id="modal-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN: LOBBY
+══════════════════════════════ -->
+<div id="screen-lobby" class="screen active">
+  <div class="lobby-wrap">
+    <div class="lobby-logo">
+      <span class="eyebrow">Angkatan XVI · Game Malam</span>
+      <h1>Were<span>wolf</span></h1>
+      <div class="sub">◆ — ◆</div>
+    </div>
+
+    <!-- Name -->
+    <div class="card">
+      <div class="card-title">Nama Kamu</div>
+      <input class="name-input" id="playerName" placeholder="Ketik namamu..." maxlength="24">
+    </div>
+
+    <!-- Create room -->
+    <div class="card">
+      <div class="card-title">Buat Room Baru</div>
+      <button class="btn btn-primary" onclick="createRoom()">Buat Room</button>
+    </div>
+
+    <div class="divider">atau</div>
+
+    <!-- Join room -->
+    <div class="card">
+      <div class="card-title">Masuk ke Room</div>
+      <input class="name-input" id="roomCodeInput" placeholder="Kode room (4 huruf)..." maxlength="4"
+             style="text-transform:uppercase;letter-spacing:4px;margin-bottom:.6rem;">
+      <button class="btn btn-outline" onclick="joinRoom()">Masuk Room</button>
+    </div>
+
+    <div class="ornament">── ✦ ──</div>
+    <div class="info-text">3 – 10 pemain · Firebase Realtime · Auto role assign</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN: WAITING ROOM
+══════════════════════════════ -->
+<div id="screen-waiting" class="screen">
+  <div style="width:100%;max-width:440px;margin:auto;padding:2rem 1rem;">
+    <div class="lobby-logo" style="margin-bottom:1.2rem;">
+      <h1 style="font-size:2.8rem;">Were<span style="color:var(--red)">wolf</span></h1>
+    </div>
+    <div class="room-code-display">
+      <div class="rc-label">Kode Room</div>
+      <div class="rc-code" id="displayRoomCode">—</div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:.3rem;font-family:'IBM Plex Mono',monospace;">
+        Bagikan kode ini ke teman
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pemain (<span id="playerCount">0</span>/10)</div>
+      <div class="player-list" id="playerList"></div>
+      <div class="info-text" id="waitingMsg">Menunggu pemain lain...</div>
+    </div>
+
+    <!-- Role config (host only) -->
+    <div class="card" id="roleConfigCard" style="display:none;">
+      <div class="card-title">Konfigurasi Peran</div>
+      <div id="roleConfig" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.8rem;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--muted);">
+        <!-- auto-generated based on player count -->
+      </div>
+      <button class="btn btn-primary" id="startBtn" onclick="startGame()" style="display:none;">
+        Mulai Permainan
+      </button>
+    </div>
+    <div class="card" id="guestWaitCard" style="display:none;">
+      <div class="info-text">Menunggu host memulai...</div>
+    </div>
+    <button class="btn btn-outline" onclick="leaveRoom()" style="margin-top:.5rem;">Keluar Room</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN: ROLE REVEAL
+══════════════════════════════ -->
+<div id="screen-role" class="screen">
+  <div class="role-reveal-wrap">
+    <div class="card-title" style="text-align:center;margin-bottom:1rem;">PERANMU MALAM INI</div>
+    <div class="btn-tap-reveal" id="btnTapReveal" onclick="revealRole()">
+      🃏 Ketuk untuk lihat peranmu
+    </div>
+    <div id="roleCardWrap" style="display:none;">
+      <div class="role-card" id="roleCard">
+        <div class="role-card-eyebrow">Kamu adalah</div>
+        <span class="role-icon" id="roleIcon">🐺</span>
+        <div class="role-name" id="roleName">Werewolf</div>
+        <div class="role-desc" id="roleDesc">Deskripsi peran</div>
+      </div>
+      <!-- Werewolf team info -->
+      <div id="wwTeamInfo" style="display:none;" class="card">
+        <div class="card-title">Tim Serigala</div>
+        <div id="wwTeamList" style="font-family:'Lora',serif;font-size:.82rem;color:var(--red);"></div>
+      </div>
+    </div>
+    <div class="ornament" style="margin:.6rem 0;">── ✦ ──</div>
+    <button class="btn btn-primary" id="btnRoleDone" style="display:none;" onclick="roleReady()">
+      Siap
+    </button>
+    <div class="info-text" id="roleReadyStatus"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN: NIGHT
+══════════════════════════════ -->
+<div id="screen-night" class="screen">
+  <div class="phase-wrap">
+    <div class="phase-header">
+      <span class="phase-icon">🌙</span>
+      <div class="phase-round" id="nightRoundLabel">RONDE 1 · MALAM</div>
+      <div class="phase-title night">Malam Tiba</div>
+      <div class="phase-sub" id="nightSubtitle">Werewolf bergerak dalam kegelapan...</div>
+    </div>
+
+    <!-- Werewolf action -->
+    <div class="action-section" id="wwAction" style="display:none;">
+      <div class="action-title">🐺 Werewolf — Pilih Korban</div>
+      <div class="target-grid" id="wwTargetGrid"></div>
+      <button class="btn btn-danger btn-sm" id="btnWWConfirm" onclick="confirmWWKill()" disabled>Konfirmasi Mangsa</button>
+    </div>
+
+    <!-- Seer action -->
+    <div class="action-section" id="seerAction" style="display:none;">
+      <div class="action-title">🔮 Peramal — Intip Peran</div>
+      <div class="target-grid" id="seerTargetGrid"></div>
+      <button class="btn btn-primary btn-sm" id="btnSeerConfirm" onclick="confirmSeer()" disabled>Intip</button>
+      <div id="seerResult" style="margin-top:.5rem;font-family:'IBM Plex Mono',monospace;font-size:.68rem;"></div>
+    </div>
+
+    <!-- Doctor action -->
+    <div class="action-section" id="doctorAction" style="display:none;">
+      <div class="action-title">💊 Dokter — Lindungi Seseorang</div>
+      <div class="target-grid" id="doctorTargetGrid"></div>
+      <button class="btn btn-primary btn-sm" id="btnDoctorConfirm" onclick="confirmDoctor()" disabled>Lindungi</button>
+    </div>
+
+    <!-- Waiting (non-action roles) -->
+    <div class="action-section" id="nightWaiting" style="display:none;">
+      <div class="action-title">Menunggu Malam Berakhir</div>
+      <div class="info-text">Tutup mata dan tunggu pagi tiba...</div>
+    </div>
+
+    <div class="game-log" id="nightLog"></div>
+    <div class="info-text" id="nightWaitStatus">Menunggu semua aksi selesai...</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN: DAY
+══════════════════════════════ -->
+<div id="screen-day" class="screen">
+  <div class="phase-wrap">
+    <div class="phase-header">
+      <span class="phase-icon">☀️</span>
+      <div class="phase-round" id="dayRoundLabel">RONDE 1 · SIANG</div>
+      <div class="phase-title day">Pagi Telah Tiba</div>
+      <div class="phase-sub" id="daySubtitle"></div>
+    </div>
+
+    <!-- Night result announcement -->
+    <div class="action-section" id="nightResult">
+      <div class="action-title">Laporan Malam</div>
+      <div id="nightResultText" style="font-size:.82rem;font-family:'Lora',serif;line-height:1.6;"></div>
+    </div>
+
+    <!-- Voting -->
+    <div class="action-section">
+      <div class="action-title">🗳️ Voting — Siapa Werewolf?</div>
+      <div class="target-grid" id="voteTargetGrid"></div>
+      <button class="btn btn-danger btn-sm" id="btnVoteConfirm" onclick="confirmVote()" disabled>Kirim Suara</button>
+    </div>
+
+    <!-- Vote results bar -->
+    <div class="action-section" id="voteResultSection" style="display:none;">
+      <div class="action-title">Hasil Voting</div>
+      <div id="voteResultBars"></div>
+    </div>
+
+    <div class="game-log" id="dayLog"></div>
+    <div class="info-text" id="dayWaitStatus">Menunggu semua suara masuk...</div>
+    <!-- host advance -->
+    <div id="hostAdvanceWrap" style="display:none;margin-top:.5rem;">
+      <button class="btn btn-outline" onclick="hostAdvanceToNight()">Lanjut ke Malam Berikutnya →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN: GAME OVER
+══════════════════════════════ -->
+<div id="screen-over" class="screen">
+  <div class="over-wrap">
+    <span class="over-icon" id="overIcon">🐺</span>
+    <div class="over-eyebrow">PERMAINAN SELESAI</div>
+    <div class="over-title" id="overTitle">Serigala Menang!</div>
+    <div class="ornament">── ✦ ──</div>
+    <div class="card">
+      <div class="card-title">Semua Peran</div>
+      <div class="reveal-list" id="revealList"></div>
+    </div>
+    <button class="btn btn-primary" onclick="backToLobby()" style="margin-top:.5rem;">Main Lagi</button>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   FIREBASE CONFIG
+════════════════════════════════════════ */
+const FB = {
+  apiKey: 'AIzaSyBY-wq2_0z8eUe88IOngPls_LpY055Ndyg',
+  authDomain: 'chat-angkatan-16.firebaseapp.com',
+  databaseURL: 'https://chat-angkatan-16-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId: 'chat-angkatan-16',
+  storageBucket: 'chat-angkatan-16.appspot.com',
+  messagingSenderId: '47699501502',
+  appId: '1:47699501502:web:0d09e69d0b3ff39a7359ef'
+};
+firebase.initializeApp(FB);
+const db = firebase.database();
+
+/* ════════════════════════════════════════
+   GAME STATE
+════════════════════════════════════════ */
+let myId    = localStorage.getItem('wwUID') || ('ww_' + Math.random().toString(36).substr(2, 8));
+let myName  = '';
+let roomCode = '';
+let isHost  = false;
+let myRole  = '';
+let gameRef = null;
+let listeners = [];
+
+// Local cache
+let players   = {};  // { id: { name, alive, role } }
+let gameState = {};  // full game state from Firebase
+
+localStorage.setItem('wwUID', myId);
+
+/* Pre-fill name from shared storage */
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('lbName') || localStorage.getItem('wwName') || '';
+  if (saved) document.getElementById('playerName').value = saved;
+  document.getElementById('roomCodeInput').addEventListener('input', function(){
+    this.value = this.value.toUpperCase().replace(/[^A-Z]/g,'');
+  });
+});
+
+/* ════════════════════════════════════════
+   ROLES CONFIG
+════════════════════════════════════════ */
+const ROLES = {
+  werewolf: { name:'Werewolf', icon:'🐺', desc:'Setiap malam, pilih satu warga untuk dibunuh bersama tim. Bersembunyi di siang hari dan jangan ketahuan!', team:'evil' },
+  villager:  { name:'Warga',   icon:'👨‍🌾', desc:'Kamu hanya warga biasa. Gunakan akal dan pengamatan untuk menemukan siapa Werewolf dan singkirkan mereka saat voting.', team:'good' },
+  seer:      { name:'Peramal', icon:'🔮', desc:'Setiap malam kamu bisa melihat peran satu pemain. Gunakan informasi ini dengan bijak — jangan terlalu kentara!', team:'good' },
+  doctor:    { name:'Dokter',  icon:'💊', desc:'Setiap malam kamu bisa melindungi satu orang dari serangan Werewolf. Kamu bisa melindungi dirimu sendiri!', team:'good' },
+  hunter:    { name:'Pemburu', icon:'🏹', desc:'Jika kamu mati, kamu bisa menembak satu pemain lain untuk ikut mati bersamamu. Pilih dengan bijak!', team:'good' },
+};
+
+function getRoleComposition(n) {
+  // Returns array of role strings for n players
+  if (n <= 3)  return ['werewolf','villager','seer'];
+  if (n === 4) return ['werewolf','villager','villager','seer'];
+  if (n === 5) return ['werewolf','villager','villager','seer','doctor'];
+  if (n === 6) return ['werewolf','werewolf','villager','villager','seer','doctor'];
+  if (n === 7) return ['werewolf','werewolf','villager','villager','villager','seer','doctor'];
+  if (n === 8) return ['werewolf','werewolf','villager','villager','villager','seer','doctor','hunter'];
+  if (n === 9) return ['werewolf','werewolf','werewolf','villager','villager','villager','seer','doctor','hunter'];
+  return        ['werewolf','werewolf','werewolf','villager','villager','villager','villager','seer','doctor','hunter'];
+}
+
+function getRoleCountText(n) {
+  const comp = getRoleComposition(n);
+  const counts = {};
+  comp.forEach(r => counts[r] = (counts[r]||0)+1);
+  return Object.entries(counts).map(([r,c]) =>
+    `${ROLES[r].icon} ${ROLES[r].name}: ${c}`
+  ).join('  |  ');
+}
+
+/* ════════════════════════════════════════
+   ROOM MANAGEMENT
+════════════════════════════════════════ */
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  return Array.from({length:4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+async function createRoom() {
+  const name = document.getElementById('playerName').value.trim();
+  if (!name) { toast('Masukkan namamu dulu!'); return; }
+  myName = name;
+  localStorage.setItem('wwName', name);
+
+  roomCode = genCode();
+  isHost   = true;
+
+  const roomData = {
+    host: myId,
+    phase: 'waiting',
+    round: 0,
+    created: Date.now(),
+    players: {
+      [myId]: { name, alive: true, ready: false, connected: true }
+    },
+    actions: {},
+    votes: {},
+    log: [],
+  };
+
+  await db.ref('ww_rooms/' + roomCode).set(roomData);
+  gameRef = db.ref('ww_rooms/' + roomCode);
+  gameRef.onDisconnect().update({ [`players/${myId}/connected`]: false });
+  listenRoom();
+  showScreen('waiting');
+}
+
+async function joinRoom() {
+  const name = document.getElementById('playerName').value.trim();
+  const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+  if (!name) { toast('Masukkan namamu dulu!'); return; }
+  if (code.length !== 4) { toast('Kode room harus 4 huruf!'); return; }
+
+  myName = name;
+  localStorage.setItem('wwName', name);
+
+  const snap = await db.ref('ww_rooms/' + code).once('value');
+  if (!snap.exists()) { toast('Room tidak ditemukan!'); return; }
+  const data = snap.val();
+  if (data.phase !== 'waiting') { toast('Permainan sudah dimulai!'); return; }
+  const playerCount = Object.keys(data.players || {}).length;
+  if (playerCount >= 10) { toast('Room penuh (maks 10)!'); return; }
+
+  roomCode = code;
+  isHost   = false;
+
+  await db.ref('ww_rooms/' + code + '/players/' + myId).set({
+    name, alive: true, ready: false, connected: true
+  });
+
+  gameRef = db.ref('ww_rooms/' + code);
+  gameRef.onDisconnect().update({ [`players/${myId}/connected`]: false });
+  listenRoom();
+  showScreen('waiting');
+}
+
+function leaveRoom() {
+  if (gameRef) {
+    gameRef.child('players/' + myId).remove();
+    offListeners();
+  }
+  roomCode = ''; isHost = false; myRole = '';
+  players = {}; gameState = {};
+  showScreen('lobby');
+}
+
+/* ════════════════════════════════════════
+   FIREBASE LISTENER
+════════════════════════════════════════ */
+function listenRoom() {
+  offListeners();
+  const ref = gameRef.on('value', snap => {
+    if (!snap.exists()) { toast('Room dihapus!'); leaveRoom(); return; }
+    const data = snap.val();
+    gameState = data;
+    players = data.players || {};
+    handleStateChange(data);
+  });
+  listeners.push({ ref: gameRef, event: 'value', fn: ref });
+}
+
+function offListeners() {
+  listeners.forEach(l => l.ref.off(l.event));
+  listeners = [];
+}
+
+function handleStateChange(data) {
+  const phase = data.phase;
+  document.getElementById('displayRoomCode').textContent = roomCode;
+
+  switch (phase) {
+    case 'waiting':   renderWaiting(data);  break;
+    case 'roleReveal':
+      if (document.getElementById('screen-role').classList.contains('active')) return;
+      myRole = (players[myId]||{}).role || 'villager';
+      showScreen('role');
+      renderRoleScreen();
+      break;
+    case 'night':
+      if (document.getElementById('screen-night').classList.contains('active')) renderNight(data);
+      else { showScreen('night'); renderNight(data); }
+      break;
+    case 'day':
+      if (document.getElementById('screen-day').classList.contains('active')) renderDay(data);
+      else { showScreen('day'); renderDay(data); }
+      break;
+    case 'gameover':
+      showScreen('over');
+      renderGameOver(data);
+      break;
+  }
+}
+
+/* ════════════════════════════════════════
+   WAITING ROOM RENDER
+════════════════════════════════════════ */
+function renderWaiting(data) {
+  if (!document.getElementById('screen-waiting').classList.contains('active')) {
+    if (data.phase === 'waiting') showScreen('waiting');
+  }
+  const pList = data.players || {};
+  const pArr  = Object.entries(pList);
+  document.getElementById('playerCount').textContent = pArr.length;
+  document.getElementById('displayRoomCode').textContent = roomCode;
+
+  // Player list
+  const ul = document.getElementById('playerList');
+  ul.innerHTML = pArr.map(([uid, p]) => `
+    <div class="player-item">
+      <div class="pi-dot" style="background:${p.connected===false?'var(--red)':'var(--green)'}"></div>
+      <span class="pi-name">${esc(p.name)}</span>
+      ${uid === data.host ? '<span class="pi-badge pi-host">Host</span>' : ''}
+      ${uid === myId ? '<span class="pi-badge">Kamu</span>' : ''}
+    </div>
+  `).join('');
+
+  // Host controls
+  const isMe = data.host === myId;
+  document.getElementById('roleConfigCard').style.display = isMe ? 'block' : 'none';
+  document.getElementById('guestWaitCard').style.display  = isMe ? 'none' : 'block';
+
+  if (isMe) {
+    const n = pArr.length;
+    document.getElementById('roleConfig').innerHTML = `
+      <div>${n} pemain → ${getRoleCountText(n)}</div>
+    `;
+    const startBtn = document.getElementById('startBtn');
+    startBtn.style.display = n >= 3 ? 'block' : 'none';
+    document.getElementById('waitingMsg').textContent = n < 3 ? 'Minimal 3 pemain untuk mulai.' : 'Siap memulai!';
+  }
+}
+
+/* ════════════════════════════════════════
+   START GAME — HOST ONLY
+════════════════════════════════════════ */
+async function startGame() {
+  const pArr = Object.entries(players);
+  if (pArr.length < 3) { toast('Minimal 3 pemain!'); return; }
+
+  // Shuffle & assign roles
+  const roles = shuffle(getRoleComposition(pArr.length));
+  const updates = {};
+  pArr.forEach(([uid], i) => {
+    updates[`players/${uid}/role`]  = roles[i];
+    updates[`players/${uid}/alive`] = true;
+    updates[`players/${uid}/ready`] = false;
+  });
+  updates['phase']   = 'roleReveal';
+  updates['round']   = 1;
+  updates['actions'] = {};
+  updates['votes']   = {};
+  updates['log']     = [];
+
+  await gameRef.update(updates);
+}
+
+/* ════════════════════════════════════════
+   ROLE REVEAL SCREEN
+════════════════════════════════════════ */
+function renderRoleScreen() {
+  document.getElementById('btnTapReveal').style.display = 'block';
+  document.getElementById('roleCardWrap').style.display = 'none';
+  document.getElementById('btnRoleDone').style.display  = 'none';
+  document.getElementById('wwTeamInfo').style.display   = 'none';
+  document.getElementById('roleReadyStatus').textContent = '';
+}
+
+function revealRole() {
+  document.getElementById('btnTapReveal').style.display = 'none';
+  document.getElementById('roleCardWrap').style.display = 'block';
+  document.getElementById('btnRoleDone').style.display  = 'block';
+
+  const role = myRole;
+  const info = ROLES[role] || ROLES.villager;
+  const card = document.getElementById('roleCard');
+  card.className = 'role-card role-' + role;
+  document.getElementById('roleIcon').textContent = info.icon;
+  document.getElementById('roleName').textContent = info.name;
+  document.getElementById('roleDesc').textContent = info.desc;
+
+  // Show werewolf team
+  if (role === 'werewolf') {
+    const wwList = Object.entries(players)
+      .filter(([uid, p]) => p.role === 'werewolf' && uid !== myId)
+      .map(([, p]) => p.name);
+    if (wwList.length > 0) {
+      document.getElementById('wwTeamInfo').style.display = 'block';
+      document.getElementById('wwTeamList').textContent = wwList.join(', ') + ' adalah sesama Werewolf.';
+    }
+  }
+}
+
+function roleReady() {
+  gameRef.child('players/' + myId + '/ready').set(true);
+  document.getElementById('btnRoleDone').disabled = true;
+  document.getElementById('btnRoleDone').textContent = 'Menunggu pemain lain...';
+
+  // Check if all ready → move to night (host only)
+  if (gameState.host === myId) {
+    const checkReady = setInterval(async () => {
+      const snap = await gameRef.child('players').once('value');
+      const ps = snap.val() || {};
+      const all = Object.values(ps).filter(p => p.alive !== false);
+      if (all.every(p => p.ready)) {
+        clearInterval(checkReady);
+        await gameRef.update({ phase: 'night', 'actions': {}, 'votes': {} });
+      }
+    }, 1500);
+  }
+}
+
+/* ════════════════════════════════════════
+   NIGHT PHASE
+════════════════════════════════════════ */
+function renderNight(data) {
+  const round = data.round || 1;
+  document.getElementById('nightRoundLabel').textContent = `RONDE ${round} · MALAM`;
+
+  const alivePlayers = Object.entries(players).filter(([,p]) => p.alive !== false);
+  const actions = data.actions || {};
+
+  // Hide all action sections
+  ['wwAction','seerAction','doctorAction','nightWaiting'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+
+  if (myRole === 'werewolf' && players[myId]?.alive !== false) {
+    document.getElementById('wwAction').style.display = 'block';
+    const grid = document.getElementById('wwTargetGrid');
+    const nonWW = alivePlayers.filter(([uid, p]) => p.role !== 'werewolf' && uid !== myId);
+    const myAction = actions['ww_' + myId];
+    grid.innerHTML = nonWW.map(([uid, p]) => `
+      <button class="target-btn ${myAction === uid ? 'selected voted-danger' : ''}"
+              onclick="selectWWTarget('${uid}', this)" data-uid="${uid}">
+        <span class="tb-num">${ROLES['villager'].icon}</span>
+        ${esc(p.name)}
+      </button>
+    `).join('');
+    document.getElementById('btnWWConfirm').disabled = !myAction;
+  } else if (myRole === 'seer' && players[myId]?.alive !== false) {
+    document.getElementById('seerAction').style.display = 'block';
+    const grid = document.getElementById('seerTargetGrid');
+    const others = alivePlayers.filter(([uid]) => uid !== myId);
+    const myAction = actions['seer_' + myId];
+    grid.innerHTML = others.map(([uid, p]) => `
+      <button class="target-btn ${myAction === uid ? 'selected' : ''}"
+              onclick="selectSeerTarget('${uid}', this)" data-uid="${uid}">
+        <span class="tb-num">🔮</span>
+        ${esc(p.name)}
+      </button>
+    `).join('');
+    document.getElementById('btnSeerConfirm').disabled = !myAction;
+    if (myAction && players[myAction]) {
+      const target = players[myAction];
+      const isWW = target.role === 'werewolf';
+      document.getElementById('seerResult').innerHTML =
+        `<span style="color:${isWW?'var(--red)':'var(--green)'}">${esc(target.name)} adalah ${ROLES[target.role]?.icon} ${ROLES[target.role]?.name}${isWW?' ⚠️':' ✓'}</span>`;
+    }
+  } else if (myRole === 'doctor' && players[myId]?.alive !== false) {
+    document.getElementById('doctorAction').style.display = 'block';
+    const grid = document.getElementById('doctorTargetGrid');
+    const myAction = actions['doc_' + myId];
+    grid.innerHTML = alivePlayers.map(([uid, p]) => `
+      <button class="target-btn ${myAction === uid ? 'selected' : ''}"
+              onclick="selectDoctorTarget('${uid}', this)" data-uid="${uid}">
+        <span class="tb-num">💊</span>
+        ${esc(p.name)}${uid === myId ? ' (kamu)' : ''}
+      </button>
+    `).join('');
+    document.getElementById('btnDoctorConfirm').disabled = !myAction;
+  } else {
+    document.getElementById('nightWaiting').style.display = 'block';
+  }
+
+  // Log
+  renderLog('nightLog', data.log || []);
+
+  // Host: check if all night actions done → advance to day
+  if (gameState.host === myId) {
+    checkNightComplete(data);
+  }
+}
+
+let wwTarget = null, seerTarget = null, doctorTarget = null;
+
+function selectWWTarget(uid, btn) {
+  wwTarget = uid;
+  document.querySelectorAll('#wwTargetGrid .target-btn').forEach(b => b.classList.remove('selected','voted-danger'));
+  btn.classList.add('selected','voted-danger');
+  document.getElementById('btnWWConfirm').disabled = false;
+}
+
+function selectSeerTarget(uid, btn) {
+  seerTarget = uid;
+  document.querySelectorAll('#seerTargetGrid .target-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('btnSeerConfirm').disabled = false;
+}
+
+function selectDoctorTarget(uid, btn) {
+  doctorTarget = uid;
+  document.querySelectorAll('#doctorTargetGrid .target-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('btnDoctorConfirm').disabled = false;
+}
+
+async function confirmWWKill() {
+  if (!wwTarget) return;
+  await gameRef.child('actions/ww_' + myId).set(wwTarget);
+  document.getElementById('btnWWConfirm').disabled = true;
+  document.getElementById('btnWWConfirm').textContent = '✓ Terkonfirmasi';
+  toast('Mangsa dipilih. Menunggu malam berakhir...');
+}
+
+async function confirmSeer() {
+  if (!seerTarget) return;
+  await gameRef.child('actions/seer_' + myId).set(seerTarget);
+  document.getElementById('btnSeerConfirm').disabled = true;
+  document.getElementById('btnSeerConfirm').textContent = '✓ Sudah diintip';
+  const target = players[seerTarget];
+  if (target) {
+    const isWW = target.role === 'werewolf';
+    document.getElementById('seerResult').innerHTML =
+      `<span style="color:${isWW?'var(--red)':'var(--green)'}">${esc(target.name)} adalah ${ROLES[target.role]?.icon} ${ROLES[target.role]?.name}${isWW?' ⚠️':' ✓'}</span>`;
+    toast(target.name + ' adalah ' + ROLES[target.role]?.name);
+  }
+}
+
+async function confirmDoctor() {
+  if (!doctorTarget) return;
+  await gameRef.child('actions/doc_' + myId).set(doctorTarget);
+  document.getElementById('btnDoctorConfirm').disabled = true;
+  document.getElementById('btnDoctorConfirm').textContent = '✓ Sudah dilindungi';
+  toast('Perlindungan diberikan!');
+}
+
+async function checkNightComplete(data) {
+  const alivePlayers = Object.entries(players).filter(([,p]) => p.alive !== false);
+  const actions = data.actions || {};
+
+  const wwPlayers  = alivePlayers.filter(([,p]) => p.role === 'werewolf');
+  const seerPlayer = alivePlayers.find(([,p]) => p.role === 'seer');
+  const docPlayer  = alivePlayers.find(([,p]) => p.role === 'doctor');
+
+  const wwDone  = wwPlayers.length === 0  || wwPlayers.every(([uid]) => actions['ww_'  + uid]);
+  const seerDone = !seerPlayer || actions['seer_' + seerPlayer[0]];
+  const docDone  = !docPlayer  || actions['doc_'  + docPlayer[0]];
+
+  if (wwDone && seerDone && docDone) {
+    await resolveNight(data);
+  }
+}
+
+async function resolveNight(data) {
+  const actions = data.actions || {};
+  const round   = data.round || 1;
+
+  // Tally WW votes (majority)
+  const wwVotes = {};
+  Object.entries(players).forEach(([uid, p]) => {
+    if (p.role === 'werewolf' && p.alive !== false) {
+      const target = actions['ww_' + uid];
+      if (target) wwVotes[target] = (wwVotes[target] || 0) + 1;
+    }
+  });
+
+  const wwTarget = Object.entries(wwVotes).sort((a,b) => b[1]-a[1])[0]?.[0];
+
+  // Doctor save?
+  const docTarget = Object.values(actions).find((v, _, arr) => {
+    const key = Object.keys(actions).find(k => actions[k] === v && k.startsWith('doc_'));
+    return key;
+  });
+  const docSave = Object.entries(actions).find(([k]) => k.startsWith('doc_'))?.[1];
+
+  const updates = {};
+  const log = [...(data.log || [])];
+  let nightResultMsg = '';
+
+  if (wwTarget && wwTarget !== docSave) {
+    updates[`players/${wwTarget}/alive`] = false;
+    const name = players[wwTarget]?.name || '?';
+    nightResultMsg = `💀 ${name} ditemukan tewas tadi malam!`;
+    log.push({ type:'kill', msg:`[Ronde ${round}] ${name} dibunuh Werewolf.`, ts: Date.now() });
+  } else if (wwTarget && wwTarget === docSave) {
+    nightResultMsg = `🌟 Semua selamat! Dokter berhasil menyelamatkan seseorang tadi malam.`;
+    log.push({ type:'save', msg:`[Ronde ${round}] Seseorang diselamatkan Dokter.`, ts: Date.now() });
+  } else {
+    nightResultMsg = `🌅 Malam berlalu tanpa korban.`;
+    log.push({ type:'sys', msg:`[Ronde ${round}] Malam berlalu tanpa korban.`, ts: Date.now() });
+  }
+
+  updates['nightResultMsg'] = nightResultMsg;
+  updates['phase'] = 'day';
+  updates['actions'] = {};
+  updates['votes'] = {};
+  log.forEach((l, i) => { updates[`log/${i}`] = l; });
+
+  // Check game over before transitioning
+  const newPlayers = { ...players };
+  if (wwTarget && wwTarget !== docSave) newPlayers[wwTarget] = { ...newPlayers[wwTarget], alive: false };
+  const winner = checkWinner(newPlayers);
+  if (winner) {
+    updates['phase'] = 'gameover';
+    updates['winner'] = winner;
+  }
+
+  await gameRef.update(updates);
+}
+
+/* ════════════════════════════════════════
+   DAY PHASE
+════════════════════════════════════════ */
+function renderDay(data) {
+  const round = data.round || 1;
+  document.getElementById('dayRoundLabel').textContent = `RONDE ${round} · SIANG`;
+  document.getElementById('nightResultText').textContent = data.nightResultMsg || '';
+
+  const alivePlayers = Object.entries(players).filter(([,p]) => p.alive !== false);
+  const votes = data.votes || {};
+  const myVote = votes[myId];
+
+  // Vote grid
+  const grid = document.getElementById('voteTargetGrid');
+  grid.innerHTML = alivePlayers.filter(([uid]) => uid !== myId).map(([uid, p]) => {
+    const vCount = Object.values(votes).filter(v => v === uid).length;
+    return `
+      <button class="target-btn ${myVote === uid ? 'selected voted-danger' : ''}"
+              onclick="selectVoteTarget('${uid}', this)" data-uid="${uid}">
+        <span class="tb-num">🗳️</span>
+        ${esc(p.name)}
+        ${vCount > 0 ? `<span class="tb-votes">${vCount} suara</span>` : ''}
+      </button>
+    `;
+  }).join('');
+
+  document.getElementById('btnVoteConfirm').disabled = !myVote;
+
+  // Vote result bars
+  if (Object.keys(votes).length > 0) {
+    const total = Object.keys(votes).length;
+    document.getElementById('voteResultSection').style.display = 'block';
+    const tally = {};
+    alivePlayers.forEach(([uid]) => { tally[uid] = 0; });
+    Object.values(votes).forEach(v => { if (tally[v] !== undefined) tally[v]++; });
+    document.getElementById('voteResultBars').innerHTML = alivePlayers
+      .sort((a,b) => (tally[b[0]]||0) - (tally[a[0]]||0))
+      .map(([uid, p]) => {
+        const pct = total > 0 ? Math.round((tally[uid]||0) / total * 100) : 0;
+        return `<div class="vote-bar-wrap">
+          <div class="vote-bar-name"><span>${esc(p.name)}</span><span>${tally[uid]||0} suara</span></div>
+          <div class="vote-bar-bg"><div class="vote-bar-fill" style="width:${pct}%"></div></div>
+        </div>`;
+      }).join('');
+  }
+
+  // Log
+  renderLog('dayLog', data.log || []);
+
+  // Wait status
+  const voted = Object.keys(votes).length;
+  const alive = alivePlayers.length;
+  document.getElementById('dayWaitStatus').textContent = `${voted}/${alive} suara masuk`;
+
+  // Host advance button
+  const hostAdv = document.getElementById('hostAdvanceWrap');
+  hostAdv.style.display = (gameState.host === myId && voted >= alive) ? 'block' : 'none';
+
+  // Auto-resolve if host and all voted
+  if (gameState.host === myId && voted >= alive) {
+    resolveDayVoting(data);
+  }
+}
+
+let voteTarget = null;
+function selectVoteTarget(uid, btn) {
+  voteTarget = uid;
+  document.querySelectorAll('#voteTargetGrid .target-btn').forEach(b => b.classList.remove('selected','voted-danger'));
+  btn.classList.add('selected','voted-danger');
+  document.getElementById('btnVoteConfirm').disabled = false;
+}
+
+async function confirmVote() {
+  if (!voteTarget) return;
+  await gameRef.child('votes/' + myId).set(voteTarget);
+  document.getElementById('btnVoteConfirm').disabled = true;
+  document.getElementById('btnVoteConfirm').textContent = '✓ Suara terkirim';
+  toast('Suara dikirim!');
+  voteTarget = null;
+}
+
+async function resolveDayVoting(data) {
+  const votes = data.votes || {};
+  const alivePlayers = Object.entries(players).filter(([,p]) => p.alive !== false);
+
+  // Tally
+  const tally = {};
+  alivePlayers.forEach(([uid]) => { tally[uid] = 0; });
+  Object.values(votes).forEach(v => { if (tally[v] !== undefined) tally[v]++; });
+
+  // Find most voted
+  const sorted = Object.entries(tally).sort((a,b) => b[1]-a[1]);
+  const maxVotes = sorted[0][1];
+  const tied = sorted.filter(([,c]) => c === maxVotes);
+
+  const updates = {};
+  const log = [...(data.log || [])];
+  const round = data.round || 1;
+
+  let eliminated = null;
+  if (tied.length === 1 && maxVotes > 0) {
+    eliminated = tied[0][0];
+  }
+
+  if (eliminated) {
+    updates[`players/${eliminated}/alive`] = false;
+    const name = players[eliminated]?.name || '?';
+    const role = players[eliminated]?.role || 'villager';
+    log.push({ type:'vote', msg:`[Ronde ${round}] ${name} (${ROLES[role]?.name}) dieksekusi warga.`, ts: Date.now() });
+
+    // Hunter: if eliminated is hunter, they get to shoot (simplified: auto shoot random alive non-eliminated)
+    // (skipped for simplicity — can be added later)
+  } else {
+    log.push({ type:'sys', msg:`[Ronde ${round}] Suara seri — tidak ada yang dieksekusi.`, ts: Date.now() });
+  }
+
+  updates['votes'] = {};
+  updates['actions'] = {};
+  updates['round'] = (data.round || 1) + 1;
+  log.forEach((l, i) => { updates[`log/${i}`] = l; });
+
+  // Check game over
+  const newPlayers = { ...players };
+  if (eliminated) newPlayers[eliminated] = { ...newPlayers[eliminated], alive: false };
+  const winner = checkWinner(newPlayers);
+  if (winner) {
+    updates['phase'] = 'gameover';
+    updates['winner'] = winner;
+  } else {
+    updates['phase'] = 'night';
+  }
+
+  await gameRef.update(updates);
+}
+
+async function hostAdvanceToNight() {
+  if (gameState.host !== myId) return;
+  await resolveDayVoting(gameState);
+}
+
+/* ════════════════════════════════════════
+   WIN CONDITION
+════════════════════════════════════════ */
+function checkWinner(ps) {
+  const alive = Object.values(ps).filter(p => p.alive !== false);
+  const wwAlive  = alive.filter(p => p.role === 'werewolf').length;
+  const vilAlive = alive.filter(p => p.role !== 'werewolf').length;
+  if (wwAlive === 0)            return 'villager';
+  if (wwAlive >= vilAlive)      return 'werewolf';
+  return null;
+}
+
+/* ════════════════════════════════════════
+   GAME OVER
+════════════════════════════════════════ */
+function renderGameOver(data) {
+  const winner = data.winner || 'villager';
+  const wrap = document.querySelector('.over-wrap');
+  wrap.className = 'over-wrap over-' + winner;
+
+  document.getElementById('overIcon').textContent   = winner === 'werewolf' ? '🐺' : '🏡';
+  document.getElementById('overTitle').textContent  = winner === 'werewolf' ? 'Werewolf Menang!' : 'Warga Menang!';
+
+  const reveal = document.getElementById('revealList');
+  reveal.innerHTML = Object.entries(data.players || {}).map(([, p]) => {
+    const role = ROLES[p.role] || ROLES.villager;
+    return `<div class="reveal-item">
+      <span>${role.icon}</span>
+      <span style="flex:1">${esc(p.name)}</span>
+      <span class="status-badge ${p.alive !== false ? 'badge-alive' : 'badge-dead'}">${p.alive !== false ? 'Selamat' : 'Gugur'}</span>
+      <span class="status-badge ${p.role === 'werewolf' ? 'badge-ww' : 'badge-vil'}">${role.name}</span>
+    </div>`;
+  }).join('');
+}
+
+function backToLobby() {
+  offListeners();
+  roomCode = ''; isHost = false; myRole = '';
+  players = {}; gameState = {};
+  wwTarget = null; seerTarget = null; doctorTarget = null; voteTarget = null;
+  showScreen('lobby');
+}
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+function renderLog(containerId, logs) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const recent = [...logs].reverse().slice(0, 12);
+  el.innerHTML = recent.map(l =>
+    `<div class="log-entry log-${l.type||'sys'}">${esc(l.msg||'')}</div>`
+  ).join('') || '<div class="log-entry" style="opacity:.4">Belum ada aktivitas.</div>';
+}
+
+function toast(msg, dur = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._ww_toast);
+  window._ww_toast = setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function esc(t) {
+  return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function closeModal() {
+  document.getElementById('modal-confirm').classList.remove('open');
+}
+</script>
+</body>
+</html>
