@@ -310,16 +310,7 @@ window.addEventListener('beforeunload', stopTyping);
 ══════════════════════════ */
 (function() {
   const PLAYLIST = [
-    { file: 'Kenangan Manis.mp3',           title: 'Kenangan Manis' },
-    { file: 'Kita Ke Sana.mp3',             title: 'Kita Ke Sana' },
-    { file: 'Lantas.mp3',                   title: 'Lantas' },
-    { file: 'Monokrom.mp3',                 title: 'Monokrom' },
-    { file: 'Monolog.mp3',                  title: 'Monolog' },
-    { file: 'Ribuan Memori.mp3',            title: 'Ribuan Memori' },
-    { file: 'Secukupnya.mp3',               title: 'Secukupnya' },
-    { file: 'Terbuang Dalam Waktu.mp3',     title: 'Terbuang Dalam Waktu' },
-    { file: 'Tujuh Belas.mp3',              title: 'Tujuh Belas' },
-    { file: 'bergema sampai selamanya.mp3', title: 'Bergema Sampai Selamanya' },
+    { file: '',           title: 'Waktu Sudah Habis. Angkatan 16 Akan Segera Lulus' },
   ];
   const BASE_PATH = './music/';
 
