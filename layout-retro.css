@@ -1,0 +1,946 @@
+/* ================================================================
+   LAYOUT RETRO — Sidebar Kiri + Vintage Ornamental
+   Tambahkan SETELAH style.css & game-theme.css:
+   <link rel="stylesheet" href="layout-retro.css">
+   <script src="layout-retro.js" defer></script>
+================================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=UnifrakturMaguntia&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+
+/* ── Core vars ── */
+:root {
+  --sb-w: 230px;           /* sidebar width */
+  --sb-bg: #0C0E08;
+  --sb-border: rgba(148,172,68,.22);
+  --sb-acc: #94AC44;
+  --sb-warm: #C4883A;
+  --sb-text: #D8CEAD;
+  --sb-muted: rgba(195,180,138,.38);
+  --ornament: #94AC44;
+}
+
+/* ================================================================
+   BODY — push right for sidebar
+================================================================ */
+body {
+  padding-top: 0 !important;
+  padding-left: var(--sb-w) !important;
+  background: #080B05 !important;
+}
+
+/* Overlay (mobile) */
+#sb-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(4,5,2,.72);
+  z-index: 998;
+  backdrop-filter: blur(3px);
+}
+#sb-overlay.open { display: block; }
+
+/* ================================================================
+   SIDEBAR (was #navbar)
+================================================================ */
+#navbar {
+  /* Size & Position */
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: var(--sb-w) !important;
+  height: 100vh !important;
+
+  /* Layout */
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  padding: 0 !important;
+  gap: 0 !important;
+
+  /* Visual */
+  background: var(--sb-bg) !important;
+  border-right: 1px solid var(--sb-border) !important;
+  border-bottom: none !important;
+  backdrop-filter: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  z-index: 999 !important;
+
+  /* Vintage double-rule border */
+  box-shadow: inset -5px 0 0 -4px rgba(148,172,68,.08), 3px 0 20px rgba(0,0,0,.5) !important;
+
+  /* Transition for mobile */
+  transition: transform .3s cubic-bezier(.25,.46,.45,.94) !important;
+}
+#navbar::-webkit-scrollbar { width: 2px; }
+#navbar::-webkit-scrollbar-thumb { background: rgba(148,172,68,.2); }
+
+/* ── SIDEBAR HEADER ── */
+.nav-left {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.8rem 1rem 1.4rem !important;
+  border-bottom: 1px solid var(--sb-border) !important;
+  position: relative !important;
+  width: 100% !important;
+}
+
+/* Ornamental top frame */
+.nav-left::before {
+  content: '— ✦ —' !important;
+  display: block !important;
+  font-size: .55rem !important;
+  letter-spacing: 4px !important;
+  color: var(--sb-acc) !important;
+  margin-bottom: .7rem !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  opacity: .7 !important;
+}
+
+/* School crest placeholder */
+.nav-left::after {
+  content: '❧' !important;
+  display: block !important;
+  font-size: 1.4rem !important;
+  color: rgba(148,172,68,.25) !important;
+  margin-top: .6rem !important;
+  line-height: 1 !important;
+}
+
+.nav-left h1,
+.nav-left a h1 {
+  font-family: 'Playfair Display', serif !important;
+  font-size: 1.1rem !important;
+  font-weight: 900 !important;
+  font-style: italic !important;
+  letter-spacing: .5px !important;
+  text-transform: none !important;
+  text-align: center !important;
+  line-height: 1.15 !important;
+  color: #F2EBCC !important;
+}
+.nav-left h1 span,
+.nav-left a h1 span {
+  color: var(--sb-acc) !important;
+  display: block !important;
+  font-size: .85rem !important;
+  font-style: normal !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  letter-spacing: 5px !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+  margin-top: .15rem !important;
+}
+
+.nav-left a { text-decoration: none !important; }
+
+/* ── NAV LINKS SECTION ── */
+.nav-right {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  padding: 1rem 0 .5rem !important;
+  flex: 1 !important;
+}
+
+/* Section label */
+.nav-right::before {
+  content: 'NAVIGASI' !important;
+  display: block !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .46rem !important;
+  letter-spacing: 4px !important;
+  color: var(--sb-muted) !important;
+  padding: 0 1.1rem .6rem !important;
+  text-transform: uppercase !important;
+}
+
+.nav-right a,
+.nav-right a.nav-desktop {
+  display: flex !important;
+  align-items: center !important;
+  gap: .55rem !important;
+  padding: .58rem 1.1rem !important;
+  color: var(--sb-muted) !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .62rem !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  border-left: 2px solid transparent !important;
+  transition: all .18s !important;
+  position: relative !important;
+  width: 100% !important;
+}
+
+/* Show ALL links in sidebar (no more .nav-desktop hidden) */
+.nav-right a.nav-desktop {
+  display: flex !important;
+}
+
+.nav-right a:hover {
+  color: var(--sb-acc) !important;
+  background: rgba(148,172,68,.07) !important;
+  border-left-color: var(--sb-acc) !important;
+  padding-left: 1.3rem !important;
+}
+
+.nav-right a .icon {
+  width: .75rem !important;
+  height: .75rem !important;
+  flex-shrink: 0 !important;
+  opacity: .6 !important;
+}
+.nav-right a:hover .icon { opacity: 1 !important; }
+
+/* Ornamental divider between nav sections */
+.nav-right a:nth-child(4)::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 1rem !important;
+  right: 1rem !important;
+  height: 1px !important;
+  background: linear-gradient(to right, transparent, var(--sb-border), transparent) !important;
+}
+
+/* ── SIDEBAR FOOTER ── */
+.nav-right::after {
+  content: '— Angkatan XVI —' !important;
+  display: block !important;
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  font-size: .65rem !important;
+  color: var(--sb-muted) !important;
+  text-align: center !important;
+  padding: 1.5rem 1rem .8rem !important;
+  margin-top: auto !important;
+  border-top: 1px solid var(--sb-border) !important;
+}
+
+/* ── BURGER button (mobile trigger) ── */
+.nav-burger {
+  display: none !important; /* Hidden inside sidebar by default */
+}
+
+/* ── MOBILE CLOSE BUTTON inside sidebar ── */
+#sb-close {
+  display: none !important;
+  position: absolute !important;
+  top: .8rem !important;
+  right: .8rem !important;
+  background: rgba(148,172,68,.1) !important;
+  border: 1px solid var(--sb-border) !important;
+  color: var(--sb-muted) !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 2px !important;
+  cursor: pointer !important;
+  font-size: .8rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 10 !important;
+}
+
+/* ── MOBILE OPEN BUTTON (floating) ── */
+#sb-open {
+  display: none !important;
+  position: fixed !important;
+  top: .9rem !important;
+  left: .9rem !important;
+  z-index: 997 !important;
+  background: var(--sb-bg) !important;
+  border: 1px solid var(--sb-border) !important;
+  color: var(--sb-acc) !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  font-size: 1rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5) !important;
+}
+#sb-open span {
+  display: block !important;
+  width: 16px !important;
+  height: 2px !important;
+  background: var(--sb-acc) !important;
+  border-radius: 1px !important;
+}
+
+/* ── Hide old mobile nav (we use sidebar now) ── */
+.mobile-nav {
+  display: none !important;
+}
+
+/* Notif bell - repositioned to sidebar bottom */
+.notif-bell {
+  margin: 0 !important;
+  padding: .58rem 1.1rem !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: .55rem !important;
+  color: var(--sb-muted) !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .62rem !important;
+  letter-spacing: 1px !important;
+  border-left: 2px solid transparent !important;
+  transition: all .18s !important;
+}
+.notif-bell:hover {
+  color: var(--sb-acc) !important;
+  background: rgba(148,172,68,.07) !important;
+  border-left-color: var(--sb-acc) !important;
+}
+.notif-bell .icon { width: .75rem !important; height: .75rem !important; }
+.notif-bell::after { content: 'Notifikasi' !important; font-size: .62rem !important; }
+
+/* Notif panel */
+#notifPanel {
+  left: var(--sb-w) !important;
+  top: 0 !important;
+  right: auto !important;
+  border-top: 2px solid var(--sb-acc) !important;
+}
+
+/* ================================================================
+   RETRO PAGE LAYOUT OVERHAUL
+================================================================ */
+
+/* ── Online strip ── */
+#onlineStrip {
+  margin-left: 0 !important;
+  padding: .5rem 2rem !important;
+  border-bottom: 1px solid rgba(148,172,68,.12) !important;
+  background: rgba(10,13,6,.95) !important;
+  position: sticky !important;
+  top: 0 !important;
+}
+
+/* ── PAGE SECTIONS — ornamental borders ── */
+main {
+  padding-top: 0 !important;
+}
+
+/* Section dividers — vintage rule lines */
+.kelas-section,
+#chat-section,
+#gallery-section,
+#mading-section,
+#songRequestSection,
+#calendar-section,
+#games-section {
+  position: relative !important;
+}
+
+.kelas-section::before,
+#games-section::before,
+#mading-section::before,
+#calendar-section::before {
+  content: '' !important;
+  display: block !important;
+  width: 100% !important;
+  height: 1px !important;
+  background: linear-gradient(to right, transparent 0%, rgba(148,172,68,.2) 20%, rgba(148,172,68,.35) 50%, rgba(148,172,68,.2) 80%, transparent 100%) !important;
+}
+
+/* ── HERO SECTION ── */
+#countdown-hero {
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4rem 3rem !important;
+  position: relative !important;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 10%, rgba(148,172,68,.09) 0%, transparent 60%),
+    #080B05 !important;
+}
+
+/* Vintage frame around hero */
+#countdown-hero::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 2rem !important;
+  border: 1px solid rgba(148,172,68,.1) !important;
+  pointer-events: none !important;
+}
+#countdown-hero::after {
+  content: '✦' !important;
+  position: absolute !important;
+  bottom: 2.3rem !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  font-size: .7rem !important;
+  color: rgba(148,172,68,.3) !important;
+}
+
+/* Corner ornaments via SVG data */
+.countdown-content {
+  position: relative !important;
+  z-index: 2 !important;
+}
+.countdown-content::before,
+.countdown-content::after {
+  font-family: 'Playfair Display', serif !important;
+  color: rgba(148,172,68,.15) !important;
+  font-size: 6rem !important;
+  position: absolute !important;
+  line-height: 1 !important;
+}
+
+.countdown-eyebrow {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .58rem !important;
+  letter-spacing: 6px !important;
+  color: var(--sb-acc) !important;
+}
+
+.countdown-title {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  font-size: clamp(4rem, 10vw, 9rem) !important;
+  color: #F2EBCC !important;
+  text-shadow: none !important;
+}
+.countdown-title span {
+  font-style: normal !important;
+  -webkit-text-stroke: 1.5px var(--sb-acc) !important;
+  color: transparent !important;
+}
+
+/* Vintage countdown blocks */
+.countdown-blocks {
+  display: flex !important;
+  border: 1px solid rgba(148,172,68,.2) !important;
+  background: rgba(12,14,8,.6) !important;
+  position: relative !important;
+}
+/* Corner marks on countdown */
+.countdown-blocks::before {
+  content: '◆' !important;
+  position: absolute !important;
+  top: -7px !important;
+  left: -7px !important;
+  font-size: .5rem !important;
+  color: var(--sb-acc) !important;
+}
+.countdown-blocks::after {
+  content: '◆' !important;
+  position: absolute !important;
+  bottom: -7px !important;
+  right: -7px !important;
+  font-size: .5rem !important;
+  color: var(--sb-acc) !important;
+}
+
+.cd-block {
+  border-right: 1px solid rgba(148,172,68,.12) !important;
+  position: relative !important;
+}
+.cd-num {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  font-size: 3.2rem !important;
+  color: var(--sb-acc) !important;
+}
+.cd-label {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .44rem !important;
+  letter-spacing: 2.5px !important;
+  color: var(--sb-muted) !important;
+}
+
+/* ── GAME CARDS — Vintage Look ── */
+.games-section {
+  padding: 4rem 2rem !important;
+  max-width: 1060px !important;
+  margin: 0 auto !important;
+}
+
+.games-header {
+  margin-bottom: 2.5rem !important;
+  position: relative !important;
+  padding-bottom: 1.5rem !important;
+}
+
+/* Ornamental rule under section header */
+.games-header::after {
+  content: '── ✦ ──' !important;
+  display: block !important;
+  font-size: .75rem !important;
+  color: rgba(148,172,68,.3) !important;
+  text-align: center !important;
+  margin-top: 1rem !important;
+  letter-spacing: 6px !important;
+}
+
+.games-eyebrow {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .54rem !important;
+  letter-spacing: 6px !important;
+  color: var(--sb-acc) !important;
+}
+.games-title {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  font-size: clamp(2.2rem,5vw,4.5rem) !important;
+}
+.games-title span { color: var(--sb-acc) !important; }
+.games-sub {
+  font-family: 'Lora', serif !important;
+  font-style: italic !important;
+}
+
+/* Game cards - vintage magazine layout */
+.games-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)) !important;
+  gap: 1px !important;
+  border: 1px solid rgba(148,172,68,.15) !important;
+  background: rgba(148,172,68,.07) !important;
+}
+
+.game-card {
+  background: #0C0E08 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 1.2rem 1.3rem !important;
+  transition: background .18s !important;
+  position: relative !important;
+}
+.game-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 2px !important;
+  background: var(--sb-acc) !important;
+  transition: width .25s !important;
+}
+.game-card:hover {
+  background: rgba(148,172,68,.06) !important;
+  border: none !important;
+  transform: none !important;
+}
+.game-card:hover::before { width: 100% !important; }
+
+.game-card-icon {
+  width: 36px !important;
+  height: 36px !important;
+  background: rgba(148,172,68,.06) !important;
+  border: 1px solid rgba(148,172,68,.15) !important;
+  border-radius: 0 !important;
+}
+.game-card-info h3 {
+  font-family: 'Lora', serif !important;
+  font-style: italic !important;
+  font-size: .9rem !important;
+}
+.game-card-info p {
+  font-family: 'Lora', serif !important;
+  font-size: .68rem !important;
+  line-height: 1.45 !important;
+}
+.game-card-badge {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .5rem !important;
+  letter-spacing: 1px !important;
+  border-radius: 0 !important;
+}
+.game-tag { border-radius: 0 !important; }
+
+/* ── KELAS SECTIONS ── */
+.kelas-photo {
+  height: 380px !important;
+  position: relative !important;
+}
+
+/* Vintage grid overlay on photos */
+.kelas-photo::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 1.5rem !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+  pointer-events: none !important;
+  z-index: 3 !important;
+}
+
+.class-title h2 {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+}
+
+/* Wali strip */
+.wali-strip {
+  position: relative !important;
+}
+.wali-strip::after {
+  content: '◆◆◆' !important;
+  position: absolute !important;
+  right: 1.5rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: .4rem !important;
+  letter-spacing: 6px !important;
+  color: rgba(0,0,0,.2) !important;
+}
+
+/* Student cards */
+.student-card {
+  border-radius: 0 !important;
+  border-left: 2px solid transparent !important;
+}
+.student-card:hover {
+  border-left-color: var(--cls) !important;
+}
+.student-card.active {
+  border-left-color: var(--cls) !important;
+}
+
+/* ── CHAT SECTION ── */
+#chat-section {
+  max-width: 820px !important;
+  margin: 3rem auto !important;
+  border: 1px solid rgba(148,172,68,.15) !important;
+  border-top: 2px solid var(--sb-acc) !important;
+  border-radius: 0 !important;
+  position: relative !important;
+}
+
+/* Vintage corner marks */
+#chat-section::before {
+  content: '◆' !important;
+  position: absolute !important;
+  top: -5px !important;
+  right: -1px !important;
+  font-size: .4rem !important;
+  color: var(--sb-acc) !important;
+}
+
+.chat-header {
+  background: var(--sb-bg) !important;
+  border-bottom: 1px solid rgba(148,172,68,.12) !important;
+}
+.chat-header-info h2 {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  font-size: 1rem !important;
+}
+
+/* ── MADING SECTION ── */
+#mading-section {
+  padding: 3rem 2rem !important;
+  max-width: 820px !important;
+  margin: 0 auto !important;
+}
+.mading-title {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+}
+
+.mading-compose {
+  border-radius: 0 !important;
+  border-top: 2px solid var(--sb-acc) !important;
+}
+
+.mading-card {
+  border-radius: 0 !important;
+  position: relative !important;
+}
+
+/* Numbered cards — vintage almanac style */
+.mading-card::before {
+  counter-increment: mading-counter !important;
+  content: '§' !important;
+  position: absolute !important;
+  top: .7rem !important;
+  right: .9rem !important;
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  font-size: .9rem !important;
+  color: rgba(148,172,68,.15) !important;
+}
+
+/* ── GALLERY ── */
+.gallery-section {
+  padding: 3rem 2rem !important;
+  max-width: 1060px !important;
+  margin: 0 auto !important;
+}
+.gallery-title {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+}
+
+.gallery-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+  gap: 3px !important;
+  background: rgba(148,172,68,.08) !important;
+  padding: 3px !important;
+  border: 1px solid rgba(148,172,68,.12) !important;
+}
+.gallery-item {
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* ── KALENDER ── */
+#calendar-section {
+  padding: 3rem 2rem !important;
+  max-width: 1060px !important;
+  margin: 0 auto !important;
+}
+.cal-title {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+}
+.cal-month-card {
+  border-radius: 0 !important;
+  border-top: 2px solid rgba(148,172,68,.2) !important;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 2rem !important;
+  text-align: center !important;
+  position: relative !important;
+  margin-left: 0 !important;
+}
+footer::before {
+  content: '── ✦ ──' !important;
+  display: block !important;
+  font-size: .7rem !important;
+  color: rgba(148,172,68,.22) !important;
+  letter-spacing: 6px !important;
+  margin-bottom: .8rem !important;
+}
+
+/* ── MUSIC PLAYER ── */
+.music-player {
+  bottom: 0 !important;
+  left: var(--sb-w) !important;
+  right: 0 !important;
+  max-width: none !important;
+  width: auto !important;
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+}
+
+/* ================================================================
+   GAME PAGES — join screens, lobby, in-game
+================================================================ */
+
+/* Shift game screens to account for sidebar */
+#sJoin.screen.on,
+#sLobby.screen.on,
+#sMeeting.screen,
+#sEnd.screen.on {
+  padding-left: 0 !important;
+}
+
+/* Vintage game cards — no rounded corners */
+.card,
+.join-card,
+.j-card,
+.lcard,
+.panel,
+.s-panel,
+.lob-card,
+.task-card,
+.waiting-box,
+.oc,
+.modal-card {
+  border-radius: 0 !important;
+}
+
+/* Square input fields */
+.j-inp, .inp, input.j-inp,
+.chat-inp, .nc-inp,
+input[type="text"],
+input[type="search"] {
+  border-radius: 0 !important;
+}
+
+/* Square buttons */
+.j-btn, .btn-cyan, .btn-gold,
+.btn-grey, .btn-sec, .btn-primary,
+.btn-secondary, .btn-danger, .start-btn,
+.act-btn, .vote-btn, .send-word-btn,
+.clue-submit, .restart-btn,
+.ob-p, .ob-s, .modal-btn {
+  border-radius: 0 !important;
+}
+
+/* Remove pill shapes from player chips */
+.pchip, .plyr-chip, .queue-player,
+.chain-word, .next-pill,
+.badge, .badge-green, .badge-red,
+.badge-yellow, .badge-blue,
+.turn-badge, .tb-mine-badge, .pc-badge,
+.game-card-badge, .game-tag, .game-tag-new {
+  border-radius: 0 !important;
+}
+
+/* Vintage heading treatment in game pages */
+.page-title {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  position: relative !important;
+  padding-bottom: 1rem !important;
+}
+.page-title::after {
+  content: '' !important;
+  display: block !important;
+  width: 60px !important;
+  height: 2px !important;
+  background: var(--sb-acc) !important;
+  margin-top: .5rem !important;
+}
+
+/* Ornamental section eyebrows */
+.page-eyebrow,
+.lcard-t,
+.panel-t,
+.panel-title,
+.s-panel h3,
+.scores-title,
+.chain-box-label,
+.status-label,
+.section-title {
+  font-family: 'IBM Plex Mono', monospace !important;
+  letter-spacing: 3px !important;
+  font-size: .54rem !important;
+  text-transform: uppercase !important;
+}
+
+/* Turn banners */
+.ph-banner, .turn-banner, .round-banner {
+  border-radius: 0 !important;
+  position: relative !important;
+}
+.ph-banner::before {
+  content: '◆' !important;
+  position: absolute !important;
+  top: -5px !important;
+  left: 1rem !important;
+  font-size: .4rem !important;
+  color: var(--sb-acc) !important;
+}
+
+/* Lobby wrappers */
+.lob-wrap, .wrap, .game-wrap,
+.end-wrap, .lob-hero {
+  padding-top: 2rem !important;
+}
+
+/* Vote rows */
+.vote-row {
+  border-radius: 0 !important;
+}
+
+/* Hole card in mini golf */
+.hole-card-inner {
+  border: 1px solid rgba(148,172,68,.2) !important;
+  padding: 2rem 3rem !important;
+  background: rgba(12,14,8,.92) !important;
+  position: relative !important;
+}
+.hole-card-inner::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 8px !important;
+  border: 1px solid rgba(148,172,68,.1) !important;
+  pointer-events: none !important;
+}
+
+/* Podium (end screens) */
+.podium-bar { border-radius: 0 !important; }
+
+/* Chess board */
+.board-wrap { border-radius: 0 !important; }
+.sq { transition: background .1s !important; }
+
+/* UNO cards */
+.card { border-radius: 3px !important; }
+
+/* Overlay backgrounds */
+#overlay, .modal-bg, .color-picker-overlay, #promoDlg {
+  background: rgba(4,5,2,.88) !important;
+}
+
+/* ================================================================
+   MOBILE — Sidebar becomes a drawer
+================================================================ */
+@media (max-width: 900px) {
+  body {
+    padding-left: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  #navbar {
+    transform: translateX(-100%) !important;
+    width: 260px !important;
+    z-index: 1000 !important;
+    box-shadow: 4px 0 32px rgba(0,0,0,.7) !important;
+  }
+  #navbar.open {
+    transform: translateX(0) !important;
+  }
+
+  #sb-open {
+    display: flex !important;
+  }
+  #sb-close {
+    display: flex !important;
+  }
+
+  .music-player {
+    left: 0 !important;
+  }
+
+  .games-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #onlineStrip {
+    padding-left: 3.5rem !important;
+  }
+
+  .page-wrap {
+    padding: 1.5rem 1rem 5rem !important;
+  }
+
+  .games-section,
+  .gallery-section,
+  #mading-section,
+  #calendar-section,
+  #songRequestSection {
+    padding: 2rem 1rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #countdown-hero {
+    padding: 3rem 1.2rem !important;
+  }
+  #countdown-hero::before {
+    inset: 1rem !important;
+  }
+  .countdown-title {
+    font-size: clamp(3rem, 14vw, 6rem) !important;
+  }
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}

@@ -1,0 +1,163 @@
+/* ================================================================
+   coming-soon.css — Semua game diganti Coming Soon
+================================================================ */
+.cs-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 20%, rgba(148,172,68,.1) 0%, transparent 60%),
+    #080B05 !important;
+  font-family: 'Lora', Georgia, serif !important;
+}
+
+/* Vintage frame */
+.cs-frame {
+  position: relative !important;
+  padding: 3.5rem 3rem !important;
+  max-width: 480px !important;
+  width: 90% !important;
+  text-align: center !important;
+  border: 1px solid rgba(148,172,68,.22) !important;
+  background: rgba(12,14,8,.85) !important;
+}
+
+/* Double inner border */
+.cs-frame::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 8px !important;
+  border: 1px solid rgba(148,172,68,.09) !important;
+  pointer-events: none !important;
+}
+
+/* Corner diamonds */
+.cs-frame::after {
+  content: '' !important;
+  pointer-events: none !important;
+}
+.cs-corner {
+  position: absolute !important;
+  width: 10px !important;
+  height: 10px !important;
+  background: #080B05 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: .45rem !important;
+  color: rgba(148,172,68,.5) !important;
+}
+.cs-corner.tl { top: -4px; left: -4px; }
+.cs-corner.tr { top: -4px; right: -4px; }
+.cs-corner.bl { bottom: -4px; left: -4px; }
+.cs-corner.br { bottom: -4px; right: -4px; }
+
+/* Ornamental divider top */
+.cs-rule {
+  font-size: .6rem !important;
+  letter-spacing: 8px !important;
+  color: rgba(148,172,68,.35) !important;
+  margin-bottom: 1.6rem !important;
+  display: block !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+}
+
+/* Game icon */
+.cs-icon {
+  font-size: 2.8rem !important;
+  margin-bottom: 1rem !important;
+  display: block !important;
+  opacity: .55 !important;
+  filter: grayscale(.4) !important;
+}
+
+/* "Coming Soon" label */
+.cs-label {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .52rem !important;
+  letter-spacing: 6px !important;
+  text-transform: uppercase !important;
+  color: #94AC44 !important;
+  display: block !important;
+  margin-bottom: .5rem !important;
+}
+
+/* Game title */
+.cs-title {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  font-size: clamp(1.8rem, 5vw, 3rem) !important;
+  font-weight: 900 !important;
+  color: #F2EBCC !important;
+  line-height: 1.1 !important;
+  margin-bottom: 1rem !important;
+}
+.cs-title span { color: #94AC44 !important; }
+
+/* Description */
+.cs-desc {
+  font-family: 'Lora', serif !important;
+  font-style: italic !important;
+  font-size: .83rem !important;
+  color: rgba(195,180,138,.45) !important;
+  line-height: 1.65 !important;
+  margin-bottom: 1.8rem !important;
+}
+
+/* Bottom rule */
+.cs-rule-bot {
+  font-size: .55rem !important;
+  letter-spacing: 6px !important;
+  color: rgba(148,172,68,.2) !important;
+  display: block !important;
+  margin-top: 1.6rem !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+}
+
+/* Back button */
+.cs-back {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .5rem !important;
+  padding: .62rem 1.6rem !important;
+  background: transparent !important;
+  border: 1px solid rgba(148,172,68,.35) !important;
+  color: #94AC44 !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: .6rem !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all .2s !important;
+  border-radius: 0 !important;
+}
+.cs-back:hover {
+  background: rgba(148,172,68,.1) !important;
+  border-color: #94AC44 !important;
+  color: #F2EBCC !important;
+}
+
+/* Animated dots */
+@keyframes cs-dot {
+  0%,80%,100% { opacity:.2; transform: scale(.8); }
+  40%         { opacity:1;  transform: scale(1.1); }
+}
+.cs-dots {
+  display: flex !important;
+  justify-content: center !important;
+  gap: .4rem !important;
+  margin: 1.2rem 0 0 !important;
+}
+.cs-dot {
+  width: 5px !important;
+  height: 5px !important;
+  border-radius: 50% !important;
+  background: #94AC44 !important;
+  animation: cs-dot .9s ease-in-out infinite !important;
+}
+.cs-dot:nth-child(2) { animation-delay: .15s !important; }
+.cs-dot:nth-child(3) { animation-delay: .3s  !important; }
