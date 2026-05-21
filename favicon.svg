@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Background -->
+  <rect width="100" height="100" fill="#0C0904"/>
+
+  <!-- Outer border -->
+  <rect x="3" y="3" width="94" height="94" fill="none" stroke="#94AC44" stroke-width="2.5"/>
+
+  <!-- Inner border -->
+  <rect x="7" y="7" width="86" height="86" fill="none" stroke="#94AC44" stroke-width="0.8" stroke-opacity="0.4"/>
+
+  <!-- Corner diamonds -->
+  <polygon points="3,3 7,3 3,7"       fill="#94AC44"/>
+  <polygon points="97,3 93,3 97,7"    fill="#94AC44"/>
+  <polygon points="3,97 7,97 3,93"    fill="#94AC44"/>
+  <polygon points="97,97 93,97 97,93" fill="#94AC44"/>
+
+  <!-- Top ornament line -->
+  <line x1="20" y1="22" x2="80" y2="22" stroke="#94AC44" stroke-width="0.6" stroke-opacity="0.5"/>
+
+  <!-- Top diamond ornament -->
+  <polygon points="50,17 53,22 50,27 47,22" fill="#94AC44" opacity="0.7"/>
+
+  <!-- XVI Text - main -->
+  <text
+    x="50"
+    y="62"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="34"
+    font-weight="900"
+    font-style="italic"
+    text-anchor="middle"
+    fill="#F2EBCC"
+    letter-spacing="1"
+  >XVI</text>
+
+  <!-- Angkatan label -->
+  <text
+    x="50"
+    y="38"
+    font-family="'Courier New', Courier, monospace"
+    font-size="8"
+    font-weight="700"
+    text-anchor="middle"
+    fill="#94AC44"
+    letter-spacing="3"
+  >ANGKATAN</text>
+
+  <!-- Bottom ornament line -->
+  <line x1="20" y1="76" x2="80" y2="76" stroke="#94AC44" stroke-width="0.6" stroke-opacity="0.5"/>
+
+  <!-- Bottom dots -->
+  <circle cx="44" cy="82" r="1.5" fill="#94AC44" opacity="0.6"/>
+  <circle cx="50" cy="82" r="1.5" fill="#94AC44" opacity="0.8"/>
+  <circle cx="56" cy="82" r="1.5" fill="#94AC44" opacity="0.6"/>
+</svg>
