@@ -57,6 +57,44 @@ document.querySelectorAll('#navbar a').forEach(anchor => {
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
+// ─── Countdown Pengumuman Kelulusan 2 Juni 2026 ───
+(function() {
+  const target2 = new Date('2026-06-02T00:00:00+08:00').getTime();
+
+  const el2Days  = document.getElementById('cd2-days');
+  const el2Hours = document.getElementById('cd2-hours');
+  const el2Mins  = document.getElementById('cd2-minutes');
+  const el2Secs  = document.getElementById('cd2-seconds');
+  const el2Msg   = document.getElementById('countdown2-msg');
+
+  function update2() {
+    const diff = target2 - Date.now();
+    if (diff <= 0) {
+      [el2Days,el2Hours,el2Mins,el2Secs].forEach(el => { if(el) el.textContent = '00'; });
+      if (el2Msg) { el2Msg.textContent = '🎉 Selamat! Kalian semua LULUS!'; }
+      return;
+    }
+    const days  = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins  = Math.floor((diff % 3600000)  / 60000);
+    const secs  = Math.floor((diff % 60000)    / 1000);
+
+    function pad(n) { return String(n).padStart(2,'0'); }
+    function tick(el, val) {
+      if (!el) return;
+      const f = pad(val);
+      if (el.textContent !== f) {
+        el.textContent = f;
+        el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick');
+        setTimeout(() => el.classList.remove('tick'), 150);
+      }
+    }
+    tick(el2Days, days); tick(el2Hours, hours); tick(el2Mins, mins); tick(el2Secs, secs);
+  }
+
+  update2();
+  setInterval(update2, 1000);
+})();
 
 // Initial gradient per huruf
 function getInitialGradient(letter) {
