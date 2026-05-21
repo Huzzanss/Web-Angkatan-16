@@ -851,10 +851,12 @@ document.addEventListener('click', function(e) {
     { month: 5, start: 11, end: 12, label: 'Gladi Wisuda Akbar',            type: 'graduation', note: '' },
     { month: 5, start: 13, end: 13, label: 'Wisuda Akbar',                  type: 'wisuda',    note: '🎓' },
     { month: 5, start: 23, end: 23, label: 'Imtihan Al-Quran',              type: 'religious', note: 'Bagi yang mengikuti Munaqosah' },
+    { month: 5, start: 30, end: 30, label: 'Perpisahan',            type: 'wisuda',   note: '🎉' },
+    { month: 6, start: 2,  end: 2,  label: 'Pengumuman Kelulusan',  type: 'academic', note: '🎓' },
   ];
 
   const TYPE_COLOR  = { academic:'#FF6B6B', religious:'#00D4AA', graduation:'#8B7CF6', wisuda:'#F9C74F' };
-  const MONTH_NAMES = { 4: 'April', 5: 'Mei' };
+  const MONTH_NAMES = { 4: 'April', 5: 'Mei', 6: 'Juni' };
   const DAY_ABBR    = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
 
   function buildDayMap(month) {
@@ -934,4 +936,6 @@ document.addEventListener('click', function(e) {
   renderGrid('cal-grid-may',   2026, 5);
   renderList('cal-events-april', 4);
   renderList('cal-events-may',   5);
+  renderGrid('cal-grid-june',  2026, 6);
+  renderList('cal-events-june', 6);
 })();
