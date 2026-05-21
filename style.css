@@ -170,7 +170,7 @@ body{
   color:rgba(139,187,58,.04);
   line-height:1;pointer-events:none;user-select:none;
 }
-.countdown-content{position:relative;z-index:1;text-align:center;max-width:780px;}
+.countdown-content{position:relative;z-index:1;text-align:center;max-width:780px;width:100%;}
 .countdown-eyebrow{
   font-family:'IBM Plex Mono',monospace;
   font-size:.6rem;letter-spacing:5px;text-transform:uppercase;
@@ -193,19 +193,34 @@ body{
   font-size:.7rem;color:var(--acc-warm);letter-spacing:4px;
   margin-bottom:2.5rem;
 }
+
+/* ── Countdown blocks — FIXED untuk mobile ── */
 .countdown-blocks{
   display:flex;align-items:stretch;justify-content:center;
   gap:0;margin-bottom:1.6rem;
+  width:100%;
   border:1px solid rgba(139,187,58,.25);
   background:rgba(139,187,58,.03);
+  overflow:hidden; /* jangan sampai keluar */
 }
 .cd-block{
   display:flex;flex-direction:column;align-items:center;
-  padding:1.2rem 2rem;min-width:90px;
+  /* Pakai flex:1 supaya otomatis bagi rata, bukan min-width tetap */
+  flex:1;
+  padding:1.2rem .8rem;
+  min-width:0; /* penting! biar flex bisa menyusut */
   border-right:1px solid rgba(139,187,58,.15);
   position:relative;
 }
 .cd-block:last-child{border-right:none;}
+.cd-sep{
+  display:flex;align-items:center;
+  padding:0 .2rem;
+  font-family:'Playfair Display',serif;
+  font-size:2rem;font-weight:900;
+  color:rgba(139,187,58,.4);
+  flex-shrink:0;
+}
 .cd-num{
   font-family:'Playfair Display',serif;
   font-weight:900;font-size:3.6rem;
@@ -215,6 +230,7 @@ body{
   font-family:'IBM Plex Mono',monospace;
   font-size:.5rem;letter-spacing:2px;text-transform:uppercase;
   color:var(--muted);margin-top:.2rem;
+  white-space:nowrap;
 }
 .countdown-sub{
   font-size:.82rem;color:var(--muted);
@@ -765,7 +781,7 @@ main{padding-top:52px;}
 .sr-req{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--muted);}
 .sr-votes{display:flex;align-items:center;gap:.25rem;font-size:.72rem;font-weight:700;color:var(--acc);}
 .sr-vote-btn{
-  background:none;border:1px solid rgba(139,187,58,.25);
+  background:none;border:1px solid rgba(139,187,25,.25);
   color:var(--acc);padding:.08rem .38rem;cursor:pointer;
   font-size:.65rem;transition:all .15s;
 }
@@ -923,13 +939,6 @@ footer span{color:var(--acc);}
   .games-grid{grid-template-columns:1fr;}
   .wali-strip{padding:.7rem 1rem;}
 }
-@media(max-width:480px){
-  .countdown-blocks{flex-wrap:nowrap;overflow-x:auto;gap:0;padding-bottom:0;scrollbar-width:none;}
-  .countdown-blocks::-webkit-scrollbar{display:none;}
-  .cd-block{min-width:72px;padding:.8rem .9rem;flex-shrink:0;}
-  .cd-num{font-size:2.4rem;}
-  .nav-right a{display:none;}
-}
 
 /* ════════════════════ MOBILE NAV ════════════════════ */
 .nav-burger{
@@ -976,9 +985,27 @@ footer span{color:var(--acc);}
 /* ════════════════════ FULL MOBILE OVERHAUL ════════════════════ */
 @media(max-width:768px){
   .countdown-title{font-size:clamp(3.2rem,17vw,7rem);}
-  .countdown-blocks{flex-wrap:nowrap;overflow-x:auto;border:1px solid rgba(139,187,58,.2);gap:0;scrollbar-width:none;}
-  .cd-block{min-width:72px;padding:.8rem .9rem;flex-shrink:0;border-top:2px solid var(--acc);}
-  .cd-num{font-size:2.5rem;}
+
+  /* Countdown blocks — flex bagi rata, tidak overflow */
+  .countdown-blocks{
+    flex-wrap:nowrap;
+    overflow:hidden;
+    border:1px solid rgba(139,187,58,.2);
+    gap:0;
+    scrollbar-width:none;
+    width:100%;
+  }
+  .countdown-blocks::-webkit-scrollbar{display:none;}
+  .cd-block{
+    flex:1;
+    min-width:0;
+    padding:.7rem .3rem;
+    border-top:2px solid var(--acc);
+  }
+  .cd-num{font-size:2rem;}
+  .cd-label{font-size:.42rem;letter-spacing:1px;}
+  .cd-sep{font-size:1.4rem;padding:0;}
+
   .kelas-photo{height:260px;}
   .kelas-photo .class-title{left:1.2rem;bottom:1.2rem;}
   .kelas-photo .class-title h2{font-size:3rem;}
@@ -1007,14 +1034,25 @@ footer span{color:var(--acc);}
   .music-player{bottom:0;right:0;left:0;max-width:100%;width:100%;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:2px solid var(--acc);}
   #onlineStrip{padding:.28rem .8rem;}
 }
+
 @media(max-width:480px){
   .kelas-photo{height:200px;}
   .kelas-photo .class-title h2{font-size:2.4rem;}
   .roster-grid{grid-template-columns:1fr;}
   .student-card.active{grid-column:span 1;}
-  .cd-block{min-width:62px;padding:.65rem .7rem;}
-  .cd-num{font-size:2rem;}
-  .cd-label{font-size:.46rem;}
+
+  /* Countdown extra kecil di layar sempit */
+  .countdown-blocks{overflow:hidden;}
+  .cd-block{
+    flex:1;
+    min-width:0;
+    padding:.55rem .15rem;
+  }
+  .cd-num{font-size:1.6rem;}
+  .cd-label{font-size:.38rem;letter-spacing:.5px;}
+  .cd-sep{font-size:1.1rem;padding:0;}
+
+  .nav-right a{display:none;}
   .gallery-grid{grid-template-columns:repeat(2,1fr);}
   #mading-section,#songRequestSection,#chat-section{margin-left:.5rem;margin-right:.5rem;}
 }
